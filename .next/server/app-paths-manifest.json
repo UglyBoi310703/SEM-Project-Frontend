@@ -1,7 +1,5 @@
 {
-  "/dashboard/classrooms/page": "app/dashboard/classrooms/page.js",
+  "/page": "app/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/account/page": "app/dashboard/account/page.js",
-  "/dashboard/borrowequipment/page": "app/dashboard/borrowequipment/page.js",
-  "/dashboard/settings/page": "app/dashboard/settings/page.js"
+  "/dashboard/borrowequipment/page": "app/dashboard/borrowequipment/page.js"
 }
