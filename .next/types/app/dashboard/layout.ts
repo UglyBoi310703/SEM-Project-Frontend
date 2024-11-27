@@ -1,4 +1,4 @@
-// File: D:\Front-end\Learn-ReactJS\SEM-Frontend\src\app\dashboard\layout.tsx
+// File: D:\Front-end\Project\SEM-Frontend\src\app\dashboard\layout.tsx
 import * as entry from '../../../../src/app/dashboard/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

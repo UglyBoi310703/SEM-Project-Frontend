@@ -10,7 +10,7 @@ import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Downloa
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 // import dayjs from 'dayjs';
-
+import Addclassroommodal from '@/components/dashboard/classrooms/addclassroom/addclassroommodal';
 import { config } from '@/config';
 import { ClassroomCard } from '@/components/dashboard/classrooms/classrooms-card';
 import type { Classroom } from '@/components/dashboard/classrooms/classrooms-card';
@@ -77,8 +77,8 @@ export default function Page(): React.JSX.Element {
           </Stack>
         </Stack>
         <div>
-          <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained">
-            Add
+          <Button >
+           <Addclassroommodal/>
           </Button>
         </div>
       </Stack>

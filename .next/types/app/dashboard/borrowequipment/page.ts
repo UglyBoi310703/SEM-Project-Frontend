@@ -1,4 +1,4 @@
-// File: D:\Front-end\Learn-ReactJS\SEM-Frontend\src\app\dashboard\borrowequipment\page.tsx
+// File: D:\Front-end\Project\SEM-Frontend\src\app\dashboard\borrowequipment\page.tsx
 import * as entry from '../../../../../src/app/dashboard/borrowequipment/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

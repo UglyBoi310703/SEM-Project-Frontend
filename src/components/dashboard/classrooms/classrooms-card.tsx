@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-
+import ClassRoomInformation from './classroominformation/classroominfomationmodal';
 
 
 
@@ -43,6 +43,7 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
             {classroom.status} 
           </Typography>
         </Stack>
+        <ClassRoomInformation/>
       </Stack>
     </Card>
   );
