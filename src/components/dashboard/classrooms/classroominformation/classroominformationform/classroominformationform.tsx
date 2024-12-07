@@ -49,10 +49,9 @@ const handleChangeStatus = (event: SelectChangeEvent) => {
               <InputLabel>Loại phòng</InputLabel>
               <OutlinedInput label="classroom type" name="classroomtype" type="classroomtype" />
             </FormControl>
-            <FormControl fullWidth>
+        <FormControl fullWidth>
         <InputLabel id="classroomstatus">Trạng thái</InputLabel>
         <Select
-      
           value={status}
           label="Classroomstatus"
           onChange={handleChangeStatus}
@@ -64,7 +63,6 @@ const handleChangeStatus = (event: SelectChangeEvent) => {
       </FormControl>
           </Stack>
         </CardContent>
- 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
           <Button variant="contained">Sửa</Button>
           <Button variant="contained">Lưu</Button>

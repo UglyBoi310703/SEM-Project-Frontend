@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Checkbox from '@mui/material/Checkbox';
+
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -15,9 +15,10 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 
-
 import { useSelection } from '@/hooks/use-selection';
-import { display } from '@mui/system';
+import EquipmentDetails from './equipmentdetails/equipmetdetails';
+import EditEquipmentCategoryModal from './editequipment/editcategoryequipment';
+
 
 function noop(): void {
   // do nothing
@@ -51,10 +52,7 @@ export function EquipmentsTable({
     return rows.map((borrow) => borrow.id);
   }, [rows]);
 
-  const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
-
-  const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
-  const selectedAll = rows.length > 0 && selected?.size === rows.length;
+  const {  selected } = useSelection(rowIds);
 
   return (
     <Card>
@@ -62,7 +60,6 @@ export function EquipmentsTable({
         <Table sx={{ minWidth: '900px' }}>
           <TableHead>
             <TableRow>
-      
               <TableCell>Mã thiết bị</TableCell>
               <TableCell>Tên thiết bị</TableCell>
               <TableCell>Loại thiết bị</TableCell>
@@ -77,7 +74,6 @@ export function EquipmentsTable({
           <TableBody>
             {rows.map((row) => {
               const isSelected = selected?.has(row.id);
-
               return (
                 <TableRow hover key={row.id} selected={isSelected}>
       
@@ -95,10 +91,18 @@ export function EquipmentsTable({
                   <TableCell>{row.usingQuantity}</TableCell>
                   <TableCell>{row.brokenQuantity}</TableCell>
                   <TableCell>
-                    <Box>
-                    <Button variant="contained">Chi tiết</Button>
-                    <Button variant="outlined">Sửa</Button>
-                    <Button variant="outlined" color='error'>Xoá</Button>
+                    <Box 
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                   
+                 
+                    
+                    }}>
+                   <EquipmentDetails/>
+                    <EditEquipmentCategoryModal/>
+              
                     </Box>
                   </TableCell>
               

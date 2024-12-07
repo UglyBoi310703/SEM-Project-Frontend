@@ -20,7 +20,6 @@ export function AccountInfo(): React.JSX.Element {
   return (
     <Card>
       <CardContent>
-        
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <div>
             <Avatar src={user.avatar} sx={{ height: '80px', width: '80px' }} />

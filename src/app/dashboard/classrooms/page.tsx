@@ -14,7 +14,7 @@ import Addclassroommodal from '@/components/dashboard/classrooms/addclassroom/ad
 import { config } from '@/config';
 import { ClassroomCard } from '@/components/dashboard/classrooms/classrooms-card';
 import type { Classroom } from '@/components/dashboard/classrooms/classrooms-card';
-import { ClassroomFilters } from '@/components/dashboard/classrooms/classrooms-filters';
+import ClassroomFilters from '@/components/dashboard/classrooms/classrooms-filters';
 
 export const metadata = { title: `ClassRooms | Dashboard | ${config.site.name}` } satisfies Metadata;
 

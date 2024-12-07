@@ -6,12 +6,11 @@ import Typography from '@mui/material/Typography';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
-
-
 import { config } from '@/config';
-import { BorrowEquipmentFilters } from '@/components/dashboard/borrowequipment/borrowequipment-filters';
+import CategoryEquipmentFilter from '@/components/dashboard/equipments/equipmentfilters/categoryequipmentfilters';
 import { EquipmentsTable } from '@/components/dashboard/equipments/equipment';
 import type { Equipment } from '@/components/dashboard/equipments/equipment';
+import AddCategoryEquipmentModal from '@/components/dashboard/equipments/addequipment/addcategoryequipment';
 
 export const metadata = { title: `BorrowEquipment | Dashboard | ${config.site.name}` } satisfies Metadata;
 
@@ -77,12 +76,10 @@ export default function Page(): React.JSX.Element {
           </Stack>
         </Stack>
         <div>
-          <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained">
-            Add
-          </Button>
+            <AddCategoryEquipmentModal/>
         </div>
       </Stack>
-      <BorrowEquipmentFilters />
+      <CategoryEquipmentFilter/>
       <EquipmentsTable
         count={paginatedBorrows.length}
         page={page}

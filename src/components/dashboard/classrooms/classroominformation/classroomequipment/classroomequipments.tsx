@@ -12,6 +12,48 @@ import Button from '@mui/material/Button';
 import CardActions from '@mui/material/CardActions';
 import { ClassroomEquipmentSearch } from './classroomequipmentsearch';
 
+const classequipments = [
+  {
+    id: 'E-001',
+    name: 'Máy chiếu',
+    category: 'Phòng học',
+    totalQuantity: 50,
+    usableQuantity: 45,
+    usingQuantity:40,
+    brokenQuantity:5
+
+  },
+  {
+    id: 'E-002',
+    name: 'Loa JBL',
+    category: 'Phòng học',
+    totalQuantity: 50,
+    usableQuantity: 45,
+    usingQuantity:40,
+    brokenQuantity:5
+
+  },  {
+    id: 'E-003',
+    name: 'Mic',
+    category: 'Phòng học',
+    totalQuantity: 50,
+    usableQuantity: 45,
+    usingQuantity:40,
+    brokenQuantity:5
+
+  },  {
+    id: 'E-004',
+    name: 'Quả địa cầu',
+    category: 'Hỗ trợ',
+    totalQuantity: 40,
+    usableQuantity: 39,
+    usingQuantity:5,
+    brokenQuantity:1
+  },
+
+]
+
+
 function not(a: readonly number[], b: readonly number[]) {
   return a.filter((value) => !b.includes(value));
 }
@@ -26,11 +68,12 @@ function union(a: readonly number[], b: readonly number[]) {
 
 export default function ClassroomEquipments() {
   const [checked, setChecked] = React.useState<readonly number[]>([]);
-  const [left, setLeft] = React.useState<readonly number[]>([0, 1, 2, 3 , 4, 5,6]);
-  const [right, setRight] = React.useState<readonly number[]>([]);
-
+  const [left, setLeft] = React.useState<readonly number[]>([0, 1, 2, 3 , 4, 5, 6,7]);
+  const [right, setRight] = React.useState<readonly number[]>([0,1,2]);
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
+
+  
 
   const handleToggle = (value: number) => () => {
     const currentIndex = checked.indexOf(value);
@@ -45,16 +88,8 @@ export default function ClassroomEquipments() {
     setChecked(newChecked);
   };
 
-  const numberOfChecked = (items: readonly number[]) =>
-    intersection(checked, items).length;
+  const numberOfChecked = (items: readonly number[]) => intersection(checked, items).length;
 
-  const handleToggleAll = (items: readonly number[]) => () => {
-    if (numberOfChecked(items) === items.length) {
-      setChecked(not(checked, items));
-    } else {
-      setChecked(union(checked, items));
-    }
-  };
 
   const handleCheckedRight = () => {
     setRight(right.concat(leftChecked));
@@ -67,34 +102,25 @@ export default function ClassroomEquipments() {
     setRight(not(right, rightChecked));
     setChecked(not(checked, rightChecked));
   };
+  
+  const classEquipmentItem = () => (
+    <Card>
+      
+    </Card>
+  );
 
   const customList = (title: React.ReactNode, items: readonly number[]) => (
     <Card>
       <CardHeader
         sx={{ px: 2, py: 1 }}
-        avatar={
-          <Checkbox
-            onClick={handleToggleAll(items)}
-            checked={numberOfChecked(items) === items.length && items.length !== 0}
-            indeterminate={
-              numberOfChecked(items) !== items.length && numberOfChecked(items) !== 0
-            }
-            disabled={items.length === 0}
-            inputProps={{
-              'aria-label': 'all items selected',
-            }}
-          />
-        }
         title={title}
         subheader={`${numberOfChecked(items)}/${items.length} Được chọn`}
-        
       />
        <ClassroomEquipmentSearch/>
       <List
         sx={{
-          width: 320,
+          width: 420,
           height: 240,
-          bgcolor: 'background.paper',
           overflow: 'auto',
         }}
         dense
@@ -103,7 +129,6 @@ export default function ClassroomEquipments() {
       >
         {items.map((value: number) => {
           const labelId = `transfer-list-all-item-${value}-label`;
-
           return (
             <ListItemButton
               key={value}
@@ -171,7 +196,5 @@ export default function ClassroomEquipments() {
     <Button variant="contained">Lưu</Button>
     </CardActions>
         </Card>
-
- 
   );
 }

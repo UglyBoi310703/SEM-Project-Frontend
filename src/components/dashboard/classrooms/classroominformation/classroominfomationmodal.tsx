@@ -59,7 +59,7 @@ export default function ClassroomInformation() {
       </Button>
       <BootstrapDialog
         onClose={handleClose}
-        maxWidth="lg" // sm, md, lg, xl tùy chỉnh
+        maxWidth="xl" // sm, md, lg, xl tùy chỉnh
         fullWidth={true}
         aria-labelledby="customized-dialog-title"
         open={open}
@@ -85,7 +85,7 @@ export default function ClassroomInformation() {
         <Grid item xs={6}>
           <Item>
      <ClassroomInformationForm/>
-    </Item>
+        </Item>
         </Grid>
         <Grid item xs={12}>
           <Item><ClassroomEquipments/></Item>
