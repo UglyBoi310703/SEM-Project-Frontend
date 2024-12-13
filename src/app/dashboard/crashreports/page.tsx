@@ -30,18 +30,18 @@ export default function Page(): React.JSX.Element {
         </Stack>
    <ReportFilters/>
         <Reports
-          orders={[
+          reports={[
             {
               id: 'ORD-009',
-              customer: { name: 'Đỗ Văn Vương' },
+              user: { name: 'Đỗ Văn Vương' },
              idEquip:'DTLT-E001',
              nameEquip:'Mic',
-              status: 'pending',
+            status: 'pending',
               createdAt: dayjs().subtract(10, 'minutes').toDate(),
             },
             {
               id: 'ORD-006',
-              customer: { name: 'Chiến LV' },
+              user: { name: 'Chiến LV' },
               idEquip:'DTLT-E002',
              nameEquip:'Máy chiếu',
               status: 'approved',
@@ -49,7 +49,7 @@ export default function Page(): React.JSX.Element {
             },
             {
               id: 'ORD-004',
-              customer: { name: 'Lê Phúc Lâm' },
+              user: { name: 'Lê Phúc Lâm' },
               idEquip:'DTLT-E003',
               nameEquip:'Loa',
               status: 'approved',
@@ -57,7 +57,7 @@ export default function Page(): React.JSX.Element {
             },
             {
               id: 'ORD-001',
-              customer: { name: 'Vũ Đình Trường' },
+              user: { name: 'Vũ Đình Trường' },
               idEquip:'DTLT-E004',
               nameEquip:'Máy chiếu',
               status: 'approved',
@@ -65,7 +65,7 @@ export default function Page(): React.JSX.Element {
             },
             
           ]}
-          sx={{ height: '100%' }}
+       
         />
     </Grid>
   );

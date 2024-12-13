@@ -13,21 +13,27 @@ import {
 } from '@mui/material';
 import BorrowEquipmentFilters from './equipmentborrowrequestfilters';
 import BorrowEquipmentDetail from './equipmentborrowdetail';
+import Chip from '@mui/material/Chip';
 
 interface BorrowRecord {
-  teacherId: string;
+  requestId: string;
   teacherName: string;
   borrowDate: string;
   expectedReturnDate: string;
-  status: string;
+  status: 'pending' | 'approved' | 'overdue'|'paid';
 }
-
+const statusMap = {
+  overdue: { label: 'Quá hạn', color: 'error' },
+  approved: { label: 'Đã duyệt', color: 'success' },
+  pending: { label: 'Chờ duyệt', color: 'warning' },
+  paid:{ label: 'Đã trả', color: 'info' },
+} as const;
 const deviceBorrowData: BorrowRecord[] = [
-  { teacherId: 'GV001', teacherName: 'Nguyen Van A', borrowDate: '2024-12-01', expectedReturnDate: '2024-12-10', status: 'Chờ duyệt' },
-  { teacherId: 'GV002', teacherName: 'Tran Thi B', borrowDate: '2024-12-02', expectedReturnDate: '2024-12-11', status: 'Đã duyệt' },
-  { teacherId: 'GV003', teacherName: 'Pham Van C', borrowDate: '2024-12-03', expectedReturnDate: '2024-12-12', status: 'Quá hạn' },
-  { teacherId: 'GV004', teacherName: 'Nguyen Van D', borrowDate: '2024-12-04', expectedReturnDate: '2024-12-13', status: 'Đã trả' },
-  { teacherId: 'GV005', teacherName: 'Le Thi E', borrowDate: '2024-12-05', expectedReturnDate: '2024-12-14', status: 'Đã trả một phần' },
+  { requestId: 'GV001', teacherName: 'Nguyen Van A', borrowDate: '2024-12-01', expectedReturnDate: '2024-12-10', status: 'pending' },
+  { requestId: 'GV002', teacherName: 'Tran Thi B', borrowDate: '2024-12-02', expectedReturnDate: '2024-12-11', status: 'approved' },
+  { requestId: 'GV003', teacherName: 'Pham Van C', borrowDate: '2024-12-03', expectedReturnDate: '2024-12-12', status: 'overdue' },
+  { requestId: 'GV004', teacherName: 'Nguyen Van D', borrowDate: '2024-12-04', expectedReturnDate: '2024-12-13', status: 'paid' },
+  { requestId: 'GV005', teacherName: 'Le Thi E', borrowDate: '2024-12-05', expectedReturnDate: '2024-12-14', status: 'approved' },
 ];
 
 function DeviceBorrowTable(){
@@ -50,7 +56,7 @@ function DeviceBorrowTable(){
     <Table>
       <TableHead>
         <TableRow>
-          <TableCell>Mã giáo viên</TableCell>
+          <TableCell>Mã đơn mượn</TableCell>
           <TableCell>Tên giáo viên</TableCell>
           <TableCell>Ngày mượn</TableCell>
           <TableCell>Ngày trả dự kiến</TableCell>
@@ -61,16 +67,19 @@ function DeviceBorrowTable(){
       <TableBody>
         {deviceBorrowData
           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          .map((row) => (
-            <TableRow key={row.teacherId}>
-              <TableCell>{row.teacherId}</TableCell>
-              <TableCell>{row.teacherName}</TableCell>
-              <TableCell>{row.borrowDate}</TableCell>
-              <TableCell>{row.expectedReturnDate}</TableCell>
-              <TableCell>{row.status}</TableCell>
-              <TableCell><BorrowEquipmentDetail/></TableCell>
-            </TableRow>
-          ))}
+          .map((row) => {
+            const { label, color } = statusMap[row.status] ?? { label: 'Unknown', color: 'default' };
+            return(
+              <TableRow key={row.requestId}>
+                <TableCell>{row.requestId}</TableCell>
+                <TableCell>{row.teacherName}</TableCell>
+                <TableCell>{row.borrowDate}</TableCell>
+                <TableCell>{row.expectedReturnDate}</TableCell>
+                <TableCell><Chip color={color} label={label} size="small" /></TableCell>
+                <TableCell><BorrowEquipmentDetail/></TableCell>
+              </TableRow>
+            )
+          })}
       </TableBody>
     </Table>
     <TablePagination

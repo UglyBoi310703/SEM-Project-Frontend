@@ -1,0 +1,84 @@
+"use client"
+import React, { useState } from 'react';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import Box from '@mui/material/Box';
+
+function CreateCrashReport (): React.JSX.Element{
+  // Sử dụng useState để quản lý trạng thái mở/đóng dialog và nội dung báo cáo
+  const [open, setOpen] = useState<boolean>(false);
+  const [reportContent, setReportContent] = useState<string>('');
+
+  // Mở dialog
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  // Đóng dialog
+  const handleClose = () => {
+    setOpen(false);
+    setReportContent(''); // Xóa nội dung báo cáo khi đóng dialog
+  };
+
+  // Xử lý thay đổi nội dung báo cáo
+  const handleReportContentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setReportContent(event.target.value);
+  };
+
+  // Gửi báo cáo
+  const handleSubmit = () => {
+    console.log('Báo cáo sự cố:', reportContent);
+    setReportContent(''); // Xóa nội dung báo cáo sau khi gửi
+    handleClose(); // Đóng dialog
+  };
+
+  // Hủy báo cáo
+  const handleCancel = () => {
+    setReportContent(''); // Xóa nội dung khi hủy
+    handleClose(); // Đóng dialog
+  };
+
+  return (
+    <div>
+      <Button variant="contained" color="primary" onClick={handleOpen}>
+        Tạo báo cáo sự cố
+      </Button>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+        <DialogTitle>
+          Báo cáo sự cố
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpen(false)}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+        <Box component="form"
+        mt={2}>
+        <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label="Nội dung báo cáo"
+            variant="outlined"
+            value={reportContent}
+            onChange={handleReportContentChange}
+          />
+        </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancel} color="secondary">
+            Hủy
+          </Button>
+          <Button onClick={handleSubmit} color="primary">
+            Gửi
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+export default CreateCrashReport;

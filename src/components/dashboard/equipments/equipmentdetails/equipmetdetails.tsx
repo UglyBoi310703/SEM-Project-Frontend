@@ -34,7 +34,7 @@ const equipmentdetails = [
     local:'SamSung',
     manufactureyear:2024,
     purchasedate:dayjs().subtract(2, 'hours').toDate(),
-    status: 'Sẵn có',
+    status: 'available',
     note:'Thiết bị mới',
   },
   {
@@ -44,7 +44,7 @@ const equipmentdetails = [
     local:'SamSung',
     manufactureyear:2024,
     purchasedate:dayjs().subtract(2, 'hours').toDate(),
-    status: 'Sẵn có',
+    status: 'available',
     note:'Thiết bị mới',
   },
   {
@@ -54,7 +54,7 @@ const equipmentdetails = [
     local:'SamSung',
     manufactureyear:2024,
     purchasedate:dayjs().subtract(2, 'hours').toDate(),
-    status: 'Sẵn có',
+    status: 'used',
     note:'Thiết bị mới',
   },
   {
@@ -64,7 +64,7 @@ const equipmentdetails = [
     local:'SamSung',
     manufactureyear:2024,
     purchasedate:dayjs().subtract(2, 'hours').toDate(),
-    status: 'Sẵn có',
+    status: 'fixing',
     note:'Thiết bị mới',
   },
   {
@@ -74,7 +74,7 @@ const equipmentdetails = [
     local:'SamSung',
     manufactureyear:2024,
     purchasedate:dayjs().subtract(2, 'hours').toDate(),
-    status: 'Sẵn có',
+    status: 'used',
     note:'Thiết bị mới',
   },
 

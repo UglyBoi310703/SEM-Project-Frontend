@@ -23,41 +23,39 @@ const classrooms = [
     id: 'CLASS-001',
     title: 'TC-301',
     description: 'Phòng học',
-    status:"active"
+    status:"fixing"
   },
   {
     id: 'CLASS-002',
     title: 'TC-302',
     description: 'Phòng học',
-    status:"active"
+    status:"available"
   
   },
   {
     id: 'CLASS-003',
     title: 'TC-303',
     description: 'Phòng tự học',
-    status:"active"
+    status:"available"
 
   },
   {
     id: 'CLASS-004',
     title: 'TC-304',
     description: 'Phòng hội đồng',
-    status:"active"
+    status:"available"
   },
   {
     id: 'CLASS-005',
     title: 'TC-305',
     description: 'Phòng máy tính',
-    status:"active"
+    status:"used"
   },
   {
     id: 'CLASS-006',
     title: 'TC-306',
     description: 'Phòng thí nghiệm hoá học',
-    status:"active"
-
-  
+    status:"fixing"
   },
 ] satisfies Classroom[];
 

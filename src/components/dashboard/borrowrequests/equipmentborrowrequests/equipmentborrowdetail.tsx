@@ -22,6 +22,7 @@ import {
   Box,
   Button
 } from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
@@ -65,57 +66,63 @@ function BorrowDeviceDialog({ open, onClose, borrower, devices }: Props): React.
 
       {/* Dialog Content */}
       <DialogContent>
-        <Box sx={{ display: "flex", gap: 4, mt: 2 }}>
+        <Box sx={{ display: "flex",flexDirection:"column", gap: 4 }}>
           {/* Left Column: Thông tin người mượn */}
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2, textAlign: "center" }}>
-              Thông tin người mượn
-            </Typography>
-            <TextField
-              fullWidth
-              label="Mã giáo viên"
-              value={borrower.teacherId}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
+          <Box  sx={{  display:"flex", justifyContent:"space-between" }}>
+          <Box sx={{ display: "flex",flexDirection:"column",justifyContent:"space-between" }}>
+          <TextField
+               value={borrower.teacherName}
+               variant="standard"
+               margin="dense"
+               InputProps={{
+                 readOnly: true,
+                 startAdornment: <InputAdornment position="start">Tên người mượn: </InputAdornment>,
+               }}
+               sx={{
+                '& .MuiInput-underline:before': {
+                  borderBottom: 'none',
+                },
+                '& .MuiInput-underline:after': {
+                  borderBottom: 'none',
+                },
+                '& .MuiInput-root:hover:not(.Mui-disabled):before': {
+                  borderBottom: 'none',
+                },
+              }}
             />
             <TextField
-              fullWidth
-              label="Tên giáo viên"
-              value={borrower.teacherName}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
+               value={borrower.email}
+               variant="standard"
+               margin="dense"
+               InputProps={{
+                 readOnly: true,
+                 startAdornment: <InputAdornment position="start">Email: </InputAdornment>,
+               }}
+               sx={{
+                '& .MuiInput-underline:before': {
+                  borderBottom: 'none',
+                },
+                '& .MuiInput-underline:after': {
+                  borderBottom: 'none',
+                },
+                '& .MuiInput-root:hover:not(.Mui-disabled):before': {
+                  borderBottom: 'none',
+                },
+              }}
             />
-            <TextField
-              fullWidth
-              label="Email"
-              value={borrower.email}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Số điện thoại"
-              value={borrower.phone}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <FormControl fullWidth margin="dense">
+            
+          </Box>
+          <FormControl  margin="dense">
               <InputLabel>Trạng thái</InputLabel>
               <Select value={borrower.status} readOnly>
                 <MenuItem value="Đã duyệt">Đã duyệt</MenuItem>
                 <MenuItem value="Chưa duyệt">Chưa duyệt</MenuItem>
-                <MenuItem value="Trả một phần">Trả một phần</MenuItem>
                 <MenuItem value="Quá hạn">Quá hạn</MenuItem>
               </Select>
             </FormControl>
+           
           </Box>
-
-          {/* Right Column: Thông tin thiết bị */}
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{width:"100%"}} >
             <Typography variant="subtitle1" sx={{ mb: 2, textAlign: "center" }}>
               Thông tin thiết bị mượn
             </Typography>

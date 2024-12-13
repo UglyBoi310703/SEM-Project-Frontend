@@ -9,5 +9,13 @@ export const paths = {
     classrooms: '/dashboard/classrooms',
     settings: '/dashboard/settings',
   },
+  user: {
+    crashreports: '/user/crashreports',
+    account: '/user/account',
+    borrows: '/user/borrowrequests',
+    equipments:'/user/equipments',
+    classrooms: '/user/classrooms',
+    settings: '/user/settings',
+  },
   errors: { notFound: '/errors/not-found' },
 } as const;

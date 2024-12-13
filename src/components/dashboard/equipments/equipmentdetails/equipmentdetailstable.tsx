@@ -18,6 +18,7 @@ import Card from "@mui/material/Card";
 
 import { useSelection } from '@/hooks/use-selection';
 import EditEquipmentModal from '../editequipment/editequipment';
+import Chip from '@mui/material/Chip';
 
 function noop(): void {
   // do nothing
@@ -30,7 +31,7 @@ export interface EquipmentDetail {
   local: string;
   manufactureyear:number;
   purchasedate: Date;
-  status: string;
+  status:'used' | 'available' | 'fixing';
   note:string;
 }
 interface EquipmentDetailTableProps {
@@ -39,6 +40,11 @@ interface EquipmentDetailTableProps {
   rows?: EquipmentDetail[];
   rowsPerPage?: number;
 }
+const statusMap = {
+  fixing: { label: 'Đang bảo trì', color: 'secondary' },
+  available: { label: 'Sẵn sàng', color: 'success' },
+  used: { label: 'Đang được sử dụng', color: 'warning' },
+} as const;
 
 export function EquipmentsDetailsTable({
   count = 0,
@@ -49,10 +55,7 @@ export function EquipmentsDetailsTable({
   const rowIds = React.useMemo(() => {
     return rows.map((borrow) => borrow.id);
   }, [rows]);
-
   const {  selected } = useSelection(rowIds);
-
-
   return (
     <Card>
       <Box sx={{ overflowX: 'auto' }}>
@@ -72,11 +75,10 @@ export function EquipmentsDetailsTable({
           </TableHead>
           <TableBody>
             {rows.map((row) => {
+              const { label, color } = statusMap[row.status] ?? { label: 'Unknown', color: 'default' };
               const isSelected = selected?.has(row.id);
-
               return (
                 <TableRow hover key={row.seri} selected={isSelected}>
-      
                   <TableCell>{row.seri}</TableCell>
                   <TableCell>
                     <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
@@ -88,10 +90,14 @@ export function EquipmentsDetailsTable({
                 
                   <TableCell>{row.manufactureyear}</TableCell>
                   <TableCell>{dayjs(row.purchasedate).format('MMM D, YYYY')}</TableCell>
-                  <TableCell>{row.status}</TableCell>
+                  <TableCell><Chip color={color} label={label} size="small" /></TableCell>
                   <TableCell>{row.note}</TableCell>
                   <TableCell>
-                    <Box>
+                    <Box   sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}>
                     <EditEquipmentModal/>
                     <Button variant="outlined" color='error'>Xoá</Button>
                     </Box>

@@ -96,16 +96,11 @@ export function EquipmentsTable({
                       display: "flex",
                       alignItems: "center",
                       gap: 1,
-                   
-                 
-                    
                     }}>
                    <EquipmentDetails/>
                     <EditEquipmentCategoryModal/>
-              
                     </Box>
                   </TableCell>
-              
                 </TableRow>
               );
             })}

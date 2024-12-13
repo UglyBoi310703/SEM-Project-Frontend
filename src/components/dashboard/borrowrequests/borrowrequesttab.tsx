@@ -8,7 +8,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import DeviceBorrowTable from './equipmentborrowrequests/equipmentborrowtable';
 import RoomBorrowTable from './classroomborrowrequests/classroomborrowtable';
 
-const BorrowRequestTabs: React.FC = () => {
+function BorrowRequestTabs(): React.JSX.Element  {
   const [value, setValue] = React.useState('1');
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
