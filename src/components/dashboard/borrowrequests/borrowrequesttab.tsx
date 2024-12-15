@@ -14,7 +14,6 @@ function BorrowRequestTabs(): React.JSX.Element  {
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
-
   return (
     <Box sx={{ width: '100%', typography: 'body1' }}>
       <TabContext value={value}>

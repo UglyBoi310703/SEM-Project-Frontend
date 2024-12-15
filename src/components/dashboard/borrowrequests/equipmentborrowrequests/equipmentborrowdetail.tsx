@@ -6,23 +6,20 @@ import {
   DialogContent,
   DialogActions,
   Typography,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  IconButton,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   List,
   ListItem,
   ListItemText,
   Divider,
   Box,
-  Button
+  Button,
+  IconButton,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  MenuItem,
+  Select,
+  FormControl,
 } from "@mui/material";
-import InputAdornment from '@mui/material/InputAdornment';
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
@@ -30,7 +27,6 @@ interface BorrowerInfo {
   teacherId: string;
   teacherName: string;
   email: string;
-  phone: string;
   status: string;
 }
 
@@ -48,8 +44,14 @@ interface Props {
 }
 
 function BorrowDeviceDialog({ open, onClose, borrower, devices }: Props): React.JSX.Element {
+  const [status, setStatus] = useState(borrower.status);
+
+  const handleStatusChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setStatus(event.target.value as string);
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       {/* Dialog Header */}
       <DialogTitle>
         <Typography variant="h5" sx={{ textAlign: "center" }}>
@@ -66,82 +68,57 @@ function BorrowDeviceDialog({ open, onClose, borrower, devices }: Props): React.
 
       {/* Dialog Content */}
       <DialogContent>
-        <Box sx={{ display: "flex",flexDirection:"column", gap: 4 }}>
-          {/* Left Column: Thông tin người mượn */}
-          <Box  sx={{  display:"flex", justifyContent:"space-between" }}>
-          <Box sx={{ display: "flex",flexDirection:"column",justifyContent:"space-between" }}>
-          <TextField
-               value={borrower.teacherName}
-               variant="standard"
-               margin="dense"
-               InputProps={{
-                 readOnly: true,
-                 startAdornment: <InputAdornment position="start">Tên người mượn: </InputAdornment>,
-               }}
-               sx={{
-                '& .MuiInput-underline:before': {
-                  borderBottom: 'none',
-                },
-                '& .MuiInput-underline:after': {
-                  borderBottom: 'none',
-                },
-                '& .MuiInput-root:hover:not(.Mui-disabled):before': {
-                  borderBottom: 'none',
-                },
-              }}
-            />
-            <TextField
-               value={borrower.email}
-               variant="standard"
-               margin="dense"
-               InputProps={{
-                 readOnly: true,
-                 startAdornment: <InputAdornment position="start">Email: </InputAdornment>,
-               }}
-               sx={{
-                '& .MuiInput-underline:before': {
-                  borderBottom: 'none',
-                },
-                '& .MuiInput-underline:after': {
-                  borderBottom: 'none',
-                },
-                '& .MuiInput-root:hover:not(.Mui-disabled):before': {
-                  borderBottom: 'none',
-                },
-              }}
-            />
-            
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {/* Thông tin người mượn */}
+          <Box    sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            mt: 2,
+            p: 2,
+            bgcolor: "#f9f9f9",
+            borderRadius: 2,
+            boxShadow: 1,
+          }}
+          >
+          
+            <Typography variant="body1"><strong>Tên giáo viên:</strong> {borrower.teacherName}</Typography>
+            <Typography variant="body1"><strong>Email:</strong> {borrower.email}</Typography>
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Typography variant="body1"><strong>Trạng thái:</strong></Typography>
+              {status === "Chờ duyệt" ? (
+                <Typography variant="body1">{status}</Typography>
+              ) : (
+                <FormControl size="small">
+                  <Select value={status} onChange={handleStatusChange}>
+                    <MenuItem value="Đã duyệt">Đã duyệt</MenuItem>
+                    <MenuItem value="Đã trả">Đã trả</MenuItem>
+                    <MenuItem value="Quá hạn">Quá hạn</MenuItem>
+                  </Select>
+                </FormControl>
+              )}
+            </Box>
           </Box>
-          <FormControl  margin="dense">
-              <InputLabel>Trạng thái</InputLabel>
-              <Select value={borrower.status} readOnly>
-                <MenuItem value="Đã duyệt">Đã duyệt</MenuItem>
-                <MenuItem value="Chưa duyệt">Chưa duyệt</MenuItem>
-                <MenuItem value="Quá hạn">Quá hạn</MenuItem>
-              </Select>
-            </FormControl>
-           
-          </Box>
-          <Box sx={{width:"100%"}} >
-            <Typography variant="subtitle1" sx={{ mb: 2, textAlign: "center" }}>
-              Thông tin thiết bị mượn
+
+          <Divider />
+
+          {/* Thông tin thiết bị */}
+          <Box>
+            <Typography variant="subtitle1" fontWeight="bold">
+              Thông tin thiết bị mượn:
             </Typography>
-            <List
-              sx={{
-                width: "100%",
-                maxHeight: 340,
-                overflow: "auto",
-              }}
-            >
+            <List disablePadding>
               {devices.map((device, index) => (
                 <Accordion key={index}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <ListItemText
-                      primary={`${device.name} (Số lượng: ${device.quantity})`}
+                      primary={`${device.name}`}
+                      secondary={`Số lượng mượn: ${device.quantity}`}
                     />
                   </AccordionSummary>
                   <AccordionDetails>
-                    <List>
+                    <List disablePadding>
                       {device.serialNumbers.map((serial, idx) => (
                         <ListItem key={idx}>
                           <ListItemText primary={`Serial: ${serial}`} />
@@ -160,7 +137,7 @@ function BorrowDeviceDialog({ open, onClose, borrower, devices }: Props): React.
       <DialogActions>
         <Button
           variant="contained"
-          disabled={borrower.status !== "Chưa duyệt"}  // Disable button if status is not "Chưa duyệt"
+          disabled={status !== "Chờ duyệt"}
         >
           Duyệt đơn
         </Button>
@@ -177,7 +154,7 @@ function BorrowEquipmentDetail(): React.JSX.Element {
     teacherName: "Nguyễn Văn A",
     email: "nguyenvana@gmail.com",
     phone: "0987654321",
-    status: "Đã duyệt", // Test with "đã duyệt" status
+    status: "Đã duyệt",
   };
 
   const devices: Device[] = [
@@ -200,7 +177,9 @@ function BorrowEquipmentDetail(): React.JSX.Element {
 
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(true)}>Chi tiết</Button>
+      <Button variant="contained" onClick={() => setOpen(true)}>
+        Chi tiết
+      </Button>
       <BorrowDeviceDialog
         open={open}
         onClose={() => setOpen(false)}

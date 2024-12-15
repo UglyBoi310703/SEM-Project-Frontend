@@ -54,7 +54,7 @@ function EditEquipmentCategoryModal(): JSX.Element {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '50%',
+            width: '30%',
             bgcolor: 'background.paper',
             borderRadius: 2,
             boxShadow: 24,
@@ -78,17 +78,7 @@ function EditEquipmentCategoryModal(): JSX.Element {
 
           {/* Form */}
           <Grid container spacing={2}>
-            {/* Row 1 */}
-            <Grid item xs={12}>
-              <TextField
-                label="Mã thiết bị"
-                name="deviceCode"
-                value={formData.deviceCode}
-                onChange={handleInputChange}
-                fullWidth
-              />
-            </Grid>
-
+      
             {/* Row 2 */}
             <Grid item xs={12}>
               <TextField
@@ -106,7 +96,7 @@ function EditEquipmentCategoryModal(): JSX.Element {
                 <InputLabel>Loại thiết bị</InputLabel>
                 <Select
                   label = "Loại thiết bị"
-                  name="deviceType"
+                  name="Loại thiết bị"
                   value={formData.deviceType}
                   onChange={handleInputChange}
                 >

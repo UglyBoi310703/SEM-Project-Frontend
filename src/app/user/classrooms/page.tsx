@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Box from '@mui/material/Box';
@@ -13,9 +14,17 @@ import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { config } from '@/config';
 import { ClassroomCard } from '@/components/user/classrooms/classrooms-card';
 import type { Classroom } from '@/components/user/classrooms/classrooms-card';
-import ClassroomFilters from '@/components/user/classrooms/classrooms-filters';
-export const metadata = { title: `ClassRooms | User | ${config.site.name}` } satisfies Metadata;
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 
+export const metadata = { title: `ClassRooms | User | ${config.site.name}` } satisfies Metadata;
 const classrooms = [
   {
     id: 'CLASS-001',
@@ -66,6 +75,16 @@ const classrooms = [
 ] satisfies Classroom[];
 
 export default function Page(): React.JSX.Element {
+
+    const [RoomStatus, setRoomStatus] = React.useState("Tất cả");
+
+    const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+      setRoomStatus(event.target.value as string);
+    };
+  
+    const handleApplyFilter = () => {
+      console.log("Loại thiết bị được chọn:", RoomStatus);
+    };
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
@@ -81,7 +100,80 @@ export default function Page(): React.JSX.Element {
           </Stack>
         </Stack>
       </Stack>
-      <ClassroomFilters/>
+      <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        bgcolor: "background.paper",
+        p: 2,
+        borderRadius: 2,
+        boxShadow: 1,
+      }}
+    >
+      <OutlinedInput
+        placeholder="Tìm kiếm"
+        startAdornment={
+          <InputAdornment position="start">
+            <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
+          </InputAdornment>
+        }
+        sx={{ maxWidth: '500px' }}
+      />  
+      {/* Tiêu đề */}
+      <Box
+       sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        p: 2,
+      }}
+      >
+      <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        Bộ lọc:
+      </Typography>
+      {/* Trường Loại thiết bị */}
+      <FormControl sx={{ minWidth: 200 }} size="small">
+        <InputLabel>Trạng thái</InputLabel>
+        <Select
+          value="Tất cả"
+          onChange={handleFilterChange}
+          name="roomstatus"
+          label = "Trạng thái"
+        >
+          <MenuItem value="Tất cả">Tất cả</MenuItem>
+          <MenuItem value="Điện tử">Sẵn có</MenuItem>
+          <MenuItem value="Cơ khí">Đang sử dụng</MenuItem>
+          <MenuItem value="Y tế">Đang bảo trì</MenuItem>
+
+        </Select>
+      </FormControl>
+      <FormControl sx={{ minWidth: 200 }} size="small">
+        <InputLabel>Loại phòng</InputLabel>
+        <Select
+          value="Tất cả"
+          onChange={handleFilterChange}
+          name="roomtype"
+          label = "Trạng thái"
+        >
+          <MenuItem value="Tất cả">Tất cả</MenuItem>
+          <MenuItem value="Điện tử">Phòng học</MenuItem>
+          <MenuItem value="Cơ khí">Phòng hội đồng</MenuItem>
+          <MenuItem value="Y tế">Phòng thí nghiệm</MenuItem>
+        </Select>
+      </FormControl>
+    
+      {/* Nút Áp dụng */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleApplyFilter}
+        sx={{ whiteSpace: "nowrap" }}
+      >
+        Áp dụng
+      </Button>
+      </Box>
+    </Box>
       <Grid container spacing={3}>
         {classrooms.map((classroom) => (
           <Grid key={classroom.id} lg={4} md={6} xs={12}>

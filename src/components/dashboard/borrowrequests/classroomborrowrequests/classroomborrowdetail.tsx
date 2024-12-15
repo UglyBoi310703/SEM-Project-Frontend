@@ -6,18 +6,12 @@ import {
   DialogContent,
   DialogActions,
   Typography,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   IconButton,
   Divider,
   Box,
-  Button
+  Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
 
 interface BorrowerInfo {
   teacherId: string;
@@ -30,7 +24,7 @@ interface BorrowerInfo {
 interface Room {
   name: string;
   seats: number;
-  type:string
+  type: string;
 }
 
 interface Props {
@@ -41,12 +35,13 @@ interface Props {
 }
 
 function BorrowRoomDialog({ open, onClose, borrower, room }: Props): React.JSX.Element {
+  const isApproved = borrower.status === "Đã duyệt";
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      {/* Dialog Header */}
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      {/* Hóa đơn Header */}
       <DialogTitle>
         <Typography variant="h5" sx={{ textAlign: "center" }}>
-          Thông tin đơn mượn thiết bị
+          Thông tin đơn mượn phòng
         </Typography>
         <IconButton
           onClick={onClose}
@@ -56,95 +51,59 @@ function BorrowRoomDialog({ open, onClose, borrower, room }: Props): React.JSX.E
         </IconButton>
       </DialogTitle>
       <Divider />
-      {/* Dialog Content */}
-      <DialogContent>
-        <Box sx={{ display: "flex", gap: 4, mt: 2 }}>
-          {/* Left Column: Thông tin người mượn */}
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2, textAlign: "center" }}>
-              Thông tin người mượn
-            </Typography>
-            <TextField
-              fullWidth
-              label="Mã giáo viên"
-              value={borrower.teacherId}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Tên giáo viên"
-              value={borrower.teacherName}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Email"
-              value={borrower.email}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Số điện thoại"
-              value={borrower.phone}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <FormControl fullWidth margin="dense">
-              <InputLabel>Trạng thái</InputLabel>
-              <Select value={borrower.status} readOnly>
-                <MenuItem value="Đã duyệt">Đã duyệt</MenuItem>
-                <MenuItem value="Chưa duyệt">Chưa duyệt</MenuItem>
-                <MenuItem value="Trả một phần">Trả một phần</MenuItem>
-                <MenuItem value="Quá hạn">Quá hạn</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
 
-          {/* Right Column: Thông tin thiết bị */}
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1" sx={{ mb: 2, textAlign: "center" }}>
-              Thông tin phòng học mượn
-            </Typography>
-            <TextField
-              fullWidth
-              label="Tên phòng"
-              value={room.name}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Loại phòng"
-              value={room.type}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Số lượng chỗ ngồi"
-              value={room.seats}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-          </Box>
+      {/* Nội dung hóa đơn */}
+      <DialogContent>
+        {/* Phần thông tin người mượn */}
+  
+        <Box sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            mt: 2,
+            p: 2,
+            bgcolor: "#f9f9f9",
+            borderRadius: 2,
+            boxShadow: 1,
+          }}>
+           <Typography variant="body1">
+                      <strong>Tên giáo viên:</strong> {borrower.teacherName}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Email:</strong> {borrower.email}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Trạng thái:</strong> <span style={{ color: isApproved ? "green" : "orange" }}>{borrower.status}</span>
+                    </Typography>
+                 
+        </Box>
+
+        {/* Phần thông tin phòng */}
+        <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
+          Thông tin phòng học:
+        </Typography>
+        <Box  sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            mt: 2,
+            p: 2,
+            bgcolor: "#f9f9f9",
+            borderRadius: 2,
+            boxShadow: 1,
+          }}>
+          <Typography><strong>Tên phòng:</strong> {room.name}</Typography>
+          <Typography><strong>Loại phòng:</strong> {room.type}</Typography>
+          <Typography><strong>Số lượng chỗ ngồi:</strong> {room.seats}</Typography>
         </Box>
       </DialogContent>
 
-      {/* Dialog Actions */}
+      {/* Chân hóa đơn */}
+      <Divider />
       <DialogActions>
         <Button
           variant="contained"
-          disabled={borrower.status !== "Chưa duyệt"}  // Disable button if status is not "Chưa duyệt"
+          disabled={borrower.status !== "Chưa duyệt"} // Disable button nếu không phải "Chưa duyệt"
         >
           Duyệt đơn
         </Button>
@@ -161,19 +120,20 @@ function BorrowRoomDetail(): React.JSX.Element {
     teacherName: "Nguyễn Văn A",
     email: "nguyenvana@gmail.com",
     phone: "0987654321",
-    status: "Đã duyệt", // Test with "đã duyệt" status
+    status: "Đã duyệt",
   };
 
-  const room: Room = 
-    {
-      name: "TC-310",
-      seats: 50,
-      type:"Phòng học"
-    }
-   
+  const room: Room = {
+    name: "TC-310",
+    seats: 50,
+    type: "Phòng học",
+  };
+
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(true)}>Chi tiết</Button>
+      <Button variant="contained" onClick={() => setOpen(true)}>
+        Thông tin
+      </Button>
       <BorrowRoomDialog
         open={open}
         onClose={() => setOpen(false)}

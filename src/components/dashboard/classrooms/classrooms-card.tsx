@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import ClassRoomInformation from './classroominformation/classroominfomationmodal';
+import ClassRoomInformation from './classroominfomation';
 import Chip from '@mui/material/Chip';
 
 
@@ -13,6 +13,7 @@ export interface Classroom {
   id: string;
   title: string;
   description: string;
+  seats:number;
   status:'used' | 'available' | 'fixing';
 }
 
@@ -37,6 +38,9 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
             </Typography>
             <Typography align="center" variant="body1">
               {classroom.description}
+            </Typography>
+            <Typography align="center" variant="body1">
+              Số lượng chỗ ngồi: {classroom.seats}
             </Typography>
           </Stack>
         </Stack>

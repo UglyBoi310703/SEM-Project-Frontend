@@ -20,7 +20,6 @@ interface FilterProps {
 
 function ClassroomFilters({ onFilter }: FilterProps): React.JSX.Element {
   const [deviceStatus, setDeviceStatus] = useState<string>("Tất cả");
-
   const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setDeviceStatus(event.target.value as string);
   };

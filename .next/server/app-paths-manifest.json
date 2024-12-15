@@ -1,7 +1,8 @@
 {
-  "/user/crashreports/page": "app/user/crashreports/page.js",
-  "/dashboard/borrowrequests/page": "app/dashboard/borrowrequests/page.js",
-  "/user/equipments/page": "app/user/equipments/page.js",
+  "/user/classrooms/page": "app/user/classrooms/page.js",
   "/dashboard/classrooms/page": "app/dashboard/classrooms/page.js",
-  "/user/classrooms/page": "app/user/classrooms/page.js"
+  "/dashboard/borrowrequests/page": "app/dashboard/borrowrequests/page.js",
+  "/dashboard/crashreports/page": "app/dashboard/crashreports/page.js",
+  "/dashboard/equipments/page": "app/dashboard/equipments/page.js",
+  "/dashboard/settings/page": "app/dashboard/settings/page.js"
 }

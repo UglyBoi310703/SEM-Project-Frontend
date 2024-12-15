@@ -1,58 +1,168 @@
-"use client"
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TablePagination from '@mui/material/TablePagination';
-import Chip from '@mui/material/Chip';
-import dayjs from 'dayjs';
-import ReportDetail from './reportdetail';
+"use client";
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TablePagination from "@mui/material/TablePagination";
+import Chip from "@mui/material/Chip";
+import dayjs from "dayjs";
+import ReportDetail from "./report-detail";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import InputAdornment from "@mui/material/InputAdornment";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
 
 const statusMap = {
-  pending: { label: 'Chờ phê duyệt', color: 'warning' },
-  approved: { label: 'Đã phê duyệt', color: 'success' },
+  pending: { label: "Chờ phê duyệt", color: "warning" },
+  approved: { label: "Đã phê duyệt", color: "success" },
 } as const;
 
 export interface ReportInfo {
   id: string;
   user: { name: string };
-  status: 'pending' | 'approved';
+  status: "pending" | "approved";
   idEquip: string;
   nameEquip: string;
   createdAt: Date;
 }
 
-export interface ReportInfoProps {
-  reports?: ReportInfo[];
+const crashReports: ReportInfo[] = [
+  {
+    id: "ORD-009",
+    user: { name: "Đỗ Văn Vương" },
+    idEquip: "DTLT-E001",
+    nameEquip: "Mic",
+    status: "pending",
+    createdAt: dayjs().subtract(10, "minutes").toDate(),
+  },
+  {
+    id: "ORD-006",
+    user: { name: "Chiến LV" },
+    idEquip: "DTLT-E002",
+    nameEquip: "Máy chiếu",
+    status: "approved",
+    createdAt: dayjs().subtract(10, "minutes").toDate(),
+  },
+  {
+    id: "ORD-004",
+    user: { name: "Lê Phúc Lâm" },
+    idEquip: "DTLT-E003",
+    nameEquip: "Loa",
+    status: "approved",
+    createdAt: dayjs().subtract(10, "minutes").toDate(),
+  },
+  {
+    id: "ORD-001",
+    user: { name: "Vũ Đình Trường" },
+    idEquip: "DTLT-E004",
+    nameEquip: "Máy chiếu",
+    status: "approved",
+    createdAt: dayjs().subtract(10, "minutes").toDate(),
+  },
+];
 
-}
+export function Reports(): React.JSX.Element {
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState("Tất cả");
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-export function Reports({ reports = [] }: ReportInfoProps): React.JSX.Element {
-  // State quản lý phân trang
-  const [page, setPage] = React.useState(0); // Trang hiện tại (bắt đầu từ 0)
-  const [rowsPerPage, setRowsPerPage] = React.useState(5); // Số hàng trên mỗi trang
+  // Xử lý thay đổi tìm kiếm
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    setPage(0); // Reset về trang đầu tiên khi tìm kiếm
+  };
 
-  // Tính toán vị trí bắt đầu và kết thúc của dữ liệu hiển thị
-  const startIndex = page * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedReports = reports.slice(startIndex, endIndex);
+  // Xử lý thay đổi bộ lọc trạng thái
+  const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setStatusFilter(event.target.value as string);
+    setPage(0); // Reset về trang đầu tiên khi thay đổi bộ lọc
+  };
 
-  // Xử lý khi thay đổi trang
+  // Lọc dữ liệu dựa trên tìm kiếm và trạng thái
+  const filteredReports = crashReports.filter((report) => {
+    const matchesSearch =
+      report.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.idEquip.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.nameEquip.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "Tất cả" ||
+      (statusFilter === "Chưa duyệt" && report.status === "pending") ||
+      (statusFilter === "Đã duyệt" && report.status === "approved");
+
+    return matchesSearch && matchesStatus;
+  });
+
+  // Dữ liệu phân trang
+  const paginatedReports = filteredReports.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  // Xử lý thay đổi trang
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  // Xử lý khi thay đổi số hàng trên mỗi trang
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Xử lý thay đổi số hàng mỗi trang
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Quay về trang đầu khi thay đổi số hàng
+    setPage(0); // Reset về trang đầu tiên khi thay đổi số hàng
   };
 
   return (
-    <Box >
+    <Box>
+      {/* Tìm kiếm và bộ lọc */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          bgcolor: "background.paper",
+          p: 2,
+          borderRadius: 2,
+          boxShadow: 1,
+        }}
+      >
+        <OutlinedInput
+          placeholder="Tìm kiếm báo cáo"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          startAdornment={
+            <InputAdornment position="start">
+              <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
+            </InputAdornment>
+          }
+          sx={{ maxWidth: "500px" }}
+        />
+        <FormControl sx={{ minWidth: 200 }} size="small">
+          <InputLabel>Trạng thái</InputLabel>
+          <Select
+            value={statusFilter}
+            onChange={handleFilterChange}
+            name="reportstatus"
+            label="Trạng thái"
+          >
+            <MenuItem value="Tất cả">Tất cả</MenuItem>
+            <MenuItem value="Chưa duyệt">Chưa duyệt</MenuItem>
+            <MenuItem value="Đã duyệt">Đã duyệt</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Bảng dữ liệu */}
       <Table sx={{ minWidth: 800 }}>
         <TableHead>
           <TableRow>
@@ -60,22 +170,26 @@ export function Reports({ reports = [] }: ReportInfoProps): React.JSX.Element {
             <TableCell>Người Báo cáo</TableCell>
             <TableCell>Mã thiết bị</TableCell>
             <TableCell>Tên thiết bị</TableCell>
-            <TableCell sortDirection="desc">Thời gian</TableCell>
+            <TableCell>Thời gian</TableCell>
             <TableCell>Trạng thái</TableCell>
             <TableCell>Chi tiết</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {paginatedReports.map((report) => {
-            const { label, color } = statusMap[report.status] ?? { label: 'Unknown', color: 'default' };
-
+            const { label, color } = statusMap[report.status] ?? {
+              label: "Unknown",
+              color: "default",
+            };
             return (
               <TableRow hover key={report.id}>
                 <TableCell>{report.id}</TableCell>
                 <TableCell>{report.user.name}</TableCell>
                 <TableCell>{report.idEquip}</TableCell>
                 <TableCell>{report.nameEquip}</TableCell>
-                <TableCell>{dayjs(report.createdAt).format('MMM D, YYYY')}</TableCell>
+                <TableCell>
+                  {dayjs(report.createdAt).format("MMM D, YYYY")}
+                </TableCell>
                 <TableCell>
                   <Chip color={color} label={label} size="small" />
                 </TableCell>
@@ -88,15 +202,15 @@ export function Reports({ reports = [] }: ReportInfoProps): React.JSX.Element {
         </TableBody>
       </Table>
 
-      {/* Thành phần phân trang */}
+      {/* Phân trang */}
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]} // Các tùy chọn số hàng mỗi trang
+        rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={reports.length} // Tổng số hàng
-        rowsPerPage={rowsPerPage} // Số hàng mỗi trang
-        page={page} // Trang hiện tại
-        onPageChange={handleChangePage} // Xử lý thay đổi trang
-        onRowsPerPageChange={handleChangeRowsPerPage} // Xử lý thay đổi số hàng mỗi trang
+        count={filteredReports.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </Box>
   );

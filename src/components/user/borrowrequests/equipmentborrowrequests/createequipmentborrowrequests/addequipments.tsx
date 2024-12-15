@@ -96,7 +96,6 @@ function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Bộ lọc:
           </Typography>
-
           <FormControl sx={{ minWidth: 200 }} size="small">
             <InputLabel>Loại thiết bị</InputLabel>
             <Select

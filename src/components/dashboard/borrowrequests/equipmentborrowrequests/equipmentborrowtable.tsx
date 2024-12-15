@@ -9,11 +9,19 @@ import {
   Paper,
   TablePagination,
   Box,
-  Button
 } from '@mui/material';
-import BorrowEquipmentFilters from './equipmentborrowrequestfilters';
 import BorrowEquipmentDetail from './equipmentborrowdetail';
 import Chip from '@mui/material/Chip';
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 
 interface BorrowRecord {
   requestId: string;
@@ -36,10 +44,13 @@ const deviceBorrowData: BorrowRecord[] = [
   { requestId: 'GV005', teacherName: 'Le Thi E', borrowDate: '2024-12-05', expectedReturnDate: '2024-12-14', status: 'approved' },
 ];
 
-function DeviceBorrowTable(){
+function DeviceBorrowTable(): React.JSX.Element{
+  const [BorowEquipmentStatus, SetBorowEquipmentStatus] = useState<string>("Tất cả");
+  const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    SetBorowEquipmentStatus(event.target.value as string);
+  };
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(3);
-
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -51,8 +62,59 @@ function DeviceBorrowTable(){
 
   return (
   <Box>
-    <BorrowEquipmentFilters/>
-      <TableContainer component={Paper}>
+      {/* Filters */}
+     <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        bgcolor: "background.paper",
+        p: 2,
+        borderRadius: 2,
+        boxShadow: 1,
+      }}
+    >
+      <OutlinedInput
+        placeholder="Tìm kiếm"
+        startAdornment={
+          <InputAdornment position="start">
+            <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
+          </InputAdornment>
+        }
+        sx={{ maxWidth: '500px' }}
+      />  
+      {/* Tiêu đề */}
+      <Box
+       sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        p: 2,
+      }}
+      >
+      <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        Bộ lọc:
+      </Typography>
+      {/* Trường Loại thiết bị */}
+      <FormControl sx={{ minWidth: 200 }} size="small">
+        <InputLabel>Trạng thái</InputLabel>
+        <Select
+          value={BorowEquipmentStatus}
+          onChange={handleFilterChange}
+          name="BorowEquipmentStatus"
+          label = "Trạng thái"
+        >
+          <MenuItem value="Tất cả">Tất cả</MenuItem>
+          <MenuItem value="Chưa duyệt">Đã được duyệt</MenuItem>
+          <MenuItem value="Đang chờ duyệt">Chờ duyệt</MenuItem>
+          <MenuItem value="Đã trả">Đã trả</MenuItem>
+          <MenuItem value="Quá hạn">Quá hạn</MenuItem>
+        </Select>
+      </FormControl>
+      </Box>
+    </Box>
+    {/* Bảng danh sách các đơn mượn */}
+    <TableContainer component={Paper}>
     <Table>
       <TableHead>
         <TableRow>

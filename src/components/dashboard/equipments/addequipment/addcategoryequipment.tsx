@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
+
 function AddCategoryEquipmentModal(): JSX.Element {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -56,7 +57,7 @@ function AddCategoryEquipmentModal(): JSX.Element {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '40%',
+            width: '30%',
             bgcolor: 'background.paper',
             borderRadius: 2,
             boxShadow: 24,
@@ -80,14 +81,7 @@ function AddCategoryEquipmentModal(): JSX.Element {
 
           {/* Form */}
           <Stack spacing={3}>
-            {/* Mã thiết bị */}
-            <TextField
-              label="Mã thiết bị"
-              name="deviceCode"
-              value={formData.deviceCode}
-              onChange={handleInputChange}
-              fullWidth
-            />
+    
 
             {/* Tên thiết bị */}
             <TextField
@@ -107,10 +101,10 @@ function AddCategoryEquipmentModal(): JSX.Element {
                 value={formData.deviceType}
                 onChange={handleInputChange}
               >
-                <MenuItem value="Điện tử">Điện tử</MenuItem>
-                <MenuItem value="Cơ khí">Cơ khí</MenuItem>
-                <MenuItem value="Y tế">Y tế</MenuItem>
-                <MenuItem value="Khác">Khác</MenuItem>
+                <MenuItem value="Điện tử">Phòng học</MenuItem>
+                <MenuItem value="Cơ khí">Hỗ trợ</MenuItem>
+                <MenuItem value="Y tế">Thể dục</MenuItem>
+                <MenuItem value="Khác">Thí nghiệm</MenuItem>
               </Select>
             </FormControl>
           </Stack>
