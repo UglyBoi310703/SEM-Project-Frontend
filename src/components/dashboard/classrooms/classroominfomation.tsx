@@ -56,6 +56,10 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 export default function ClassroomInformation() {
   const [open, setOpen] = React.useState(false);
+   const [roomType, setRoomType] = React.useState(""); // State for room type
+   const handleRoomTypeChange = (event) => {
+    setRoomType(event.target.value);
+  };
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -122,10 +126,19 @@ export default function ClassroomInformation() {
               <InputLabel>Tên phòng</InputLabel>
               <OutlinedInput value="TC-310" label="classroomname" name="classroomname" type="text" />
             </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>Loại phòng</InputLabel>
-              <OutlinedInput value="Phòng học" label="classroom type" name="classroomtype" type="classroomtype" />
-            </FormControl>
+            <FormControl fullWidth required>
+                    <InputLabel id="room-type-label">Loại phòng</InputLabel>
+                    <Select
+                      labelId="room-type-label"
+                      value={roomType}
+                      onChange={handleRoomTypeChange}
+                      label="Loại phòng"
+                    >
+                      <MenuItem value="Phòng học">Phòng học</MenuItem>
+                      <MenuItem value="Phòng máy tính">Phòng máy tính</MenuItem>
+                      <MenuItem value="Phòng thí nghiệm">Phòng thí nghiệm</MenuItem>
+                    </Select>
+                  </FormControl>
             <FormControl fullWidth>
               <InputLabel>Số lượng chỗ ngồi</InputLabel>
               <OutlinedInput value="40" label="classroom type" name="classroomtype" type="classroomtype" />
@@ -138,7 +151,6 @@ export default function ClassroomInformation() {
           onChange={handleChangeStatus}
         >
           <MenuItem value={10}>Sẵn có</MenuItem>
-          <MenuItem value={20}>Đang sử dụng</MenuItem>
           <MenuItem value={30}>Đang bảo trì</MenuItem>
         </Select>
       </FormControl>
