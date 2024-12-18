@@ -10,6 +10,8 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { config } from '@/config';
 import { ClassroomCard } from '@/components/dashboard/classrooms/classrooms-card';
 import type { Classroom } from '@/components/dashboard/classrooms/classrooms-card';
+import { useEffect } from 'react';
+import { APIGetAllRoom } from '@/utils/api';
 import {
     FormControl,
     InputLabel,
@@ -22,57 +24,13 @@ import {
 
 export const metadata = { title: `ClassRooms | Dashboard | ${config.site.name}` } satisfies Metadata;
 
-const classrooms = [
-  {
-    id: 'CLASS-001',
-    title: 'TC-301',
-    description: 'Phòng học',
-    seats:40,
-    status:"fixing"
-  },
-  {
-    id: 'CLASS-002',
-    title: 'TC-302',
-    description: 'Phòng học',
-    seats:40,
-    status:"available"
-  
-  },
-  {
-    id: 'CLASS-003',
-    title: 'TC-303',
-    description: 'Phòng tự học',
-    seats:40,
-    status:"available"
-
-  },
-  {
-    id: 'CLASS-004',
-    title: 'TC-304',
-    description: 'Phòng hội đồng',
-    seats:40,
-    status:"available"
-  },
-  {
-    id: 'CLASS-005',
-    title: 'TC-305',
-    description: 'Phòng máy tính',
-    seats:40,
-    status:"used"
-  },
-  {
-    id: 'CLASS-006',
-    title: 'TC-306',
-    description: 'Phòng thí nghiệm hoá học',
-    seats:40,
-    status:"fixing"
-  },
-] satisfies Classroom[];
-
 export default function ClassRoomList(): React.JSX.Element {
+    
      const [RoomStatus, setRoomStatus] = React.useState("Tất cả");
      const [RoomType, setRoomType] = React.useState("Tất cả");
-    
+     const [rooms, setRooms] = React.useState<Classroom[]>([]);
+     const [isLoading, setIsLoading] = React.useState<boolean>(true);
+     const [error, setError] = React.useState<string | null>(null);
       const handleRoomStatusFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         setRoomStatus(event.target.value as string);
       };
@@ -82,6 +40,23 @@ export default function ClassRoomList(): React.JSX.Element {
       const handleApplyFilter = () => {
         console.log("Loại thiết bị được chọn:", RoomStatus,RoomType);
       };
+
+      useEffect(() => {
+        const fetchRooms = async () => {
+          try {
+            setIsLoading(true);
+            const data = await APIGetAllRoom();
+            setRooms(data.content);
+          } catch (err) {
+            setError("Không thể tải dữ liệu phòng học.");
+          } finally {
+            setIsLoading(false);
+          }
+        };
+    
+        fetchRooms();
+      }, []);
+      
   return (
     <Stack spacing={3}>
       <Box
@@ -158,7 +133,7 @@ export default function ClassRoomList(): React.JSX.Element {
       </Box>
     </Box>
       <Grid container spacing={3}>
-        {classrooms.map((classroom) => (
+        {rooms.map((classroom) => (
           <Grid key={classroom.id} lg={4} md={6} xs={12}>
             <ClassroomCard classroom={classroom} />
           </Grid>
