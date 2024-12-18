@@ -10,7 +10,6 @@ import Chip from '@mui/material/Chip';
 
 
 export interface Classroom {
-  id: string;
   title: string;
   description: string;
   seats:number;

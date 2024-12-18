@@ -24,14 +24,14 @@ export const metadata = { title: `ClassRooms | Dashboard | ${config.site.name}` 
 
 const classrooms = [
   {
-    id: 'CLASS-001',
+
     title: 'TC-301',
     description: 'Phòng học',
     seats:40,
     status:"fixing"
   },
   {
-    id: 'CLASS-002',
+ 
     title: 'TC-302',
     description: 'Phòng học',
     seats:40,
@@ -39,7 +39,7 @@ const classrooms = [
   
   },
   {
-    id: 'CLASS-003',
+   
     title: 'TC-303',
     description: 'Phòng tự học',
     seats:40,
@@ -47,21 +47,21 @@ const classrooms = [
 
   },
   {
-    id: 'CLASS-004',
+
     title: 'TC-304',
     description: 'Phòng hội đồng',
     seats:40,
     status:"available"
   },
   {
-    id: 'CLASS-005',
+ 
     title: 'TC-305',
     description: 'Phòng máy tính',
     seats:40,
     status:"used"
   },
   {
-    id: 'CLASS-006',
+  
     title: 'TC-306',
     description: 'Phòng thí nghiệm hoá học',
     seats:40,
@@ -159,7 +159,7 @@ export default function ClassRoomList(): React.JSX.Element {
     </Box>
       <Grid container spacing={3}>
         {classrooms.map((classroom) => (
-          <Grid key={classroom.id} lg={4} md={6} xs={12}>
+          <Grid key={classroom.title} lg={4} md={6} xs={12}>
             <ClassroomCard classroom={classroom} />
           </Grid>
         ))}

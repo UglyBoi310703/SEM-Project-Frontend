@@ -1,3 +1,4 @@
+"use client"
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -20,33 +21,30 @@ export function NotificationsPopover({ anchorEl, onClose, open }: NotificationsP
   const [tabValue, setTabValue] = React.useState('all');
   const [showAllDialog, setShowAllDialog] = React.useState(false);
 
-  // Hàm thay đổi tab
   const handleChangeTab = (event: React.SyntheticEvent, newValue: string) => {
     setTabValue(newValue);
   };
 
-  // Hàm mở dialog hiển thị tất cả thông báo
+  // Hàm mở Dialog và đóng Popover
   const handleOpenDialog = () => {
-    setShowAllDialog(true);
+    onClose(); // Đóng Popover
+    setShowAllDialog(true); // Mở Dialog
   };
 
-  // Hàm đóng dialog
   const handleCloseDialog = () => {
-    setShowAllDialog(false);
+    setShowAllDialog(false); // Đóng Dialog
   };
 
-  // Danh sách thông báo
   const notifications = [
-    { id: 1, type: 'approval', code: '009', status: 'approved', isRead: false, time: '2 giờ trước' },
-    { id: 2, type: 'report', code: 'CR-09', status: 'approved', isRead: true, time: '1 ngày trước' },
-    { id: 3, type: 'approval', code: '010', status: 'rejected', isRead: false, time: '3 giờ trước' },
-    { id: 4, type: 'report', code: 'CR-10', status: 'rejected', isRead: true, time: '2 ngày trước' },
+    { id: 1, type: 'BorrowEquipmentRequest', message: 'Đươn mượn thiết bị mã ORD đã được phê duyệt', isRead: false, time: '2 giờ trước' },
+    { id: 2, type: 'BorrowRoomRequest', message: 'Đơn mượn phòng BRR-09 đã được phê duyệt', isRead: true, time: '1 ngày trước' },
+    { id: 3, type: 'CrashReports', message: 'Báo cáo sự cố mã CR-010', isRead: false, time: '3 giờ trước' },
+    { id: 4, type: 'BorrowEquipmentRequest', message: 'Đơn mượn thiết bị mã BER-10 đã bị từ chối', isRead: true, time: '2 ngày trước' },
   ];
 
-  // Lọc thông báo theo tab
   const filteredNotifications = notifications.filter((n) => {
-    if (tabValue === 'unread') return !n.isRead; // Chỉ thông báo chưa đọc
-    return true; // Tất cả thông báo
+    if (tabValue === 'unread') return !n.isRead;
+    return true;
   });
 
   return (
@@ -80,14 +78,15 @@ export function NotificationsPopover({ anchorEl, onClose, open }: NotificationsP
               <NotificationListItem
                 key={item.id}
                 type={item.type}
-                code={item.code}
-                status={item.status}
+                message={item.message}
                 isRead={item.isRead}
                 time={item.time}
+                onClick={onClose} // Đóng Popover khi nhấn vào thông báo
               />
             ))}
           </List>
           <Box sx={{ textAlign: 'center', p: 1 }}>
+            {/* Nút Xem tất cả */}
             <Button onClick={handleOpenDialog} size="small">
               Xem tất cả
             </Button>
@@ -99,7 +98,7 @@ export function NotificationsPopover({ anchorEl, onClose, open }: NotificationsP
       <NotificationsDialog
         open={showAllDialog}
         onClose={handleCloseDialog}
-        tabValue={tabValue} // Truyền tabValue vào dialog
+        tabValue={tabValue}
       />
     </>
   );

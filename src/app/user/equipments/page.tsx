@@ -1,6 +1,5 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
-import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 // import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
@@ -8,7 +7,7 @@ import Typography from '@mui/material/Typography';
 // import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { config } from '@/config';
 import { EquipmentsTable } from '@/components/user/equipments/equipment';
-import type { Equipment } from '@/components/user/equipments/equipment';
+
 
 
 export const metadata = { title: `Equipments | User | ${config.site.name}` } satisfies Metadata;

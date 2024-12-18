@@ -2,12 +2,12 @@ import * as React from 'react';
 import type { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-
+import NotificationOptions from '@/components/user/settings/notifications';
 import { config } from '@/config';
 // import { Notifications } from '@/components/dashboard/settings/notifications';
-import { UpdatePasswordForm } from '@/components/dashboard/settings/update-password-form';
-
-export const metadata = { title: `Settings | Dashboard | ${config.site.name}` } satisfies Metadata;
+import { UpdatePasswordForm } from '@/components/user/settings/update-password-form';
+import { Box } from '@mui/material';
+export const metadata = { title: `Settings | User | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
   return (
@@ -15,8 +15,14 @@ export default function Page(): React.JSX.Element {
       <div>
         <Typography variant="h4">Cài đặt</Typography>
       </div>
-
+      <Box sx={{
+        display: "flex",
+        justifyContent:"space-around",
+        width:"60%"
+      }}>
       <UpdatePasswordForm />
+      <NotificationOptions/>
+      </Box>
     </Stack>
   );
 }

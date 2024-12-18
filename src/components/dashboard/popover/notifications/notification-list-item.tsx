@@ -4,40 +4,61 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import CircleIcon from '@mui/icons-material/Circle';
 import RouterLink from 'next/link';
-import { useRouter } from 'next/navigation';
 import { paths } from '@/paths';
+
+
 export interface NotificationListItemProps {
-  type: 'approval' | 'report';
+  type: string;
   code: string;
-  status: 'approved' | 'rejected';
   isRead: boolean;
   time: string;
+  onClick: () => void; // Thêm prop mới
 }
 
 export function NotificationListItem({
   type,
   code,
-  status,
   isRead,
   time,
+  onClick, // Nhận callback từ cha
 }: NotificationListItemProps): React.JSX.Element {
-  const getMessage = () => {
-    if (type === 'approval') {
-      return `Đơn mượn thiết bị mã ${code} đã được ${status === 'approved' ? 'phê duyệt' : 'từ chối'}.`;
+  const getHref = () => {
+    if (type === 'BorrowEquipmentRequest') {
+      return paths.dashboard.borrowequipmentrequests;
     }
-    if (type === 'report') {
-      return `Báo cáo sự cố mã ${code} đã được ${status === 'approved' ? 'phê duyệt' : 'từ chối'}.`;
+    if (type === 'BorrowRoomRequest') {
+      return paths.dashboard.borrowroomrequests;
+    }
+    if (type === 'CrashReports') {
+      return paths.dashboard.crashreports;
+    }
+    return '#';
+  };
+
+  const getMessage = () => {
+    if (type === 'BorrowEquipmentRequest') {
+      return `Đơn mượn thiết bị mã ${code} đang chờ phê duyệt.`;
+    }
+    if (type === 'BorrowRoomRequest') {
+      return `Đơn mượn phòng mã ${code} đang chờ phê duyệt.`;
+    }
+    if (type === 'CrashReports') {
+      return `Báo cáo sự cố mã ${code} đang chờ phê duyệt.`;
     }
     return '';
   };
+
   return (
     <ListItem
-    component={RouterLink} href={paths.dashboard.settings} 
+      component={RouterLink}
+      href={getHref()}
+      onClick={onClick} // Gọi callback khi click
       sx={{
-        backgroundColor: isRead ? 'transparent' : '#f0f8ff', // Nền nhạt cho chưa đọc
+        backgroundColor: isRead ? 'transparent' : '#f0f8ff',
         '&:hover': { backgroundColor: '#f7f7f7' },
         cursor: 'pointer',
-        
+        textDecoration: 'none',
+        color: 'inherit',
         px: 2,
       }}
     >

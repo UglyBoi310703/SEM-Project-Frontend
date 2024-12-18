@@ -1,93 +1,65 @@
+'use client';
 import * as React from 'react';
-import { useNotifications } from '@toolpad/core/useNotifications';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import { Divider } from '@mui/material';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
 
-export default function NotificationOptions() {
-  const notifications = useNotifications();
-
-  // State cho các loại thông báo
+function NotificationOptions() {
   const [email, setEmail] = React.useState(true);
   const [inApp, setInApp] = React.useState(true);
-  const [push, setPush] = React.useState(true);
+  const { enqueueSnackbar } = useSnackbar();
 
-  // Ref để theo dõi trạng thái trước đó của các thông báo
-  const prevStates = React.useRef({ email, inApp, push });
-
-  React.useEffect(() => {
-    // Hàm xử lý logic thông báo
-    const handleNotification = (type, isEnabled) => {
-      const key = isEnabled
-        ? notifications.show(`Thông báo ${type} đã được bật`, {
-            severity: 'success',
-            autoHideDuration: 3000,
-          })
-        : notifications.show(`Thông báo ${type} đã được tắt`, {
-            severity: 'error',
-          });
-      return key;
-    };
-
-    const closeNotification = (key) => {
-      notifications.close(key);
-    };
-
-    // Xử lý Email Notification
-    if (prevStates.current.email !== email) {
-      const key = handleNotification('Email', email);
-      closeNotification(key);
-    }
-
-    // Xử lý In-App Notification
-    if (prevStates.current.inApp !== inApp) {
-      const key = handleNotification('In-App', inApp);
-      closeNotification(key);
-    }
-
-    // Xử lý Push Notification
-    if (prevStates.current.push !== push) {
-      const key = handleNotification('Push', push);
-      closeNotification(key);
-    }
-
-    // Cập nhật ref trạng thái
-    prevStates.current = { email, inApp, push };
-  }, [email, inApp, push, notifications]);
+  const handleChange = (type, value) => {
+    enqueueSnackbar(`Thông báo ${type} đã được ${value ? 'bật' : 'tắt'}`, {
+      variant: value ? 'success' : 'error',
+    });
+  };
 
   return (
-    <Box sx={{ p: 2, border: '1px solid #ddd', borderRadius: 2, maxWidth: 400 }}>
-      <Typography variant="h6" gutterBottom>
-        Tuỳ chọn Thông báo
-      </Typography>
-      <FormControlLabel
-        control={
-          <Switch
-            checked={email}
-            onChange={() => setEmail((prev) => !prev)}
+    <Card sx={{ m: 2 }}>
+      <CardHeader title="Tuỳ chỉnh thông báo" />
+      <Divider />
+      <CardContent>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={email}
+                onChange={() => {
+                  setEmail((prev) => !prev);
+                  handleChange('Email', !email);
+                }}
+              />
+            }
+            label="Thông báo Email"
           />
-        }
-        label="Thông báo Email"
-      />
-      <FormControlLabel
-        control={
-          <Switch
-            checked={inApp}
-            onChange={() => setInApp((prev) => !prev)}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={inApp}
+                onChange={() => {
+                  setInApp((prev) => !prev);
+                  handleChange('In-App', !inApp);
+                }}
+              />
+            }
+            label="Thông báo In-App"
           />
-        }
-        label="Thông báo In-App"
-      />
-      <FormControlLabel
-        control={
-          <Switch
-            checked={push}
-            onChange={() => setPush((prev) => !prev)}
-          />
-        }
-        label="Thông báo Push"
-      />
-    </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function App() {
+  return (
+    <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+      <NotificationOptions />
+    </SnackbarProvider>
   );
 }
