@@ -1,15 +1,14 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
-
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 // import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 // import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 // import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { config } from '@/config';
-import BorrowRequestTabs from '@/components/dashboard/borrowrequests/borrowrequesttab';
+import RoomBorrowTable from '@/components/dashboard/borrowroomrequests/roomborrow-table';
 
-export const metadata = { title: `BorrowEquipment | Dashboard | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `BorrowRoomRequests | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 
 export default function Page(): React.JSX.Element {
@@ -18,7 +17,7 @@ export default function Page(): React.JSX.Element {
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Danh sách mượn trả</Typography>
+          <Typography variant="h4">Danh sách mượn trả phòng</Typography>
           {/* <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
               Import
@@ -29,7 +28,7 @@ export default function Page(): React.JSX.Element {
           </Stack> */}
         </Stack>
       </Stack>
-      <BorrowRequestTabs/>
+      <RoomBorrowTable/>
     </Stack>
   );
 }

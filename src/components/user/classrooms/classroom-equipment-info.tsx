@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import {
   Dialog,
@@ -17,20 +17,27 @@ import {
   Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Chip from "@mui/material/Chip";
 
 type Device = {
   serialNumber: string;
   name: string;
-  status: string;
+  type:string;
+  status: "available" | "fixing";
 };
 
 const devices: Device[] = [
-  { serialNumber: "SN001", name: "Máy chiếu", status: "Hoạt động" },
-  { serialNumber: "SN002", name: "Máy tính", status: "Đang bảo trì" },
-  { serialNumber: "SN003", name: "Loa", status: "Hoạt động" },
+  { serialNumber: "SN001",type:"Hỗ trợ", name: "Máy chiếu", status: "available" },
+  { serialNumber: "SN002",type:"Hỗ trợ", name: "Máy tính", status: "fixing" },
+  { serialNumber: "SN003",type:"Hỗ trợ", name: "Loa", status: "available" },
 ];
 
-function ClassroomInfoDialog(): React.JSX.Element{
+const statusMap = {
+  fixing: { label: "Đang bảo trì", color: "secondary" },
+  available: { label: "Sẵn sàng", color: "success" },
+} as const;
+
+function ClassroomInfoDialog(): React.JSX.Element {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -55,17 +62,29 @@ function ClassroomInfoDialog(): React.JSX.Element{
                 <TableRow>
                   <TableCell>Số seri thiết bị</TableCell>
                   <TableCell>Tên thiết bị</TableCell>
+                  <TableCell>Loại thiết bị</TableCell>
                   <TableCell>Trạng thái</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {devices.map((device) => (
-                  <TableRow key={device.serialNumber}>
-                    <TableCell>{device.serialNumber}</TableCell>
-                    <TableCell>{device.name}</TableCell>
-                    <TableCell>{device.status}</TableCell>
-                  </TableRow>
-                ))}
+                {devices.map((device) => {
+                  const { label, color } =
+                    statusMap[device.status] ?? {
+                      label: "Không xác định",
+                      color: "default",
+                    };
+
+                  return (
+                    <TableRow key={device.serialNumber}>
+                      <TableCell>{device.serialNumber}</TableCell>
+                      <TableCell>{device.name}</TableCell>
+                      <TableCell>{device.type}</TableCell>
+                      <TableCell>
+                        <Chip color={color} label={label} size="small" />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
@@ -78,6 +97,6 @@ function ClassroomInfoDialog(): React.JSX.Element{
       </Dialog>
     </div>
   );
-};
+}
 
 export default ClassroomInfoDialog;

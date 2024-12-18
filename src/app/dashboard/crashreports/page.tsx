@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 // import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import Typography from '@mui/material/Typography';
 import { config } from '@/config';
-import { Reports } from '@/components/dashboard/crashreports/reports';
+import { Reports } from '@/components/dashboard/crashreports/crashreports-table';
 
 
 export const metadata = { title: `CrashReports | Dashboard | ${config.site.name}` } satisfies Metadata;

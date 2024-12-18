@@ -12,7 +12,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import EquipmentDetails from './equipmentdetails/equipmentdetails';
+import EquipmentDetails from './equipmentdetails/equipmentdetails-page';
 import EditEquipmentCategoryModal from './editequipment/editcategoryequipment';
 import {
   FormControl,

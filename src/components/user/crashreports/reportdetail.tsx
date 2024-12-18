@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useState } from "react";
 import {
   Dialog,
@@ -6,11 +6,6 @@ import {
   DialogContent,
   DialogActions,
   Typography,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   IconButton,
   Divider,
   Box,
@@ -18,17 +13,12 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-
 interface ReporterInfo {
-  teacherId: string;
   teacherName: string;
   email: string;
-  phone: string;
   status: string;
   content: string;
 }
-
-
 
 interface Props {
   open: boolean;
@@ -36,13 +26,15 @@ interface Props {
   reporter: ReporterInfo;
 }
 
-function ReportDetailDialog({ open, onClose, reporter}: Props): React.JSX.Element{
+function ReportDetailDialog({ open, onClose, reporter }: Props): React.JSX.Element {
+  const isApproved = reporter.status === "Đã duyệt";
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       {/* Dialog Header */}
       <DialogTitle>
         <Typography variant="h5" sx={{ textAlign: "center" }}>
-          Thông tin báo cáo sự cố
+          Báo Cáo Sự Cố
         </Typography>
         <IconButton
           onClick={onClose}
@@ -52,70 +44,48 @@ function ReportDetailDialog({ open, onClose, reporter}: Props): React.JSX.Elemen
         </IconButton>
       </DialogTitle>
       <Divider />
+
       {/* Dialog Content */}
       <DialogContent>
-        <Box sx={{ display: "flex", gap: 4, mt: 2 }}>
-          {/* Left Column: Thông tin người mượn */}
-          <Box sx={{ flex: 1 }}>
-         
-            <TextField
-              fullWidth
-              label="Mã giáo viên"
-              value={reporter.teacherId}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Tên giáo viên"
-              value={reporter.teacherName}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Email"
-              value={reporter.email}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              fullWidth
-              label="Số điện thoại"
-              value={reporter.phone}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-            <FormControl fullWidth margin="dense">
-              <InputLabel>Trạng thái</InputLabel>
-              <Select value={reporter.status} readOnly>
-                <MenuItem value="Đã duyệt">Đã duyệt</MenuItem>
-                <MenuItem value="Chưa duyệt">Chưa duyệt</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              fullWidth
-              label="Nội dung"
-              value={reporter.content}
-              variant="outlined"
-              margin="dense"
-              InputProps={{ readOnly: true }}
-            />
-          </Box>
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            mt: 2,
+            p: 2,
+            bgcolor: "#f9f9f9",
+            borderRadius: 2,
+            boxShadow: 1,
+          }}
+        >
+          <Typography variant="body1">
+            <strong>Tên giáo viên:</strong> {reporter.teacherName}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Email:</strong> {reporter.email}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Trạng thái:</strong> <span style={{ color: isApproved ? "green" : "orange" }}>{reporter.status}</span>
+          </Typography>
+          <Typography variant="body1">
+            <strong>Nội dung:</strong> {reporter.content}
+          </Typography>
+        </Box>
       </DialogContent>
 
       {/* Dialog Actions */}
       <DialogActions>
         <Button
           variant="contained"
-          disabled={reporter.status !== "Chưa duyệt"}  // Disable button if status is not "Chưa duyệt"
+          disabled={isApproved} // Disable button if status is "Đã duyệt"
+          onClick={() => {
+            if (!isApproved) {
+              alert("Đơn đã được duyệt!")
+            };
+          }}
         >
-          Duyệt đơn
+          Duyệt Đơn
         </Button>
       </DialogActions>
     </Dialog>
@@ -124,24 +94,21 @@ function ReportDetailDialog({ open, onClose, reporter}: Props): React.JSX.Elemen
 
 function ReportDetail(): React.JSX.Element {
   const [open, setOpen] = useState(false);
-
   const reporter: ReporterInfo = {
-    teacherId: "GV001",
     teacherName: "Nguyễn Văn A",
     email: "nguyenvana@gmail.com",
-    phone: "0987654321",
     status: "Đã duyệt", // Test with "đã duyệt" status
-    content:" Thiết bị máy chiếu mang số seri: DTLT-009 xảy ra sự cố không hoạt động được"
+    content: "Thiết bị máy chiếu mang số seri: DTLT-009 xảy ra sự cố không hoạt động được",
   };
 
- 
-   
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(true)}>Chi tiết</Button>
+      <Button variant="contained" onClick={() =>{ setOpen(true)}}>
+       Chi tiết
+      </Button>
       <ReportDetailDialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {setOpen(false)}}
         reporter={reporter}
       />
     </>

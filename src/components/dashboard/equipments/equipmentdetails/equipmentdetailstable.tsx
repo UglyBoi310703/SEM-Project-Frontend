@@ -23,7 +23,6 @@ import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/di
 import EditEquipmentModal from '../editequipment/editequipment';
 
 export interface EquipmentDetail {
-  id: string;
   name: string;
   seri: string;
   purchasedate: Date;
@@ -40,7 +39,7 @@ const statusMap = {
 
 const equipmentdetails: EquipmentDetail[] = [
   {
-    id: 'E-001',
+
     name: 'Máy chiếu',
     seri: 'DTLT-3107',
     purchasedate: dayjs().subtract(2, 'hours').toDate(),
@@ -49,8 +48,7 @@ const equipmentdetails: EquipmentDetail[] = [
     note: 'Thiết bị mới',
   },
   {
-    id: 'E-002',
-    name: 'Máy tính',
+    name: 'Máy chiếu',
     seri: 'PC-2023',
     purchasedate: dayjs().subtract(5, 'days').toDate(),
     room: 'Phòng Lab',
@@ -58,11 +56,11 @@ const equipmentdetails: EquipmentDetail[] = [
     note: 'Đã qua sử dụng',
   },
   {
-    id: 'E-003',
-    name: 'Máy in',
+
+    name: 'Máy chiếu',
     seri: 'PRT-123',
     purchasedate: dayjs().subtract(1, 'year').toDate(),
-    room: 'Phòng in',
+    room: 'Kho',
     status: 'fixing',
     note: 'Hỏng phần cứng',
   },
@@ -163,7 +161,7 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
             {rowsToDisplay.map((row) => {
               const { label, color } = statusMap[row.status];
               return (
-                <TableRow hover key={row.id}>
+                <TableRow hover key={row.seri}>
                   <TableCell>{row.seri}</TableCell>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{dayjs(row.purchasedate).format('MMM D, YYYY')}</TableCell>

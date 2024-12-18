@@ -4,7 +4,8 @@ export const paths = {
   dashboard: {
     crashreports: '/dashboard/crashreports',
     account: '/dashboard/account',
-    borrows: '/dashboard/borrowrequests',
+    borrowequipmentrequests: '/dashboard/borrowequipmentrequests',
+    borrowroomrequests: '/dashboard/borrowroomrequests',
     equipments:'/dashboard/equipments',
     classrooms: '/dashboard/classrooms',
     settings: '/dashboard/settings',
@@ -12,8 +13,9 @@ export const paths = {
   user: {
     crashreports: '/user/crashreports',
     account: '/user/account',
-    borrows: '/user/borrowrequests',
     equipments:'/user/equipments',
+    borrowequipmentrequests: '/user/borrowequipmentrequests',
+    borrowroomrequests: '/user/borrowroomrequests',
     classrooms: '/user/classrooms',
     settings: '/user/settings',
   },

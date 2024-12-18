@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import {
   Table,
@@ -21,7 +22,7 @@ import {
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import BorrowRoomDetail from './classroomborrowdetail';
+import BorrowRoomDetail from './roomborrow-detail';
 
 interface RoomBorrowRecord {
   RequestId: string;

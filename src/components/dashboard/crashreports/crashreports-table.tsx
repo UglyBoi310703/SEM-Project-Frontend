@@ -9,13 +9,12 @@ import TableRow from "@mui/material/TableRow";
 import TablePagination from "@mui/material/TablePagination";
 import Chip from "@mui/material/Chip";
 import dayjs from "dayjs";
-import ReportDetail from "./report-detail";
+import ReportDetail from "./crashreport-detail";
 import {
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Typography,
 } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import OutlinedInput from "@mui/material/OutlinedInput";

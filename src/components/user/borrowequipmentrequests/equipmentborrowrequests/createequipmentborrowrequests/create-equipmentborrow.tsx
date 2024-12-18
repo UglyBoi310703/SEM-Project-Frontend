@@ -38,7 +38,6 @@ interface SelectedDevice extends Device {
 
 function CreateBorrowEquipmentRequest(): React.JSX.Element {
   const [open, setOpen] = useState(false);
-  const [teacherName, setTeacherName] = useState('');
   const [borrowDate, setBorrowDate] = useState<Dayjs | null>(null);
   const [returnDate, setReturnDate] = useState<Dayjs | null>(null);
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = useState(false);
@@ -85,7 +84,7 @@ function CreateBorrowEquipmentRequest(): React.JSX.Element {
       <Button variant="contained" onClick={() => {setOpen(true)}}>
         Tạo đơn mượn thiết bị
       </Button>
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
+      <Dialog open={open} onClose={() => setOpen(false)}  maxWidth="md">
         <DialogTitle>
           <Typography variant="h6">Tạo đơn mượn</Typography>
           <IconButton
@@ -97,15 +96,7 @@ function CreateBorrowEquipmentRequest(): React.JSX.Element {
           </IconButton>
         </DialogTitle>
         <DialogContent dividers>
-          <Box display="flex" gap={2}>
-            {/* Teacher name */}
-            <TextField
-              label="Tên giáo viên"
-              value={teacherName}
-              onChange={(e) => setTeacherName(e.target.value)}
-             
-            />
-
+          <Box display="flex"  gap={2}>
             {/* Borrow date */}
             <DatePicker
               label="Ngày mượn"
@@ -121,8 +112,7 @@ function CreateBorrowEquipmentRequest(): React.JSX.Element {
               renderInput={(params) => <TextField {...params} fullWidth />}
             />
           </Box>
-
-       <Box sx={{ height:500, display: "flex",flexDirection:"column",alignItems:"center", gap: 3, mt: 2 }}>
+       <Box sx={{ height:450, display: "flex",flexDirection:"column",alignItems:"center", gap: 3, mt: 2 }}>
        <Typography variant="h6" sx={{ mt: 2 }}>
             Danh sách thiết bị
           </Typography>

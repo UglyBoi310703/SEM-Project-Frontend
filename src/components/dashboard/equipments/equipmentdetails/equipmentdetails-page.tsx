@@ -2,20 +2,13 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
-
-import { styled } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import { X } from "@phosphor-icons/react";
-import type { EquipmentDetail } from './equipmentdetailstable';
-import dayjs from 'dayjs';
-import EquipmentFilter from '../equipmentfilters/equipmentfilters';
 import { EquipmentsDetailsTable } from './equipmentdetailstable';
-import AddEquipmentModal from '../addequipment/addequipment';
+import AddEquipmentModal from '../addequipment/add-equipment';
 
 
 export default function EquipmentDetails(): React.JSX.Element {
@@ -62,10 +55,9 @@ export default function EquipmentDetails(): React.JSX.Element {
           <Typography variant="h4">Danh sách thiết bị</Typography>
         </Stack>
         <div>
-          <AddEquipmentModal/>
+        <AddEquipmentModal/>
         </div>
       </Stack>
-     
       <EquipmentsDetailsTable
       />
     </Stack>

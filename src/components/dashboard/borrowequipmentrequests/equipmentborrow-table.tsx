@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from 'react';
 import {
   Table,
@@ -10,7 +11,7 @@ import {
   TablePagination,
   Box,
 } from '@mui/material';
-import BorrowEquipmentDetail from './equipmentborrowdetail';
+import BorrowEquipmentDetail from './equipmentborrow-detail';
 import Chip from '@mui/material/Chip';
 import {
   FormControl,
@@ -44,7 +45,7 @@ const deviceBorrowData: BorrowRecord[] = [
   { requestId: 'GV005', teacherName: 'Le Thi E', borrowDate: '2024-12-05', expectedReturnDate: '2024-12-14', status: 'approved' },
 ];
 
-function DeviceBorrowTable(): React.JSX.Element{
+function EquipmentBorrowTable(): React.JSX.Element{
   const [BorowEquipmentStatus, SetBorowEquipmentStatus] = useState<string>("Tất cả");
   const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     SetBorowEquipmentStatus(event.target.value as string);
@@ -157,4 +158,4 @@ function DeviceBorrowTable(): React.JSX.Element{
   );
 };
 
-export default DeviceBorrowTable;
+export default EquipmentBorrowTable;

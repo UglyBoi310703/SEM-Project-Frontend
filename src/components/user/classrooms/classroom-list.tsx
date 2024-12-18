@@ -19,7 +19,6 @@ import {
   MenuItem,
 } from "@mui/material";
 
-
 const classrooms = [
   {
     id: 'CLASS-001',
@@ -71,10 +70,14 @@ const classrooms = [
 
 export default function ClassroomList(): React.JSX.Element {
     const [RoomStatus, setRoomStatus] = React.useState("Tất cả");
-    const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const [RoomType, setRoomType] = React.useState("Tất cả");
+    const handleRoomStatusFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
       setRoomStatus(event.target.value as string);
     };
-  
+    const handleRoomTypeFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+      setRoomType(event.target.value as string);
+    };
+    
     const handleApplyFilter = () => {
       console.log("Loại thiết bị được chọn:", RoomStatus);
     };
@@ -116,30 +119,30 @@ export default function ClassroomList(): React.JSX.Element {
       <FormControl sx={{ minWidth: 200 }} size="small">
         <InputLabel>Trạng thái</InputLabel>
         <Select
-          value="Tất cả"
-          onChange={handleFilterChange}
+          value={RoomStatus}
+          onChange={handleRoomStatusFilterChange}
           name="roomstatus"
           label = "Trạng thái"
         >
           <MenuItem value="Tất cả">Tất cả</MenuItem>
-          <MenuItem value="Điện tử">Sẵn có</MenuItem>
-          <MenuItem value="Cơ khí">Đang sử dụng</MenuItem>
-          <MenuItem value="Y tế">Đang bảo trì</MenuItem>
+          <MenuItem value="Sẵn có">Sẵn có</MenuItem>
+          <MenuItem value="Đang sử dụng">Đang sử dụng</MenuItem>
+          <MenuItem value="Đang bảo trì">Đang bảo trì</MenuItem>
 
         </Select>
       </FormControl>
       <FormControl sx={{ minWidth: 200 }} size="small">
         <InputLabel>Loại phòng</InputLabel>
         <Select
-          value="Tất cả"
-          onChange={handleFilterChange}
+          value={RoomType}
+          onChange={handleRoomTypeFilterChange}
           name="roomtype"
-          label = "Trạng thái"
+          label = "Loại phòng"
         >
           <MenuItem value="Tất cả">Tất cả</MenuItem>
-          <MenuItem value="Điện tử">Phòng học</MenuItem>
-          <MenuItem value="Cơ khí">Phòng hội đồng</MenuItem>
-          <MenuItem value="Y tế">Phòng thí nghiệm</MenuItem>
+          <MenuItem value="Phòng họ">Phòng học</MenuItem>
+          <MenuItem value="Phòng hội đồng">Phòng hội đồng</MenuItem>
+          <MenuItem value="Phòng thí nghiệm">Phòng thí nghiệm</MenuItem>
         </Select>
       </FormControl>
     

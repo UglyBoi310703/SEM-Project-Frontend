@@ -1,56 +1,94 @@
 'use client';
-
 import * as React from 'react';
-import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
+import { Divider } from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
-import Checkbox from '@mui/material/Checkbox';
-import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Unstable_Grid2';
+export default function NotificationOptions() {
+  const [email, setEmail] = React.useState(true);
+  const [inApp, setInApp] = React.useState(true);
+  const [push, setPush] = React.useState(true);
 
-export function Notifications(): React.JSX.Element {
+  // State điều khiển Snackbar
+  const [snackbar, setSnackbar] = React.useState({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
+
+  const handleChange = (type, value) => {
+    setSnackbar({
+      open: true,
+      message: `Thông báo ${type} đã được ${value ? 'bật' : 'tắt'}`,
+      severity: value ? 'success' : 'error',
+    });
+  };
+
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault();
-      }}
-    >
-      <Card>
-        <CardHeader subheader="Manage the notifications" title="Notifications" />
+   <Card sx={{ m:2}}>
+    <CardHeader  title="Tuỳ chỉnh thông báo" />
         <Divider />
-        <CardContent>
-          <Grid container spacing={6} wrap="wrap">
-            <Grid md={4} sm={6} xs={12}>
-              <Stack spacing={1}>
-                <Typography variant="h6">Email</Typography>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="Product updates" />
-                  <FormControlLabel control={<Checkbox />} label="Security updates" />
-                </FormGroup>
-              </Stack>
-            </Grid>
-            <Grid md={4} sm={6} xs={12}>
-              <Stack spacing={1}>
-                <Typography variant="h6">Phone</Typography>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox defaultChecked />} label="Email" />
-                  <FormControlLabel control={<Checkbox />} label="Security updates" />
-                </FormGroup>
-              </Stack>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <Divider />
-        <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">Save changes</Button>
-        </CardActions>
-      </Card>
-    </form>
+    <CardContent>
+    <Box sx={{display:"flex",flexDirection:"column",  }}>
+      <FormControlLabel
+        control={
+          <Switch
+            checked={email}
+            onChange={() => {
+              setEmail((prev) => !prev);
+              handleChange('Email', !email);
+            }}
+          />
+        }
+        label="Thông báo Email"
+      />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={inApp}
+            onChange={() => {
+              setInApp((prev) => !prev);
+              handleChange('In-App', !inApp);
+            }}
+          />
+        }
+        label="Thông báo In-App"
+      />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={push}
+            onChange={() => {
+              setPush((prev) => !prev);
+              handleChange('Push', !push);
+            }}
+          />
+        }
+        label="Thông báo Push"
+      />
+
+      {/* Snackbar thông báo */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
+    </CardContent>
+   </Card>
   );
 }

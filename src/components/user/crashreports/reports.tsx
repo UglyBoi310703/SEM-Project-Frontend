@@ -1,82 +1,171 @@
-"use client"
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TablePagination from '@mui/material/TablePagination';
-import Chip from '@mui/material/Chip';
-import dayjs from 'dayjs';
-import ReportDetail from './reportdetail';
+"use client";
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TablePagination from "@mui/material/TablePagination";
+import Chip from "@mui/material/Chip";
+import dayjs from "dayjs";
+import ReportDetail from "./reportdetail";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+
+} from "@mui/material";
+import InputAdornment from "@mui/material/InputAdornment";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react";
 
 const statusMap = {
-  pending: { label: 'Chờ phê duyệt', color: 'warning' },
-  approved: { label: 'Đã phê duyệt', color: 'success' },
-  refunded: { label: 'Refunded', color: 'error' },
+  pending: { label: "Chờ phê duyệt", color: "warning" },
+  approved: { label: "Đã phê duyệt", color: "success" },
+  refunded: { label: "Refunded", color: "error" },
 } as const;
 
-export interface Order {
+export interface CrashReports {
   id: string;
   customer: { name: string };
-  status: 'pending' | 'approved';
+  status: "pending" | "approved";
   idEquip: string;
   nameEquip: string;
   createdAt: Date;
 }
 
-export interface LatestOrdersProps {
-  orders?: Order[];
-  sx?: SxProps;
-}
+const crashreports: CrashReports[] = [
+  {
+    id: "ORD-009",
+    customer: { name: "Đỗ Văn Vương" },
+    idEquip: "DTLT-E001",
+    nameEquip: "Mic",
+    status: "pending",
+    createdAt: dayjs().subtract(10, "minutes").toDate(),
+  },
+  {
+    id: "ORD-006",
+    customer: { name: "Chiến LV" },
+    idEquip: "DTLT-E002",
+    nameEquip: "Máy chiếu",
+    status: "approved",
+    createdAt: dayjs().subtract(1, "day").toDate(),
+  },
+  {
+    id: "ORD-004",
+    customer: { name: "Lê Phúc Lâm" },
+    idEquip: "DTLT-E003",
+    nameEquip: "Loa",
+    status: "approved",
+    createdAt: dayjs().subtract(2, "days").toDate(),
+  },
+  {
+    id: "ORD-001",
+    customer: { name: "Vũ Đình Trường" },
+    idEquip: "DTLT-E004",
+    nameEquip: "Máy chiếu",
+    status: "approved",
+    createdAt: dayjs().subtract(3, "days").toDate(),
+  },
+];
 
-export function Reports({ orders = [] }: LatestOrdersProps): React.JSX.Element {
-  // State quản lý phân trang
-  const [page, setPage] = React.useState(0); // Trang hiện tại (bắt đầu từ 0)
-  const [rowsPerPage, setRowsPerPage] = React.useState(5); // Số hàng trên mỗi trang
+export function Reports(): React.JSX.Element {
+  const [filterStatus, setFilterStatus] = React.useState<string>("Tất cả");
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  // Tính toán vị trí bắt đầu và kết thúc của dữ liệu hiển thị
-  const startIndex = page * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedOrders = orders.slice(startIndex, endIndex);
+  // Xử lý lọc trạng thái
+  const filteredReports = crashreports.filter((report) => {
+    if (filterStatus === "Tất cả") return true;
+    return (
+      (filterStatus === "Chưa duyệt" && report.status === "pending") ||
+      (filterStatus === "Đã duyệt" && report.status === "approved")
+    );
+  });
 
-  // Xử lý khi thay đổi trang
+  // Xử lý phân trang
+  const paginatedReports = filteredReports.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  // Xử lý khi thay đổi số hàng trên mỗi trang
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Quay về trang đầu khi thay đổi số hàng
+    setPage(0);
   };
 
   return (
-    <Box >
+    <Box>
+      {/* Bộ lọc */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          bgcolor: "background.paper",
+          p: 2,
+          borderRadius: 2,
+          boxShadow: 1,
+        }}
+      >
+        <OutlinedInput
+          placeholder="Tìm kiếm báo cáo"
+          startAdornment={
+            <InputAdornment position="start">
+              <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
+            </InputAdornment>
+          }
+          sx={{ maxWidth: "500px" }}
+        />
+        <FormControl sx={{ minWidth: 200 }} size="small">
+          <InputLabel>Trạng thái</InputLabel>
+          <Select
+            value={filterStatus}
+            onChange={(e) => {setFilterStatus(e.target.value)}}
+            label="Trạng thái"
+          >
+            <MenuItem value="Tất cả">Tất cả</MenuItem>
+            <MenuItem value="Chưa duyệt">Chưa duyệt</MenuItem>
+            <MenuItem value="Đã duyệt">Đã duyệt</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Bảng hiển thị dữ liệu */}
       <Table sx={{ minWidth: 800 }}>
         <TableHead>
           <TableRow>
             <TableCell>Mã báo cáo</TableCell>
-            <TableCell>Người Báo cáo</TableCell>
+            <TableCell>Người báo cáo</TableCell>
             <TableCell>Mã thiết bị</TableCell>
             <TableCell>Tên thiết bị</TableCell>
-            <TableCell sortDirection="desc">Thời gian</TableCell>
+            <TableCell>Thời gian</TableCell>
             <TableCell>Trạng thái</TableCell>
             <TableCell>Chi tiết</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {paginatedOrders.map((order) => {
-            const { label, color } = statusMap[order.status] ?? { label: 'Unknown', color: 'default' };
+          {paginatedReports.map((report) => {
+            const { label, color } =
+              statusMap[report.status] ?? { label: "Không xác định", color: "default" };
 
             return (
-              <TableRow hover key={order.id}>
-                <TableCell>{order.id}</TableCell>
-                <TableCell>{order.customer.name}</TableCell>
-                <TableCell>{order.idEquip}</TableCell>
-                <TableCell>{order.nameEquip}</TableCell>
-                <TableCell>{dayjs(order.createdAt).format('MMM D, YYYY')}</TableCell>
+              <TableRow hover key={report.id}>
+                <TableCell>{report.id}</TableCell>
+                <TableCell>{report.customer.name}</TableCell>
+                <TableCell>{report.idEquip}</TableCell>
+                <TableCell>{report.nameEquip}</TableCell>
+                <TableCell>
+                  {dayjs(report.createdAt).format("DD/MM/YYYY HH:mm")}
+                </TableCell>
                 <TableCell>
                   <Chip color={color} label={label} size="small" />
                 </TableCell>
@@ -89,15 +178,15 @@ export function Reports({ orders = [] }: LatestOrdersProps): React.JSX.Element {
         </TableBody>
       </Table>
 
-      {/* Thành phần phân trang */}
+      {/* Phân trang */}
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]} // Các tùy chọn số hàng mỗi trang
+        rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={orders.length} // Tổng số hàng
-        rowsPerPage={rowsPerPage} // Số hàng mỗi trang
-        page={page} // Trang hiện tại
-        onPageChange={handleChangePage} // Xử lý thay đổi trang
-        onRowsPerPageChange={handleChangeRowsPerPage} // Xử lý thay đổi số hàng mỗi trang
+        count={filteredReports.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </Box>
   );
