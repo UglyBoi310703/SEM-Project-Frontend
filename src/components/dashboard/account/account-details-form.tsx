@@ -9,17 +9,9 @@ import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Select from '@mui/material/Select';
-import Grid from '@mui/material/Unstable_Grid2';
+import Stack from '@mui/material/Stack';
 
-const states = [
-  { value: 'thaibinh', label: 'Thái Bình' },
-  { value: 'hanoi', label: 'Hà Nội' },
-  { value: 'saohoa', label: 'Sao Hoả' },
-  { value: 'mattrang', label: 'Mặt trăng' },
-] as const;
 
 export function AccountDetailsForm(): React.JSX.Element {
   return (
@@ -32,47 +24,20 @@ export function AccountDetailsForm(): React.JSX.Element {
         <CardHeader subheader="Thông tin có thể được chỉnh sửa" title="Thông tin tài khoản" />
         <Divider />
         <CardContent>
-          <Grid container spacing={3}>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>First name</InputLabel>
-                <OutlinedInput defaultValue="Ugly" label="First name" name="firstName" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Last name</InputLabel>
-                <OutlinedInput defaultValue="Boi" label="Last name" name="lastName" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Email</InputLabel>
-                <OutlinedInput defaultValue="uglyboi3107@gmail.com" label="Email address" name="email" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Điện thoại</InputLabel>
-                <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Tỉnh</InputLabel>
-                <Select defaultValue="New York" label="Tỉnh" name="tinh" variant="outlined">
-                  {states.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+          <Stack spacing={2}>
+            <FormControl fullWidth required>
+              <InputLabel>Họ và tên</InputLabel>
+              <OutlinedInput defaultValue="Boi" label="Last name" name="lastName" />
+            </FormControl>
+            <FormControl fullWidth required>
+              <InputLabel>Email</InputLabel>
+              <OutlinedInput defaultValue="uglyboi3107@gmail.com" label="Email address" name="email" />
+            </FormControl>
+          </Stack>
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
+          <Button variant="outlined">Sửa</Button>
           <Button variant="contained">Lưu</Button>
         </CardActions>
       </Card>

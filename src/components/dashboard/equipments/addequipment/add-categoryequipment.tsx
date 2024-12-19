@@ -40,13 +40,15 @@ function AddCategoryEquipmentModal(): JSX.Element {
     });
   };
 
-  const handleSave = () => {
-    console.log('New Category Data:', formData);
-    setOpen(false);
-  };
+  // const handleSave = () => {
+  //   console.log('New Category Data:', formData);
+  //   setOpen(false);
+  // };
 
   return (
-    <>
+    <Box sx={{
+      p:2
+    }}>
       <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={() => setOpen(true)}>
         Thêm danh mục thiết bị
       </Button>
@@ -65,7 +67,12 @@ function AddCategoryEquipmentModal(): JSX.Element {
           }}
         >
           {/* Header */}
-          <Box
+         <form
+          onSubmit={(event) => {
+            event.preventDefault();
+          }}
+         >
+         <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -81,8 +88,7 @@ function AddCategoryEquipmentModal(): JSX.Element {
 
           {/* Form */}
           <Stack spacing={3}>
-    
-
+  
             {/* Tên thiết bị */}
             <TextField
               label="Tên thiết bị"
@@ -120,13 +126,14 @@ function AddCategoryEquipmentModal(): JSX.Element {
             <Button onClick={handleReset} variant="outlined" sx={{ mr: 2 }}>
               Đặt lại
             </Button>
-            <Button onClick={handleSave} variant="contained" color="primary">
+            <Button type="submit" variant="contained" color="primary">
               Lưu
             </Button>
           </Box>
+         </form>
         </Box>
       </Modal>
-    </>
+    </Box>
   );
 }
 

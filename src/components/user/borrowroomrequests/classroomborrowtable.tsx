@@ -66,17 +66,17 @@ function RoomBorrowTable (): React.JSX.Element {
           display: "flex",
           alignItems: "center",
           justifyContent:"space-between",
+          bgcolor: "background.paper",
+          boxShadow: 1,
+          mb:2
       }} >
-           <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-        bgcolor: "background.paper",
-        pb: 2,
-        borderRadius: 2,
-        boxShadow: 1,
-      }}
+       <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+      
+        }}
     >
       <OutlinedInput
         placeholder="Tìm kiếm "
@@ -116,7 +116,7 @@ function RoomBorrowTable (): React.JSX.Element {
       </Box>
     </Box>
           <CreateBorrowRoomRequest/>
-          </Box>
+      </Box>
       <TableContainer component={Paper}>
       <Table>
         <TableHead>

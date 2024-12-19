@@ -68,13 +68,15 @@ function EquipmentBorrowTable(){
           display: "flex",
           alignItems: "center",
           justifyContent:"space-between",
+          bgcolor: "background.paper",
+          boxShadow: 1,
+          mb:2
       }} >
            <Box
       sx={{
         display: "flex",
         alignItems: "center",
         gap: 2,
-        pb: 2,
        
       }}
     >

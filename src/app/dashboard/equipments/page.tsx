@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import { config } from '@/config';
 
 import { EquipmentsTable } from '@/components/dashboard/equipments/equipment-categories-table';
-import AddCategoryEquipmentModal from '@/components/dashboard/equipments/addequipment/add-categoryequipment';
 
 export const metadata = { title: `Equipments | Dashboard | ${config.site.name}` } satisfies Metadata;
 
@@ -29,11 +28,9 @@ export default function Page(): React.JSX.Element {
             </Button>
           </Stack> */}
         </Stack>
-        <div>
-            <AddCategoryEquipmentModal/>
-        </div>
+      
       </Stack>
-      <EquipmentsTable
+      <EquipmentsTable 
       />
     </Stack>
   );

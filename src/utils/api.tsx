@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Classroom } from "@/components/dashboard/classrooms/classrooms-card";
+import type { Classroom } from "@/components/dashboard/classrooms/classrooms-card";
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -22,7 +22,6 @@ export interface NewRoom {
   roomName: string;
   type: string;
   capacity:number;
- 
 }
 export const addClassRoom = async (classroom: NewRoom): Promise<void> => {
   try {

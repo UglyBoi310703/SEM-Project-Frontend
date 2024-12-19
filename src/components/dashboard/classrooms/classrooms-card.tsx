@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import ClassRoomInformation from './classroominfomation';
 import Chip from '@mui/material/Chip';
-
+import { Button,Box } from '@mui/material';
 
 export interface Classroom {
   id: string,
@@ -53,8 +53,16 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
         <Stack sx={{ alignItems: 'center' }} direction="row" spacing={1}>
         <Chip color={color} label={label} size="small" />
         </Stack>
-        <ClassRoomInformation room={classroom} />
-
+          <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+          >
+          <Button variant="outlined" color="error" >Xoá</Button>
+          <ClassRoomInformation room={classroom} />
+          </Box>
       </Stack>
     </Card>
   );

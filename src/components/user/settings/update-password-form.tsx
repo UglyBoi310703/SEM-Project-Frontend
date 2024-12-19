@@ -11,15 +11,17 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
+import { Box } from '@mui/material';
 
 export function UpdatePasswordForm(): React.JSX.Element {
   return (
-    <form
+   <Box sx={{flex:1,m:2}}>
+     <form  
       onSubmit={(event) => {
         event.preventDefault();
       }}
     >
-      <Card>
+      <Card >
         <CardHeader  title="Đổi mật khẩu" />
         <Divider />
         <CardContent>
@@ -44,5 +46,6 @@ export function UpdatePasswordForm(): React.JSX.Element {
         </CardActions>
       </Card>
     </form>
+   </Box>
   );
 }

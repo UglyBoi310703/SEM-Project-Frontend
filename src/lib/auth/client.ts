@@ -11,14 +11,12 @@ function generateToken(): string {
 const user = {
   id: 'USR-009',
   avatar: '/assets/AVT.jpg',
-  firstName: 'Ugly',
-  lastName: 'Boi',
+  Name: 'Ugly Boi',
   email: 'uglyboi3107@gmail.com',
 } satisfies User;
 
 export interface SignUpParams {
-  firstName: string;
-  lastName: string;
+  name:string;
   email: string;
   password: string;
 }

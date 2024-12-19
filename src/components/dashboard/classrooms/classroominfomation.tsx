@@ -62,7 +62,7 @@ export interface classRoomId {
 interface ClassroomProps {
   room: Classroom;
 }
-const ClassRoomInformation: React.FC<ClassroomProps> = ({ room }) => {
+function ClassRoomInformation({ room }:ClassroomProps): React.JSX.Element{
   const [open, setOpen] = React.useState(false);
   const ClassMapping = {
     "Phòng học": "CLASSROOM",
@@ -166,7 +166,7 @@ const ClassRoomInformation: React.FC<ClassroomProps> = ({ room }) => {
                           <InputLabel id="classroomstatus">Trạng thái</InputLabel>
                           <Select
                             value={roomStatus}
-                            label="Classroomstatus"
+                            label="Trạng thái"
                             onChange={handleChangeStatus}
                           >
                             <MenuItem value="AVAILABLE">Sẵn sàng</MenuItem>

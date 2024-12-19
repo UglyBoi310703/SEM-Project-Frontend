@@ -72,6 +72,7 @@ function CreateBorrowRoomRequest(): React.JSX.Element {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
+        <form>
         <DialogContent>
           <Box component="form" sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
             {/* Bố trí Tên giáo viên và Ngày mượn ở dòng đầu tiên */}
@@ -134,14 +135,14 @@ function CreateBorrowRoomRequest(): React.JSX.Element {
                 />
               </Grid>
             </Grid>
-
-            <DialogActions>
-            <Button variant="contained" onClick={handleSubmit} sx={{ mt: 2 }}>
-              Tạo đơn
-            </Button>
-            </DialogActions>
           </Box>
         </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={handleSubmit} sx={{ mt: 2 }}>
+            Tạo đơn
+          </Button>
+        </DialogActions>
+        </form>
       </Dialog>
     </div>
   );
