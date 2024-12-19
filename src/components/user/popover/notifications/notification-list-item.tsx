@@ -35,8 +35,6 @@ export function NotificationListItem({
     return '#';
   };
 
-
-
   return (
     <ListItem
       component={RouterLink}

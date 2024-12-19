@@ -19,6 +19,7 @@ import CardContent from "@mui/material/CardContent";
 import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 import { addClassRoom } from "@/utils/api";
 import { useState } from "react";
+
 export default function AddClassroomModal() {
   const [open, setOpen] = React.useState(false);
 

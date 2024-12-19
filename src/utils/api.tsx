@@ -23,7 +23,6 @@ export interface NewRoom {
   roomName: string;
   type: string;
   capacity:number;
- 
 }
 export const addClassRoom = async (classroom: NewRoom): Promise<void> => {
   try {
@@ -41,7 +40,6 @@ export const addClassRoom = async (classroom: NewRoom): Promise<void> => {
   }
 };
  
-
 // //Hàm gọi API sửa phòng học
 
 
