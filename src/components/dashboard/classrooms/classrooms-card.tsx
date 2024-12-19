@@ -19,6 +19,8 @@ export interface Classroom {
 export interface ClassroomCardProps {
   classroom: Classroom;
 }
+
+
 const statusMap = {
   BROKEN: { label: 'Đang bảo trì', color: 'secondary' },
   AVAILABLE: { label: 'Sẵn sàng', color: 'success' },
@@ -50,7 +52,8 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
         <Stack sx={{ alignItems: 'center' }} direction="row" spacing={1}>
         <Chip color={color} label={label} size="small" />
         </Stack>
-        <ClassRoomInformation/>
+        <ClassRoomInformation classroomName={classroom.roomName} />
+
       </Stack>
     </Card>
   );

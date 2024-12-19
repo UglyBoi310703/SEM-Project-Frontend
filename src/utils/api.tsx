@@ -18,7 +18,6 @@ export async function APIGetAllRoom(): Promise<RoomApiResponse> {
 }
 
 // //APIAddRoom
-
 export interface NewRoom {
   roomName: string;
   type: string;
@@ -27,9 +26,9 @@ export interface NewRoom {
 }
 export const addClassRoom = async (classroom: NewRoom): Promise<void> => {
   try {
-    const response = await axios.post("http://localhost:8080/api/v1/room", classroom, {
+    const response = await axios.post(`${BASE_URL}/api/v1/room`, classroom, {
       headers: {
-        "Content-Type": "application/json", // Header để server nhận JSON
+        "Content-Type": "application/json",  
       },
     });
     console.log("Phòng học đã được tạo thành công:", response.data);
@@ -40,9 +39,18 @@ export const addClassRoom = async (classroom: NewRoom): Promise<void> => {
     }
   }
 };
+
  
+export async function APIGetRoomByName(roomName: string) {
+ 
+  const response = await fetch(`${BASE_URL}/api/v1/room/search?keyword=${roomName}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch room data");
+  }
+  return response.json();
+}
 
-// //Hàm gọi API sửa phòng học
 
+//Hàm gọi API sửa phòng học
 
 
