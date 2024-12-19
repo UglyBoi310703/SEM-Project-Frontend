@@ -9,10 +9,10 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import { Bell as BellIcon } from '@phosphor-icons/react/dist/ssr/Bell';
 import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
-import { NotificationsPopover } from './notifications-popover';
+import { NotificationsPopover } from '../popover/notifications/notifications-popover';
 import { usePopover } from '@/hooks/use-popover';
 import { MobileNav } from './mobile-nav';
-import { UserPopover } from './user-popover';
+import { UserPopover } from '../popover/user-popover';
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);

@@ -4,12 +4,19 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
+import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Stack from "@mui/material/Stack";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { Box, DialogActions } from "@mui/material";
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Divider from '@mui/material/Divider';
 import { addClassRoom, APIGetAllRoom } from "@/utils/api";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
@@ -137,17 +144,22 @@ export default function AddClassroomModal({ onAddRoom }) {
 
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(true)}>
+      <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={() => setOpen(true)}>
         Thêm phòng học
       </Button>
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Thêm phòng học</DialogTitle>
+      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
+        <DialogTitle>
+        Thêm phòng học
+        </DialogTitle>
+        <Divider/>
+      <form onSubmit={handleSubmit(onSubmit)}>
+
         <DialogContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2}>
+          
+        <Stack spacing={2}>
               <FormControl fullWidth error={!!errors.roomName || !!roomNameError}>
-                <InputLabel>Tên phòng</InputLabel>
-                <OutlinedInput {...register("roomName")} />
+                <InputLabel >Tên phòng</InputLabel>
+                <OutlinedInput label="Tên phòng" {...register("roomName")} />
                 {roomNameError && (
                   <p style={{ color: "red" }}>{roomNameError}</p>
                 )}
@@ -155,12 +167,11 @@ export default function AddClassroomModal({ onAddRoom }) {
                   <p style={{ color: "red" }}>{errors.roomName.message}</p>
                 )}
               </FormControl>
-
               <FormControl fullWidth error={!!errors.type}>
                 <InputLabel>Loại phòng</InputLabel>
-                <Select {...register("type")}>
+                <Select label ="Loại phòng" {...register("type")}>
                   <MenuItem value="CLASSROOM">Phòng học</MenuItem>
-                  <MenuItem value="OFFICE">Phòng làm việc</MenuItem>
+                  <MenuItem value="OFFICE">Văn phòng cán bộ</MenuItem>
                   <MenuItem value="LABORATORY">Phòng thí nghiệm</MenuItem>
                   <MenuItem value="WAREHOUSE">Phòng kho</MenuItem>
                   <MenuItem value="MEETING_ROOM">Phòng họp</MenuItem>
@@ -172,18 +183,20 @@ export default function AddClassroomModal({ onAddRoom }) {
 
               <FormControl fullWidth error={!!errors.capacity}>
                 <InputLabel>Số lượng chỗ ngồi</InputLabel>
-                <OutlinedInput type="number" {...register("capacity")} />
+                <OutlinedInput label ="Số lượng chỗ ngồi" type="number" {...register("capacity")} />
                 {errors.capacity && (
                   <p style={{ color: "red" }}>{errors.capacity.message}</p>
                 )}
               </FormControl>
-
-              <Button type="submit" variant="contained">
-                Lưu
-              </Button>
             </Stack>
-          </form>
+            
+          <DialogActions>
+            <Button type="submit" variant="contained">
+                Lưu
+            </Button>
+          </DialogActions>
         </DialogContent>
+        </form>
       </Dialog>
     </>
   );

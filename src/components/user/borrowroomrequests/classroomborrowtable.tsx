@@ -73,9 +73,7 @@ function RoomBorrowTable (): React.JSX.Element {
         alignItems: "center",
         gap: 2,
         bgcolor: "background.paper",
-        pb: 2,
-        borderRadius: 2,
-        boxShadow: 1,
+     
       }}
     >
       <OutlinedInput

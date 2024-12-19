@@ -1,8 +1,8 @@
 "use client"
 import * as React from 'react';
-import { Button } from '@mui/material';
+
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
+
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
@@ -103,7 +103,7 @@ export function EquipmentsTable(): React.JSX.Element {
 
   return (
     <Box>
-      {/* Filter */}
+      {/* Search and Filter */}
       <Box
       sx={{
         display: "flex",
@@ -115,6 +115,7 @@ export function EquipmentsTable(): React.JSX.Element {
         boxShadow: 1,
       }}
     >
+        {/* Search */}
       <OutlinedInput
         placeholder="Tìm kiếm"
         startAdornment={
@@ -124,7 +125,7 @@ export function EquipmentsTable(): React.JSX.Element {
         }
         sx={{ maxWidth: '500px' }}
       />  
-      {/* Tiêu đề */}
+      {/* Filter */}
       <Box
        sx={{
         display: "flex",
@@ -154,7 +155,7 @@ export function EquipmentsTable(): React.JSX.Element {
       </FormControl>
       </Box>
     </Box>
-
+    
       {/* Bảng danh sách các danh mục thiết bị */}
       <Box sx={{ overflowX: 'auto' }}>
         <Table sx={{ minWidth: '900px' }}>

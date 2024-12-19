@@ -54,7 +54,6 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
         <Chip color={color} label={label} size="small" />
         </Stack>
         <ClassRoomInformation room={classroom} />
-
       </Stack>
     </Card>
   );

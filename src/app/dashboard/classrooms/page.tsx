@@ -2,7 +2,7 @@
 import * as React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+
 import AddClassroomModal from "@/components/dashboard/classrooms/add-classroom";
 import ClassRoomList from "@/components/dashboard/classrooms/classroom-list";
 import { APIGetAllRoom } from "@/utils/api";
@@ -44,8 +44,10 @@ export default function Page(): React.JSX.Element {
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
+        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
         <Typography variant="h4">Danh sách phòng học tại trường</Typography>
-        <AddClassroomModal onAddRoom={handleAddRoom} />
+        </Stack>
+        <div><AddClassroomModal onAddRoom={handleAddRoom}/></div>
       </Stack>
       <ClassRoomList rooms={rooms} isLoading={isLoading} />
     </Stack>

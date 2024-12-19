@@ -101,6 +101,7 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
 
   return (
     <Box>
+      {/* Search and Filter */}
       <Box
         sx={{
           display: 'flex',
@@ -112,6 +113,7 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
           boxShadow: 1,
         }}
       >
+        {/* Search */}
         <OutlinedInput
           placeholder="Tìm kiếm"
           startAdornment={
@@ -121,7 +123,7 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
           }
           sx={{ maxWidth: '500px' }}
         />
-
+          {/* Filter */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Bộ lọc:
@@ -144,6 +146,7 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
         </Box>
       </Box>
 
+        {/* Bảng danh sách thiết bị */}
       <Box sx={{ overflowX: 'auto' }}>
         <Table sx={{ minWidth: '900px' }}>
           <TableHead>

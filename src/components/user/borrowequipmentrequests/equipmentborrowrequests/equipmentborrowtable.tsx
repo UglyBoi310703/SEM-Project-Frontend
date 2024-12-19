@@ -74,7 +74,6 @@ function EquipmentBorrowTable(){
         display: "flex",
         alignItems: "center",
         gap: 2,
-        pb: 2,
        
       }}
     >

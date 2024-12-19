@@ -33,7 +33,7 @@ export default function Page(): React.JSX.Element {
             <AddCategoryEquipmentModal/>
         </div>
       </Stack>
-      <EquipmentsTable
+      <EquipmentsTable 
       />
     </Stack>
   );

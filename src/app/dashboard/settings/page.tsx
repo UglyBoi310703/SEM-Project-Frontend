@@ -7,6 +7,7 @@ import { config } from '@/config';
 // import { Notifications } from '@/components/dashboard/settings/notifications';
 import { UpdatePasswordForm } from '@/components/dashboard/settings/update-password-form';
 import { Box } from '@mui/material';
+
 export const metadata = { title: `Settings | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {

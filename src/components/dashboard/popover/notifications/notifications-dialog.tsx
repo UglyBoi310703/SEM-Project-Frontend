@@ -5,26 +5,24 @@ import DialogContent from '@mui/material/DialogContent';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import { NotificationListItem } from './notification-list-item';
-import Button from '@mui/material/Button';
 
 export interface NotificationsDialogProps {
-  open: boolean;
-  onClose: () => void;
-  tabValue: string; // Thêm prop này để nhận giá trị tab
+  open: boolean; // Kiểm soát trạng thái mở
+  onClose: () => void; // Hàm đóng dialog
+  tabValue: string; // Giá trị tab hiện tại
 }
 
 export function NotificationsDialog({ open, onClose, tabValue }: NotificationsDialogProps): React.JSX.Element {
   const notifications = [
-    { id: 1, type: 'approval', code: '009', status: 'approved', isRead: false, time: '2 giờ trước' },
-    { id: 2, type: 'report', code: 'CR-09', status: 'approved', isRead: true, time: '1 ngày trước' },
-    { id: 3, type: 'approval', code: '010', status: 'rejected', isRead: false, time: '3 giờ trước' },
-    { id: 4, type: 'report', code: 'CR-10', status: 'rejected', isRead: true, time: '2 ngày trước' },
+    { id: 1, type: 'BorrowEquipmentRequest', code: '009', isRead: false, time: '2 giờ trước' },
+    { id: 2, type: 'BorrowRoomRequest', code: 'CR-09', isRead: true, time: '1 ngày trước' },
+    { id: 3, type: 'CrashReports', code: '010', isRead: false, time: '3 giờ trước' },
+    { id: 4, type: 'BorrowEquipmentRequest', code: 'CR-10', isRead: true, time: '2 ngày trước' },
   ];
 
-  // Lọc thông báo theo tab
   const filteredNotifications = notifications.filter((n) => {
-    if (tabValue === 'unread') return !n.isRead; // Chỉ thông báo chưa đọc
-    return true; // Tất cả thông báo
+    if (tabValue === 'unread') return !n.isRead;
+    return true;
   });
 
   return (
@@ -37,9 +35,9 @@ export function NotificationsDialog({ open, onClose, tabValue }: NotificationsDi
               <NotificationListItem
                 type={item.type}
                 code={item.code}
-                status={item.status}
                 isRead={item.isRead}
                 time={item.time}
+                onClick={onClose} // Truyền callback đóng dialog
               />
               <Divider />
             </React.Fragment>
