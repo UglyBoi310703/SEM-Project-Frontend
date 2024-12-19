@@ -33,6 +33,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AddRoomEquipments from './add-classroomequipment';
+import { APIGetRoomByName } from '@/utils/api';
 
 interface Device {
   seri: string;
@@ -53,10 +54,35 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     padding: theme.spacing(1),
   },
 }));
+export interface classroomName {
+  classroomName: string;
+}
+export default function ClassroomInformation({ classroomName }: classroomName) {
 
-export default function ClassroomInformation() {
+  const [roomData, setRoomData] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    const fetchRoomData = async () => {
+      setLoading(true);
+      try {
+        const response = await APIGetRoomByName(classroomName);  
+        // console.log(response);
+        
+        setRoomData(response);
+      } catch (error) {
+        console.error("Error fetching room data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (classroomName) {
+      fetchRoomData();
+    }
+  }, [classroomName]);
   const [open, setOpen] = React.useState(false);
-   const [roomType, setRoomType] = React.useState(""); // State for room type
+   const [roomType, setRoomType] = React.useState(""); 
    const handleRoomTypeChange = (event) => {
     setRoomType(event.target.value);
   };
@@ -89,7 +115,7 @@ export default function ClassroomInformation() {
       </Button>
       <BootstrapDialog
         onClose={handleClose}
-        maxWidth="lg" // sm, md, lg, xl tùy chỉnh
+        maxWidth="lg"  
         fullWidth={true}
         aria-labelledby="customized-dialog-title"
         open={open}
@@ -141,13 +167,13 @@ export default function ClassroomInformation() {
                   </FormControl>
             <FormControl fullWidth>
               <InputLabel>Số lượng chỗ ngồi</InputLabel>
-              <OutlinedInput value="40" label="classroom type" name="classroomtype" type="classroomtype" />
+              <OutlinedInput value="40" label="Số lượng chỗ ngồi" name="classroomtype" type="classroomtype" />
             </FormControl>
         <FormControl fullWidth>
         <InputLabel id="classroomstatus">Trạng thái</InputLabel>
         <Select
           value={status}
-          label="Classroomstatus"
+          label="Trạng thái"
           onChange={handleChangeStatus}
         >
           <MenuItem value={10}>Sẵn có</MenuItem>

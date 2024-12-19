@@ -81,8 +81,7 @@ function AddCategoryEquipmentModal(): JSX.Element {
 
           {/* Form */}
           <Stack spacing={3}>
-    
-
+  
             {/* Tên thiết bị */}
             <TextField
               label="Tên thiết bị"

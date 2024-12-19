@@ -4,63 +4,54 @@ import type { Metadata } from 'next';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
+
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import { config } from '@/config';
 import { ClassroomCard } from '@/components/dashboard/classrooms/classrooms-card';
 
-import type { Classroom } from '@/components/dashboard/classrooms/classrooms-card';
 
-import { useEffect } from 'react';
-import { APIGetAllRoom } from '@/utils/api';
 import {
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-  } from "@mui/material";
-  import InputAdornment from '@mui/material/InputAdornment';
-  import OutlinedInput from '@mui/material/OutlinedInput';
-  import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 
 export const metadata = { title: `ClassRooms | Dashboard | ${config.site.name}` } satisfies Metadata;
 
-export default function ClassRoomList(): React.JSX.Element {
-    
-     const [RoomStatus, setRoomStatus] = React.useState("Tất cả");
-     const [RoomType, setRoomType] = React.useState("Tất cả");
-     const [rooms, setRooms] = React.useState<Classroom[]>([]);
-     const [isLoading, setIsLoading] = React.useState<boolean>(true);
-     const [error, setError] = React.useState<string | null>(null);
-      const handleRoomStatusFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setRoomStatus(event.target.value as string);
-      };
-      const handleRoomTypeFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setRoomType(event.target.value as string);
-      };
-      const handleApplyFilter = () => {
-        console.log("Loại thiết bị được chọn:", RoomStatus,RoomType);
-      };
+export default function ClassRoomList({ rooms, isLoading }) {
+  const [RoomStatus, setRoomStatus] = React.useState("Tất cả");
+  const [RoomType, setRoomType] = React.useState("Tất cả");
+ 
+   const handleRoomStatusFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+     setRoomStatus(event.target.value as string);
+   };
+   const handleRoomTypeFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+     setRoomType(event.target.value as string);
+   };
+   const handleApplyFilter = () => {
+     console.log("Loại thiết bị được chọn:", RoomStatus,RoomType);
+   };
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 6;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedRooms = rooms.slice(startIndex, startIndex + itemsPerPage);
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+  };
 
-      useEffect(() => {
-        const fetchRooms = async () => {
-          try {
-            setIsLoading(true);
-            const data = await APIGetAllRoom();
-            setRooms(data.content);
-          } catch (err) {
-            setError("Không thể tải dữ liệu phòng học.");
-          } finally {
-            setIsLoading(false);
-          }
-        };
-        fetchRooms();
-      }, []);
-      
+  if (isLoading) {
+    return <Typography>Đang tải danh sách phòng học...</Typography>;
+  }
+
   return (
-    <Stack spacing={3}>
-      <Box
+    <>
+       {/* Search and Filter */}
+       <Box
       sx={{
         display: "flex",
         alignItems: "center",
@@ -71,6 +62,7 @@ export default function ClassRoomList(): React.JSX.Element {
         boxShadow: 1,
       }}
     >
+      {/* Search */}
       <OutlinedInput
         placeholder="Tìm kiếm"
         startAdornment={
@@ -92,7 +84,7 @@ export default function ClassRoomList(): React.JSX.Element {
       <Typography variant="h6" sx={{ flexGrow: 1 }}>
         Bộ lọc:
       </Typography>
-      {/* Trường Loại thiết bị */}
+      {/* Filter */}
       <FormControl sx={{ minWidth: 200 }} size="small">
         <InputLabel>Trạng thái</InputLabel>
         <Select
@@ -134,15 +126,23 @@ export default function ClassRoomList(): React.JSX.Element {
       </Box>
     </Box>
       <Grid container spacing={3}>
-        {rooms.map((classroom) => (
-          <Grid key={classroom.title} lg={4} md={6} xs={12}>
+        {paginatedRooms.map((classroom) => (
+          <Grid key={classroom.roomName} lg={4} md={6} xs={12}>
             <ClassroomCard classroom={classroom} />
           </Grid>
         ))}
       </Grid>
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Pagination count={3} size="small" />
+        <Pagination
+          count={Math.ceil(rooms.length / itemsPerPage)}  
+          page={currentPage}  
+          onChange={handlePageChange}  
+          size="small"
+        />
       </Box>
-    </Stack>
+
+    </>
   );
 }
+
+
