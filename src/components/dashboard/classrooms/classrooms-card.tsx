@@ -10,6 +10,7 @@ import Chip from '@mui/material/Chip';
 
 
 export interface Classroom {
+  id: string,
   roomName: string;
   type: string;
   capacity:number;
@@ -52,7 +53,7 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
         <Stack sx={{ alignItems: 'center' }} direction="row" spacing={1}>
         <Chip color={color} label={label} size="small" />
         </Stack>
-        <ClassRoomInformation classroomName={classroom.roomName} />
+        <ClassRoomInformation room={classroom} />
 
       </Stack>
     </Card>

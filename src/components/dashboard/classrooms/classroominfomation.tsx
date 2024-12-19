@@ -34,6 +34,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AddRoomEquipments from './add-classroomequipment';
 import { APIGetRoomByName } from '@/utils/api';
+import { Classroom } from './classrooms-card';
+ 
 
 interface Device {
   seri: string;
@@ -54,36 +56,24 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     padding: theme.spacing(1),
   },
 }));
-export interface classroomName {
-  classroomName: string;
+export interface classRoomId {
+  classRoomId: string;
 }
-export default function ClassroomInformation({ classroomName }: classroomName) {
-
-  const [roomData, setRoomData] = React.useState(null);
-  const [loading, setLoading] = React.useState(false);
-
-  React.useEffect(() => {
-    const fetchRoomData = async () => {
-      setLoading(true);
-      try {
-        const response = await APIGetRoomByName(classroomName);  
-        // console.log(response);
-        
-        setRoomData(response);
-      } catch (error) {
-        console.error("Error fetching room data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (classroomName) {
-      fetchRoomData();
-    }
-  }, [classroomName]);
+interface ClassroomProps {
+  room: Classroom;
+}
+const ClassRoomInformation: React.FC<ClassroomProps> = ({ room }) => {
   const [open, setOpen] = React.useState(false);
-   const [roomType, setRoomType] = React.useState(""); 
-   const handleRoomTypeChange = (event) => {
+  const ClassMapping = {
+    "Phòng học": "CLASSROOM",
+    "văn phòng cán bộ": "OFFICE",
+    "Phòng thí nghiệm": "LABORATORY",
+    "Phòng kho": "WAREHOUSE",
+    "Phòng họp": "MEETING_ROOM",
+  };
+  const [roomStatus, setRoomStatus] = React.useState(room.status)
+  const [roomType, setRoomType] = React.useState(ClassMapping[room.type]);
+  const handleRoomTypeChange = (event) => {
     setRoomType(event.target.value);
   };
   const handleClickOpen = () => {
@@ -92,22 +82,22 @@ export default function ClassroomInformation({ classroomName }: classroomName) {
   const handleClose = () => {
     setOpen(false);
   };
-  const [status, setStatus] = React.useState('');
+ 
   const handleChangeStatus = (event: SelectChangeEvent) => {
-    setStatus(event.target.value)
+    setRoomStatus(event.target.value)
   }
 
-   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = React.useState(false);
-    const [selectedDevices, setSelectedDevices] = React.useState<Device[]>([]);
-  
-    const handleAddDevice = (device: Device) => {
-      if (!selectedDevices.find((d) => d.seri === device.seri)) {
-        setSelectedDevices([...selectedDevices, device]);
-      }
-    };
-    const handleRemoveDevice = (seri: string) => {
-      setSelectedDevices(selectedDevices.filter((d) => d.seri !== seri));
-    };
+  const [addDeviceDialogOpen, setAddDeviceDialogOpen] = React.useState(false);
+  const [selectedDevices, setSelectedDevices] = React.useState<Device[]>([]);
+
+  const handleAddDevice = (device: Device) => {
+    if (!selectedDevices.find((d) => d.seri === device.seri)) {
+      setSelectedDevices([...selectedDevices, device]);
+    }
+  };
+  const handleRemoveDevice = (seri: string) => {
+    setSelectedDevices(selectedDevices.filter((d) => d.seri !== seri));
+  };
   return (
     <React.Fragment>
       <Button variant="outlined" onClick={handleClickOpen}>
@@ -115,7 +105,7 @@ export default function ClassroomInformation({ classroomName }: classroomName) {
       </Button>
       <BootstrapDialog
         onClose={handleClose}
-        maxWidth="lg"  
+        maxWidth="lg"
         fullWidth={true}
         aria-labelledby="customized-dialog-title"
         open={open}
@@ -133,146 +123,152 @@ export default function ClassroomInformation({ classroomName }: classroomName) {
             color: theme.palette.grey[500],
           })}
         >
-          <X/>
+          <X />
         </IconButton>
         <DialogContent dividers>
-        <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={2} columns={16}>
-        <Grid item xs={6}>   
-        <form
-      onSubmit={(event) => {
-        event.preventDefault();
-      }}
-    >
-      <Card>
-        <CardHeader title="Thông tin" />
-        <CardContent>
-          <Stack spacing={3} sx={{ maxWidth: 'sm' }}>
-            <FormControl fullWidth>
-              <InputLabel>Tên phòng</InputLabel>
-              <OutlinedInput value="TC-310" label="classroomname" name="classroomname" type="text" />
-            </FormControl>
-            <FormControl fullWidth required>
-                    <InputLabel id="room-type-label">Loại phòng</InputLabel>
-                    <Select
-                      labelId="room-type-label"
-                      value={roomType}
-                      onChange={handleRoomTypeChange}
-                      label="Loại phòng"
-                    >
-                      <MenuItem value="Phòng học">Phòng học</MenuItem>
-                      <MenuItem value="Phòng máy tính">Phòng máy tính</MenuItem>
-                      <MenuItem value="Phòng thí nghiệm">Phòng thí nghiệm</MenuItem>
-                    </Select>
-                  </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>Số lượng chỗ ngồi</InputLabel>
-              <OutlinedInput value="40" label="classroom type" name="classroomtype" type="classroomtype" />
-            </FormControl>
-        <FormControl fullWidth>
-        <InputLabel id="classroomstatus">Trạng thái</InputLabel>
-        <Select
-          value={status}
-          label="Classroomstatus"
-          onChange={handleChangeStatus}
-        >
-          <MenuItem value={10}>Sẵn có</MenuItem>
-          <MenuItem value={30}>Đang bảo trì</MenuItem>
-        </Select>
-      </FormControl>
-          </Stack>
-        </CardContent>
-        <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">Sửa</Button>
-          <Button variant="contained">Lưu</Button>
-        </CardActions>
-      </Card>
-    </form>
-        </Grid>
-        <Grid item xs={10}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ height: 450, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, mt: 2 }}>
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Danh sách thiết bị
-        </Typography>
-        {selectedDevices.length === 0 ? (
-          <Box sx={{ height: 300 }}>
-            <Typography variant="body2" color="textSecondary">
-              Danh sách trống
-            </Typography>
-          </Box>
-        ) : (
-          <TableContainer sx={{ height: 300 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Số seri</TableCell>
-                  <TableCell>Tên thiết bị</TableCell>
-                  <TableCell>Loại thiết bị</TableCell>
-                  <TableCell>Trạng thái</TableCell>
-                  <TableCell>Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {selectedDevices.map((device) =>{
-                  const { label, color } = statusMap[device.status];
-                  return  (
-                    <TableRow key={device.seri}>
-                      <TableCell>{device.seri}</TableCell>
-                      <TableCell>{device.name}</TableCell>
-                      <TableCell>{device.category}</TableCell>
-                      <TableCell><Chip color={color} label={label} size="small" /></TableCell>
-                      <TableCell>
-                        <Button
-                          color="error"
-                          onClick={() =>
-                            window.confirm('Bạn có chắc chắn muốn xóa?') &&
-                            handleRemoveDevice(device.seri)
-                          }
-                        >
-                          Xóa
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-        <Button
-          variant="outlined"
-          onClick={() => setAddDeviceDialogOpen(true)}
-          sx={{ mt: 2 }}
-        >
-          Thêm thiết bị
-        </Button>
-      </Box>
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={2} columns={16}>
+              <Grid item xs={6}>
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                  }}
+                >
+                  <Card>
+                    <CardHeader title="Thông tin" />
+                    <CardContent>
+                      <Stack spacing={3} sx={{ maxWidth: 'sm' }}>
+                        <FormControl fullWidth>
+                          <InputLabel>Tên phòng</InputLabel>
+                          <OutlinedInput value={room.roomName} label="classroomname" name="classroomname" type="text" />
+                        </FormControl>
+                        <FormControl fullWidth required>
+                          <InputLabel id="room-type-label">Loại phòng</InputLabel>
+                          <Select
+                            labelId="room-type-label"
+                            value={roomType} // Sử dụng roomType từ state
+                            onChange={handleRoomTypeChange}
+                            label="Loại phòng"
+                          >
+                            <MenuItem value="CLASSROOM">Phòng học</MenuItem>
+                            <MenuItem value="OFFICE">Phòng làm việc</MenuItem>
+                            <MenuItem value="LABORATORY">Phòng thí nghiệm</MenuItem>
+                            <MenuItem value="WAREHOUSE">Phòng kho</MenuItem>
+                            <MenuItem value="MEETING_ROOM">Phòng họp</MenuItem>
+                          </Select>
+                        </FormControl>
 
-      {/* Add device dialog */}
-      <Dialog fullWidth maxWidth="md"
-        open={addDeviceDialogOpen}
-        onClose={() => setAddDeviceDialogOpen(false)}
-      >
-        <DialogTitle>Thêm thiết bị</DialogTitle>
-        <DialogContent>
-      <AddRoomEquipments
-        open={addDeviceDialogOpen}
-        onClose={() => setAddDeviceDialogOpen(false)}
-        onAdd={handleAddDevice}
-        selectedDeviceIds={selectedDevices.map((d) => d.seri)}
-      />
-       </DialogContent>
-             <DialogActions>
-               <Button onClick={() => setAddDeviceDialogOpen(false)}>Xong</Button>
-             </DialogActions>
-           </Dialog>
-    </LocalizationProvider>
-        </Grid>
-      </Grid>
-    </Box>
+                        <FormControl fullWidth>
+                          <InputLabel>Số lượng chỗ ngồi</InputLabel>
+                          <OutlinedInput value="40" label="classroom type" name="classroomtype" type="classroomtype" />
+                        </FormControl>
+                        <FormControl fullWidth>
+                          <InputLabel id="classroomstatus">Trạng thái</InputLabel>
+                          <Select
+                            value={roomStatus}
+                            label="Classroomstatus"
+                            onChange={handleChangeStatus}
+                          >
+                            <MenuItem value="AVAILABLE">Sẵn sàng</MenuItem>
+                            <MenuItem value="OCCUPIED">Đang sử dụng</MenuItem>
+                            <MenuItem value="BROKEN">Đang bảo trì</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Stack>
+                    </CardContent>
+                    <CardActions sx={{ justifyContent: 'flex-end' }}>
+                      <Button variant="contained">Sửa</Button>
+                      <Button variant="contained">Lưu</Button>
+                    </CardActions>
+                  </Card>
+                </form>
+              </Grid>
+              <Grid item xs={10}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Box sx={{ height: 450, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, mt: 2 }}>
+                    <Typography variant="h6" sx={{ mt: 2 }}>
+                      Danh sách thiết bị
+                    </Typography>
+                    {selectedDevices.length === 0 ? (
+                      <Box sx={{ height: 300 }}>
+                        <Typography variant="body2" color="textSecondary">
+                          Danh sách trống
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <TableContainer sx={{ height: 300 }}>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Số seri</TableCell>
+                              <TableCell>Tên thiết bị</TableCell>
+                              <TableCell>Loại thiết bị</TableCell>
+                              <TableCell>Trạng thái</TableCell>
+                              <TableCell>Hành động</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {selectedDevices.map((device) => {
+                              const { label, color } = statusMap[device.status];
+                              return (
+                                <TableRow key={device.seri}>
+                                  <TableCell>{device.seri}</TableCell>
+                                  <TableCell>{device.name}</TableCell>
+                                  <TableCell>{device.category}</TableCell>
+                                  <TableCell><Chip color={color} label={label} size="small" /></TableCell>
+                                  <TableCell>
+                                    <Button
+                                      color="error"
+                                      onClick={() =>
+                                        window.confirm('Bạn có chắc chắn muốn xóa?') &&
+                                        handleRemoveDevice(device.seri)
+                                      }
+                                    >
+                                      Xóa
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                    <Button
+                      variant="outlined"
+                      onClick={() => setAddDeviceDialogOpen(true)}
+                      sx={{ mt: 2 }}
+                    >
+                      Thêm thiết bị
+                    </Button>
+                  </Box>
+
+                  {/* Add device dialog */}
+                  <Dialog fullWidth maxWidth="md"
+                    open={addDeviceDialogOpen}
+                    onClose={() => setAddDeviceDialogOpen(false)}
+                  >
+                    <DialogTitle>Thêm thiết bị</DialogTitle>
+                    <DialogContent>
+                      <AddRoomEquipments
+                        open={addDeviceDialogOpen}
+                        onClose={() => setAddDeviceDialogOpen(false)}
+                        onAdd={handleAddDevice}
+                        selectedDeviceIds={selectedDevices.map((d) => d.seri)}
+                      />
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setAddDeviceDialogOpen(false)}>Xong</Button>
+                    </DialogActions>
+                  </Dialog>
+                </LocalizationProvider>
+              </Grid>
+            </Grid>
+          </Box>
         </DialogContent>
       </BootstrapDialog>
     </React.Fragment>
   );
 }
+
+export default ClassRoomInformation;

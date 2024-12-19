@@ -12,7 +12,6 @@ export default function Page(): React.JSX.Element {
   const [rooms, setRooms] = React.useState<Classroom[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  // Fetch rooms initially
   React.useEffect(() => {
     const fetchRooms = async () => {
       try {
