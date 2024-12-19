@@ -55,11 +55,11 @@ function AddEquipmentDialog(): React.JSX.Element {
     });
   };
 
-  const handleSave = () => {
-    // Thêm logic lưu dữ liệu ở đây
-    console.log('Dữ liệu lưu:', formData);
-    setOpen(false);
-  };
+  // const handleSave = () => {
+  //   // Thêm logic lưu dữ liệu ở đây
+  //   console.log('Dữ liệu lưu:', formData);
+  //   setOpen(false);
+  // };
 
   return (
     <>
@@ -85,7 +85,13 @@ function AddEquipmentDialog(): React.JSX.Element {
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent >
+        
+        <form
+        onSubmit={(event) => {
+          event.preventDefault();
+        }}
+        >
+          <DialogContent >
           <Stack mt={2} spacing={2}>
             {/* Ngày mua */}
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -126,10 +132,11 @@ function AddEquipmentDialog(): React.JSX.Element {
           <Button onClick={handleReset} variant="outlined">
             Đặt lại
           </Button>
-          <Button onClick={handleSave} variant="contained" color="primary">
+          <Button type="submit" variant="contained" color="primary">
             Lưu
           </Button>
         </DialogActions>
+        </form>
       </Dialog>
     </>
   );

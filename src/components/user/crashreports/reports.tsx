@@ -10,6 +10,7 @@ import TablePagination from "@mui/material/TablePagination";
 import Chip from "@mui/material/Chip";
 import dayjs from "dayjs";
 import ReportDetail from "./reportdetail";
+import CreateCrashReport from "./create-crashreport";
 import {
   FormControl,
   InputLabel,
@@ -103,19 +104,29 @@ export function Reports(): React.JSX.Element {
   };
 
   return (
-    <Box>
-      {/* Bộ lọc */}
+    <Box 
+    >
+      {/*Search , Filter và Create Report */}
+      <Box
+      sx={{
+        display: "flex",
+        justifyContent:"space-between",
+        gap: 2,
+        bgcolor: "background.paper",
+        boxShadow: 1,
+        mb:2
+      }}
+      >
+        {/* Search and Filter */}
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
           gap: 2,
-          bgcolor: "background.paper",
           p: 2,
-          borderRadius: 2,
-          boxShadow: 1,
         }}
       >
+        {/* Search */}
         <OutlinedInput
           placeholder="Tìm kiếm báo cáo"
           startAdornment={
@@ -125,6 +136,7 @@ export function Reports(): React.JSX.Element {
           }
           sx={{ maxWidth: "500px" }}
         />
+        {/* Filter */}
         <FormControl sx={{ minWidth: 200 }} size="small">
           <InputLabel>Trạng thái</InputLabel>
           <Select
@@ -138,7 +150,10 @@ export function Reports(): React.JSX.Element {
           </Select>
         </FormControl>
       </Box>
-
+      {/* Create Report */}
+      <CreateCrashReport/> 
+      </Box>
+        
       {/* Bảng hiển thị dữ liệu */}
       <Table sx={{ minWidth: 800 }}>
         <TableHead>

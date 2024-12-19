@@ -23,6 +23,7 @@ import {
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
+import AddCategoryEquipmentModal from './addequipment/add-categoryequipment';
 
 export interface Equipment {
   id: string;
@@ -76,7 +77,7 @@ const equipments: Equipment[] = [
 export function EquipmentsTable(): React.JSX.Element {
 
    const [EquipmentType, setEquipmentType] = React.useState("Tất cả");
-    const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+   const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
       setEquipmentType(event.target.value as string);
     };
   // State for pagination
@@ -103,19 +104,21 @@ export function EquipmentsTable(): React.JSX.Element {
 
   return (
     <Box>
-      {/* Search and Filter */}
+      {/* Search, Filter and Add category equipment modal */}
       <Box
       sx={{
         display: "flex",
-        alignItems: "center",
-        gap: 2,
-        bgcolor: "background.paper",
-        p: 2,
-        borderRadius: 2,
-        boxShadow: 1,
+        justifyContent:"space-between",
+        mb:2
       }}
     >
-        {/* Search */}
+       <Box sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+      
+      }}>
+         {/* Search */}
       <OutlinedInput
         placeholder="Tìm kiếm"
         startAdornment={
@@ -154,8 +157,10 @@ export function EquipmentsTable(): React.JSX.Element {
         </Select>
       </FormControl>
       </Box>
+       </Box>
+      <AddCategoryEquipmentModal/>
     </Box>
-    
+
       {/* Bảng danh sách các danh mục thiết bị */}
       <Box sx={{ overflowX: 'auto' }}>
         <Table sx={{ minWidth: '900px' }}>

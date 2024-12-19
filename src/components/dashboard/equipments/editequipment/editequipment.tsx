@@ -66,10 +66,10 @@ function EditEquipmentDialog(): React.JSX.Element {
     });
   };
 
-  const handleSave = () => {
-    console.log('Updated Device Data:', formData);
-    setOpen(false);
-  };
+  // const handleSave = () => {
+  //   console.log('Updated Device Data:', formData);
+  //   setOpen(false);
+  // };
 
   return (
     <>
@@ -87,7 +87,12 @@ function EditEquipmentDialog(): React.JSX.Element {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent dividers>
+        <form
+         onSubmit={(event) => {
+          event.preventDefault();
+        }}
+        >
+           <DialogContent dividers>
           <Box component="form" noValidate autoComplete="off">
             <DatePicker
               label="Ngày mua"
@@ -97,7 +102,6 @@ function EditEquipmentDialog(): React.JSX.Element {
               }
               renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
             />
-
             <Autocomplete
               options={groupedRoomOptions}
               groupBy={(option) => option.category}
@@ -141,10 +145,11 @@ function EditEquipmentDialog(): React.JSX.Element {
           <Button onClick={handleReset} variant="outlined">
             Đặt lại
           </Button>
-          <Button onClick={handleSave} variant="contained" color="primary">
+          <Button type='submit' variant="contained" color="primary">
             Lưu
           </Button>
         </DialogActions>
+        </form>
       </Dialog>
     </>
   );

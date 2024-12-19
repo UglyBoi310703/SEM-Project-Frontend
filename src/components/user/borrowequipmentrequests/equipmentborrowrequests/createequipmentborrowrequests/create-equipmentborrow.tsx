@@ -92,10 +92,11 @@ function CreateBorrowEquipmentRequest(): React.JSX.Element {
             onClick={() => setOpen(false)}
             sx={{ position: 'absolute', right: 8, top: 8 }}
           >
-            <CloseIcon />
+          <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent dividers>
+          {/* Thông tin đơn mượn */}
           <Box display="flex"  gap={2}>
             {/* Borrow date */}
             <DatePicker
@@ -112,6 +113,8 @@ function CreateBorrowEquipmentRequest(): React.JSX.Element {
               renderInput={(params) => <TextField {...params} fullWidth />}
             />
           </Box>
+
+        {/* Danh sách thiết bị mượn */}
        <Box sx={{ height:450, display: "flex",flexDirection:"column",alignItems:"center", gap: 3, mt: 2 }}>
        <Typography variant="h6" sx={{ mt: 2 }}>
             Danh sách thiết bị

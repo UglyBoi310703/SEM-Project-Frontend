@@ -77,8 +77,12 @@ function EditEquipmentCategoryModal(): JSX.Element {
           </Box>
 
           {/* Form */}
-          <Grid container spacing={2}>
-      
+        <form
+         onSubmit={(event) => {
+          event.preventDefault();
+        }}
+        >
+        <Grid container spacing={2}>
             {/* Row 2 */}
             <Grid item xs={12}>
               <TextField
@@ -120,10 +124,11 @@ function EditEquipmentCategoryModal(): JSX.Element {
             <Button onClick={handleReset} variant="outlined" sx={{ mr: 2 }}>
               Đặt lại
             </Button>
-            <Button onClick={handleSave} variant="contained" color="primary">
+            <Button type="submit" variant="contained" color="primary">
               Lưu
             </Button>
           </Box>
+        </form>
         </Box>
       </Modal>
     </>

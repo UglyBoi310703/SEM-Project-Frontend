@@ -140,7 +140,6 @@ export default function ClassRoomList({ rooms, isLoading }) {
           size="small"
         />
       </Box>
-
     </>
   );
 }

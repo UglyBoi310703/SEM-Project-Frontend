@@ -27,7 +27,7 @@ function CreateCrashReport (): React.JSX.Element{
 
   // Gửi báo cáo
   const handleSubmit = () => {
-    console.log('Báo cáo sự cố:', reportContent);
+   
     setReportContent(''); // Xóa nội dung báo cáo sau khi gửi
     handleClose(); // Đóng dialog
   };
@@ -39,7 +39,9 @@ function CreateCrashReport (): React.JSX.Element{
   };
 
   return (
-    <div>
+    <Box
+    sx={{p:2}}
+    >
       <Button variant="contained" color="primary" onClick={handleOpen}>
         Tạo báo cáo sự cố
       </Button>
@@ -54,7 +56,12 @@ function CreateCrashReport (): React.JSX.Element{
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+          }}
+        >
+           <DialogContent>
         <Box component="form"
         mt={2}>
         <TextField
@@ -76,8 +83,10 @@ function CreateCrashReport (): React.JSX.Element{
             Gửi
           </Button>
         </DialogActions>
+        </form>
+       
       </Dialog>
-    </div>
+    </Box>
   );
 };
 

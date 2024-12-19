@@ -133,6 +133,7 @@ export function Reports(): React.JSX.Element {
           p: 2,
           borderRadius: 2,
           boxShadow: 1,
+          mb:2
         }}
       >
         <OutlinedInput

@@ -88,7 +88,7 @@ export function SignInForm(): React.JSX.Element {
             render={({ field }) => (
               <FormControl error={Boolean(errors.email)}>
                 <InputLabel>Email</InputLabel>
-                <OutlinedInput {...field} label="Email address" type="email" />
+                <OutlinedInput {...field} label="Email" type="email" />
                 {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
               </FormControl>
             )}
@@ -127,11 +127,11 @@ export function SignInForm(): React.JSX.Element {
               </FormControl>
             )}
           />
-          <div>
+          {/* <div>
             <Link component={RouterLink} href={paths.auth.resetPassword} variant="subtitle2">
               Quên mật khẩu?
             </Link>
-          </div>
+          </div> */}
           {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
           <Button disabled={isPending} type="submit" variant="contained">
             Đăng nhập

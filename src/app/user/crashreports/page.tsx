@@ -1,14 +1,14 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Stack from '@mui/material/Stack';
-import { Button } from '@mui/material';
+
 // import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 // // import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 // import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import Typography from '@mui/material/Typography';
 import { config } from '@/config';
 import { Reports } from '@/components/user/crashreports/reports';
-import CreateCrashReport from '@/components/user/crashreports/create-crashreport';
+
 
 export const metadata = { title: `CrashReports | User | ${config.site.name}` } satisfies Metadata;
 
@@ -26,11 +26,6 @@ export default function Page(): React.JSX.Element {
           </Button>
         </Stack> */}
       </Stack>
-      <div>
-        <Button >
-         <CreateCrashReport/>
-        </Button>
-      </div>
     </Stack>
     <Reports/>
   </Stack>
