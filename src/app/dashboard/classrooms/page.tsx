@@ -26,7 +26,7 @@ export default function Page(): React.JSX.Element {
     fetchRooms();
   }, []);
 
-  // Callback to add a new room
+   
   const handleAddRoom = async (newRoom) => {
     if(newRoom){
       try {
