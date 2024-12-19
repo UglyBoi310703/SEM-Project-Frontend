@@ -9,8 +9,6 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import { config } from '@/config';
 import { ClassroomCard } from '@/components/dashboard/classrooms/classrooms-card';
-
-
 import {
   FormControl,
   InputLabel,
@@ -20,6 +18,7 @@ import {
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
+import AddClassroomModal from './add-classroom';
 
 export const metadata = { title: `ClassRooms | Dashboard | ${config.site.name}` } satisfies Metadata;
 
