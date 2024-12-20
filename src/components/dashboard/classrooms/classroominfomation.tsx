@@ -33,8 +33,8 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AddRoomEquipments from './add-classroomequipment';
-import { APIGetRoomByName } from '@/utils/api';
-import { Classroom } from './classrooms-card';
+
+import type { Classroom } from './classrooms-card';
  
 
 interface Device {
@@ -62,34 +62,44 @@ export interface classRoomId {
 interface ClassroomProps {
   room: Classroom;
 }
+
 function ClassRoomInformation({ room }:ClassroomProps): React.JSX.Element{
+
+  const [roomName, setRoomName] = React.useState(room.roomName);
+  const [roomType, setRoomType] = React.useState(room.type);
+  const [isEditing, setIsEditing] = React.useState(false); // Thêm state để quản lý chế độ chỉnh sửa
   const [open, setOpen] = React.useState(false);
-  const ClassMapping = {
-    "Phòng học": "CLASSROOM",
-    "văn phòng cán bộ": "OFFICE",
-    "Phòng thí nghiệm": "LABORATORY",
-    "Phòng kho": "WAREHOUSE",
-    "Phòng họp": "MEETING_ROOM",
+
+  const handleRoomNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRoomName(event.target.value);
   };
-  const [roomStatus, setRoomStatus] = React.useState(room.status)
-  const [roomType, setRoomType] = React.useState(ClassMapping[room.type]);
-  const handleRoomTypeChange = (event) => {
+
+  const handleRoomTypeChange = (event: SelectChangeEvent<string>) => {
     setRoomType(event.target.value);
   };
+
   const handleClickOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = () => {
+    setIsEditing(false);
+    // Gửi thông tin cập nhật đến backend tại đây, nếu cần
+    console.log('Saved room info:', { roomName, roomType });
+  };
  
-  const handleChangeStatus = (event: SelectChangeEvent) => {
-    setRoomStatus(event.target.value)
-  }
 
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = React.useState(false);
   const [selectedDevices, setSelectedDevices] = React.useState<Device[]>([]);
-
+  
   const handleAddDevice = (device: Device) => {
     if (!selectedDevices.find((d) => d.seri === device.seri)) {
       setSelectedDevices([...selectedDevices, device]);
@@ -100,7 +110,7 @@ function ClassRoomInformation({ room }:ClassroomProps): React.JSX.Element{
   };
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button size='small' variant="outlined" onClick={handleClickOpen}>
         Thông tin
       </Button>
       <BootstrapDialog
@@ -134,21 +144,27 @@ function ClassRoomInformation({ room }:ClassroomProps): React.JSX.Element{
                     event.preventDefault();
                   }}
                 >
-                  <Card>
+                   <Card>
                     <CardHeader title="Thông tin" />
                     <CardContent>
                       <Stack spacing={3} sx={{ maxWidth: 'sm' }}>
                         <FormControl fullWidth>
                           <InputLabel>Tên phòng</InputLabel>
-                          <OutlinedInput value={room.roomName} label="classroomname" name="classroomname" type="text" />
+                          <OutlinedInput
+                            value={roomName}
+                            onChange={handleRoomNameChange}
+                            label="Tên phòng"
+                            disabled={!isEditing} // Disable nếu không ở chế độ chỉnh sửa
+                          />
                         </FormControl>
                         <FormControl fullWidth required>
                           <InputLabel id="room-type-label">Loại phòng</InputLabel>
                           <Select
+                            value={roomType}
                             labelId="room-type-label"
-                            value={roomType} // Sử dụng roomType từ state
                             onChange={handleRoomTypeChange}
                             label="Loại phòng"
+                            disabled={!isEditing} // Disable nếu không ở chế độ chỉnh sửa
                           >
                             <MenuItem value="CLASSROOM">Phòng học</MenuItem>
                             <MenuItem value="OFFICE">Phòng làm việc</MenuItem>
@@ -157,28 +173,26 @@ function ClassRoomInformation({ room }:ClassroomProps): React.JSX.Element{
                             <MenuItem value="MEETING_ROOM">Phòng họp</MenuItem>
                           </Select>
                         </FormControl>
-
                         <FormControl fullWidth>
                           <InputLabel>Số lượng chỗ ngồi</InputLabel>
-                          <OutlinedInput value="40" label="classroom type" name="classroomtype" type="classroomtype" />
-                        </FormControl>
-                        <FormControl fullWidth>
-                          <InputLabel id="classroomstatus">Trạng thái</InputLabel>
-                          <Select
-                            value={roomStatus}
-                            label="Trạng thái"
-                            onChange={handleChangeStatus}
-                          >
-                            <MenuItem value="AVAILABLE">Sẵn sàng</MenuItem>
-                            <MenuItem value="OCCUPIED">Đang sử dụng</MenuItem>
-                            <MenuItem value="BROKEN">Đang bảo trì</MenuItem>
-                          </Select>
+                          <OutlinedInput
+                            value="40"
+                            label="Số lượng chỗ ngồi"
+                            disabled={!isEditing}
+                          />
                         </FormControl>
                       </Stack>
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'flex-end' }}>
-                      <Button variant="contained">Sửa</Button>
-                      <Button variant="contained">Lưu</Button>
+                      {isEditing ? (
+                        <Button variant="contained" onClick={handleSaveClick}>
+                          Lưu
+                        </Button>
+                      ) : (
+                        <Button variant="outlined" onClick={handleEditClick}>
+                          Sửa
+                        </Button>
+                      )}
                     </CardActions>
                   </Card>
                 </form>
