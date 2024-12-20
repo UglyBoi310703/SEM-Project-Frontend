@@ -24,57 +24,36 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import AddCategoryEquipmentModal from './addequipment/add-categoryequipment';
+import { APIGetAllEquipment } from '@/utils/api';
+ 
 
 export interface Equipment {
   id: string;
-  name: string;
+  equipmentName: string;
+  code: string;
   category: string;
   totalQuantity: number;
   usableQuantity: number;
-  usingQuantity: number;
+  inUseQuantity: number;
   brokenQuantity: number;
 }
-
-const equipments: Equipment[] = [
-  {
-    id: 'E-001',
-    name: 'Máy chiếu',
-    category: 'Phòng học',
-    totalQuantity: 50,
-    usableQuantity: 45,
-    usingQuantity: 40,
-    brokenQuantity: 5,
-  },
-  {
-    id: 'E-002',
-    name: 'Loa JBL',
-    category: 'Phòng học',
-    totalQuantity: 50,
-    usableQuantity: 45,
-    usingQuantity: 40,
-    brokenQuantity: 5,
-  },
-  {
-    id: 'E-003',
-    name: 'Mic',
-    category: 'Phòng học',
-    totalQuantity: 50,
-    usableQuantity: 45,
-    usingQuantity: 40,
-    brokenQuantity: 5,
-  },
-  {
-    id: 'E-004',
-    name: 'Quả địa cầu',
-    category: 'Hỗ trợ',
-    totalQuantity: 40,
-    usableQuantity: 39,
-    usingQuantity: 5,
-    brokenQuantity: 1,
-  },
-];
-
+ 
 export function EquipmentsTable(): React.JSX.Element {
+  const [equipmentCategories, setEquipmentCategories] = React.useState<Equipment[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+   React.useEffect(() => {
+       const fetchRooms = async () => {
+         try {
+           const data = await APIGetAllEquipment();
+           setEquipmentCategories(data.content)
+         } catch (err) {
+           console.error("Error fetching rooms", err);
+         } finally {
+          setIsLoading(false)
+         }
+       };
+       fetchRooms();
+     }, []);
 
    const [EquipmentType, setEquipmentType] = React.useState("Tất cả");
    const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -97,7 +76,7 @@ export function EquipmentsTable(): React.JSX.Element {
   };
 
   // Calculate the rows for the current page
-  const paginatedRows = equipments.slice(
+  const paginatedRows = equipmentCategories.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
@@ -182,13 +161,13 @@ export function EquipmentsTable(): React.JSX.Element {
                 <TableCell>{row.id}</TableCell>
                 <TableCell>
                   <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-                    <Typography variant="subtitle2">{row.name}</Typography>
+                    <Typography variant="subtitle2">{row.equipmentName}</Typography>
                   </Stack>
                 </TableCell>
                 <TableCell>{row.category}</TableCell>
                 <TableCell>{row.totalQuantity}</TableCell>
                 <TableCell>{row.usableQuantity}</TableCell>
-                <TableCell>{row.usingQuantity}</TableCell>
+                <TableCell>{row.inUseQuantity}</TableCell>
                 <TableCell>{row.brokenQuantity}</TableCell>
                 <TableCell>
                   <Box
@@ -210,7 +189,7 @@ export function EquipmentsTable(): React.JSX.Element {
       <Divider />
       <TablePagination
         component="div"
-        count={equipments.length} // Total rows
+        count={equipmentCategories.length} // Total rows
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}

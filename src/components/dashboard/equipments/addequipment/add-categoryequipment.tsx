@@ -66,7 +66,6 @@ function AddCategoryEquipmentModal(): JSX.Element {
             p: 4,
           }}
         >
-          {/* Header */}
          <form
           onSubmit={(event) => {
             event.preventDefault();

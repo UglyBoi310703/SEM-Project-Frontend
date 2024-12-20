@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { Classroom } from "@/components/dashboard/classrooms/classrooms-card";
+import { Equipment } from "@/components/dashboard/equipments/equipment-categories-table";
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -68,6 +69,26 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
 };
 
 //APIGetAllEquipmentCategories
+export type EquipmentResponse = {
+  content: Equipment[];  
+  totalElements: number;  
+  totalPages: number;  
+  size: number;  
+};
+
+export async function APIGetAllEquipment(
+  keyword: string = '', 
+  page: number = 0, 
+  size: number = 15
+): Promise<EquipmentResponse> {
+  console.log(`${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}`);
+  const response = await axios.get<EquipmentResponse>(
+    `${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}`
+  );
+  
+  
+  return response.data;
+}
 
 
 
