@@ -27,7 +27,9 @@ export default function Page(): React.JSX.Element {
   }, []);
 
    
-  const handleAddRoom = async (newRoom) => {
+  const handleUpdateRoom = async (newRoom) => {
+    console.log("Hello");
+    
     if(newRoom){
       try {
         const data = await APIGetAllRoom();
@@ -47,9 +49,9 @@ export default function Page(): React.JSX.Element {
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
         <Typography variant="h4">Danh sách phòng học tại trường</Typography>
         </Stack>
-        <div><AddClassroomModal onAddRoom={handleAddRoom}/></div>
+        <div><AddClassroomModal onUpdateRoom={handleUpdateRoom}/></div>
       </Stack>
-      <ClassRoomList rooms={rooms} isLoading={isLoading} />
+      <ClassRoomList rooms={rooms} isLoading={isLoading} onUpdateRoom={handleUpdateRoom} />
     </Stack>
   );
 }

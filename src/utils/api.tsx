@@ -51,5 +51,21 @@ export async function APIGetRoomByName(roomName: string) {
 
 
 //Hàm gọi API sửa phòng học
+export const APIModifyClassRoom = async (classroom_id: number, newClassroom: NewRoom): Promise<void> => {
+  try {
+    const response = await axios.put(`${BASE_URL}/api/v1/room/${classroom_id}`, newClassroom, {
+      headers: {
+        "Content-Type": "application/json",  
+      },
+    });
+    console.log("Phòng học đã được tạo thành công:", response.data);
+  } catch (error) {
+    console.error("Lỗi khi tạo phòng học:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
+
 
 
