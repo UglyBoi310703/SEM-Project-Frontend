@@ -90,6 +90,29 @@ export async function APIGetAllEquipment(
   return response.data;
 }
 
+//APIAddNewEquipmentCategory
+export interface NewEquipmentCategoryRequest {
+  equipmentName: string;
+  category: string;
+  code:number;
+}
+export const APIAddNewEquipmentCategory = async (equipment: NewEquipmentCategoryRequest): Promise<void> => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/v1/equipment`, equipment, {
+      headers: {
+        "Content-Type": "application/json",  
+      },
+    });
+    console.log("Loại thiết bị đã được tạo thành công", response.data);
+  } catch (error) {
+    console.error("Lỗi khi tạo loại thiết bị:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
+
+
 
 
 

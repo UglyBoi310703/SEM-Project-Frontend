@@ -24,7 +24,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import AddCategoryEquipmentModal from './addequipment/add-categoryequipment';
-import { APIGetAllEquipment } from '@/utils/api';
+import { APIGetAllEquipment, NewEquipmentCategoryRequest } from '@/utils/api';
  
 
 export interface Equipment {
@@ -41,6 +41,21 @@ export interface Equipment {
 export function EquipmentsTable(): React.JSX.Element {
   const [equipmentCategories, setEquipmentCategories] = React.useState<Equipment[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+   const handleUpdateEquipmentCategory = async (newEquipment:NewEquipmentCategoryRequest) => {
+      if(newEquipment){
+        try {
+          const data = await APIGetAllEquipment();
+          setEquipmentCategories(data.content);
+
+        } catch (err) {
+          console.error("Error fetching rooms", err);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+  
+  
    React.useEffect(() => {
        const fetchRooms = async () => {
          try {
@@ -137,7 +152,7 @@ export function EquipmentsTable(): React.JSX.Element {
       </FormControl>
       </Box>
        </Box>
-      <AddCategoryEquipmentModal/>
+      <AddCategoryEquipmentModal onUpdateEquipmentCategory={handleUpdateEquipmentCategory}/>
     </Box>
 
       {/* Bảng danh sách các danh mục thiết bị */}
@@ -178,7 +193,7 @@ export function EquipmentsTable(): React.JSX.Element {
                     }}
                   >
                     <EquipmentDetails />
-                    <EditEquipmentCategoryModal />
+                    <EditEquipmentCategoryModal equipmentCategory = {row} onUpdateEquipmentCategory={handleUpdateEquipmentCategory}/>
                   </Box>
                 </TableCell>
               </TableRow>
@@ -194,7 +209,7 @@ export function EquipmentsTable(): React.JSX.Element {
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        rowsPerPageOptions={[2, 5, 10]} // Rows per page options
+        rowsPerPageOptions={[2, 5, 10]} 
       />
     </Box>
   );

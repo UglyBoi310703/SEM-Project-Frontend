@@ -28,8 +28,6 @@ export default function Page(): React.JSX.Element {
 
    
   const handleUpdateRoom = async (newRoom) => {
-    console.log("Hello");
-    
     if(newRoom){
       try {
         const data = await APIGetAllRoom();
