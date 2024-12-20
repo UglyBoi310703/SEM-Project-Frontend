@@ -50,7 +50,7 @@ export async function APIGetRoomByName(roomName: string) {
 }
 
 
-//Hàm gọi API sửa phòng học
+//API Modify Room
 export const APIModifyClassRoom = async (classroom_id: number, newClassroom: NewRoom): Promise<void> => {
   try {
     const response = await axios.put(`${BASE_URL}/api/v1/room/${classroom_id}`, newClassroom, {
@@ -66,6 +66,9 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
     }
   }
 };
+
+//APIGetAllEquipmentCategories
+
 
 
 
