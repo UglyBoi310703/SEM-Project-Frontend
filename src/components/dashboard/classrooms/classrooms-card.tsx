@@ -24,6 +24,7 @@ export interface Classroom {
 
 export interface ClassroomCardProps {
   classroom: Classroom;
+  onUpdateRoom: (room: Classroom) => Promise<void>;
 }
 
 const statusMap = {
@@ -32,7 +33,8 @@ const statusMap = {
   OCCUPIED: { label: "Đang sử dụng", color: "warning" },
 } as const;
 
-export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Element {
+export function ClassroomCard({ classroom, onUpdateRoom }: ClassroomCardProps): React.JSX.Element {
+  const { label, color } = statusMap[classroom.status] ?? { label: 'Unknown', color: 'default' };
   const [roomStatus, setRoomStatus] = React.useState(classroom.status);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -48,9 +50,6 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
     setRoomStatus(status);
     handleCloseMenu();
   };
-
-  const { label, color } = statusMap[roomStatus] ?? { label: "Unknown", color: "default" };
-
   return (
     <Card sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <CardContent sx={{ flex: "1 1 auto" }}>
@@ -96,12 +95,10 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
             alignItems: "center",
             gap: 1,
           }}
-        >
-          <Button size="small" variant="outlined" color="error">
-            Xoá
-          </Button>
-          <ClassRoomInformation room={classroom} />
-        </Box>
+          >
+          <Button variant="outlined" color="error"  >Xoá</Button>
+          <ClassRoomInformation room={classroom} onUpdateRoom = {onUpdateRoom} />
+          </Box>
       </Stack>
     </Card>
   );

@@ -46,6 +46,7 @@ const equipments: Equipment[] = [
 function AddRoomEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  // const [equipment, ]
 
   const filteredEquipments = equipments.filter((equipment) => {
     const isSearchMatch =

@@ -22,7 +22,7 @@ import AddClassroomModal from './add-classroom';
 
 export const metadata = { title: `ClassRooms | Dashboard | ${config.site.name}` } satisfies Metadata;
 
-export default function ClassRoomList({ rooms, isLoading }) {
+export default function ClassRoomList({ rooms, isLoading , onUpdateRoom}) {
   const [RoomStatus, setRoomStatus] = React.useState("Tất cả");
   const [RoomType, setRoomType] = React.useState("Tất cả");
  
@@ -127,7 +127,7 @@ export default function ClassRoomList({ rooms, isLoading }) {
       <Grid container spacing={3}>
         {paginatedRooms.map((classroom) => (
           <Grid key={classroom.roomName} lg={4} md={6} xs={12}>
-            <ClassroomCard classroom={classroom} />
+            <ClassroomCard classroom={classroom} onUpdateRoom={onUpdateRoom} />
           </Grid>
         ))}
       </Grid>

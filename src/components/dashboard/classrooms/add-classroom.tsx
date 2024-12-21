@@ -30,10 +30,10 @@ const schema = yup.object({
     .typeError("Sức chứa phải là số.")
     .positive("Sức chứa phải lớn hơn 0.")
     .integer("Sức chứa phải là số nguyên.")
-    .required("Sức chứa là bắt buộc."),
+    .required("Sức chứa là bắt buộc.")
 });
 
-export default function AddClassroomModal({ onAddRoom }) {
+export default function AddClassroomModal({ onUpdateRoom }) {
   const [open, setOpen] = React.useState(false);
   const [roomList, setRoomList] =  React.useState<Classroom[]>([]);
   const [roomNameError, setRoomNameError] = React.useState("");
@@ -83,6 +83,8 @@ export default function AddClassroomModal({ onAddRoom }) {
   }, [roomName, roomList]);
 
   const onSubmit = async (data) => {
+    console.log(data);
+    
     setOpen(false)
     try {
       const isDuplicate = roomList.some(
@@ -123,8 +125,8 @@ export default function AddClassroomModal({ onAddRoom }) {
         };
         newClassroom.type = mapping[data.type];
 
-        if (onAddRoom) {
-          onAddRoom(newClassroom);
+        if (onUpdateRoom) {
+          onUpdateRoom(newClassroom);
         }
 
         toast.success("Phòng học đã được tạo thành công!");
