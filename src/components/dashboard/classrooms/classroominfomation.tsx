@@ -82,6 +82,7 @@ interface ClassroomProps {
 }
 function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX.Element {
   const [open, setOpen] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(false); 
   const ClassMapping = {
     "Phòng học": "CLASSROOM",
     "văn phòng cán bộ": "OFFICE",
@@ -266,7 +267,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                             labelId="room-type-label"
 
                             label="Loại phòng"
-                            disabled={!isEditing} // Disable nếu không ở chế độ chỉnh sửa
+                            // disabled={!isEditing}  
                           >
                             <MenuItem value="CLASSROOM">Phòng học</MenuItem>
                             <MenuItem value="OFFICE">Phòng làm việc</MenuItem>
