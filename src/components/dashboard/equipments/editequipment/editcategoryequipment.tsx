@@ -19,7 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import { Equipment } from '../equipment-categories-table';
-import { APIGetAllEquipment } from '@/utils/api';
+import { APIGetAllEquipment, APIUpdateEquipmentCategory } from '@/utils/api';
 
 function EditEquipmentCategoryModal({
   equipmentCategory,
@@ -99,6 +99,7 @@ function EditEquipmentCategoryModal({
   
 
   const onSubmit = async (data) => {
+    setOpen(false)
     const nameExists = existingCategories.some(
       (cat) => cat.equipmentName === data.equipmentName && cat.id !== equipmentCategoryId
     );
@@ -118,12 +119,9 @@ function EditEquipmentCategoryModal({
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          console.log(data);
-          
-          // // Giả lập API update dữ liệu
-          // onUpdateEquipmentCategory({ id: equipmentCategoryId, ...data });
+          await APIUpdateEquipmentCategory(equipmentCategoryId, data)
           toast.success('Cập nhật danh mục thiết bị thành công!');
-          setOpen(false);
+          onUpdateEquipmentCategory(data)
         } catch (error) {
           console.error('Lỗi khi cập nhật danh mục:', error);
           toast.error('Có lỗi xảy ra khi cập nhật danh mục.');

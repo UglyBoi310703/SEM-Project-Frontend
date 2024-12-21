@@ -51,7 +51,7 @@ export async function APIGetRoomByName(roomName: string) {
 }
 
 
-//API Modify Room
+//API Update Room
 export const APIModifyClassRoom = async (classroom_id: number, newClassroom: NewRoom): Promise<void> => {
   try {
     const response = await axios.put(`${BASE_URL}/api/v1/room/${classroom_id}`, newClassroom, {
@@ -59,9 +59,9 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
         "Content-Type": "application/json",  
       },
     });
-    console.log("Phòng học đã được tạo thành công:", response.data);
+    console.log("Phòng học đã được cập nhật thành công:", response.data);
   } catch (error) {
-    console.error("Lỗi khi tạo phòng học:", error);
+    console.error("Lỗi khi cập nhật phòng học:", error);
     if (axios.isAxiosError(error)) {
       console.error("Chi tiết lỗi từ API:", error.response?.data);
     }
@@ -111,6 +111,25 @@ export const APIAddNewEquipmentCategory = async (equipment: NewEquipmentCategory
     }
   }
 };
+
+//APIUpdateEquipmentCategory
+ 
+export const APIUpdateEquipmentCategory = async (equipmentCategoryId: number, newUpdateEquipment: NewEquipmentCategoryRequest): Promise<void> => {
+  try {
+    const response = await axios.put(`${BASE_URL}/api/v1/equipment/${equipmentCategoryId}`, newUpdateEquipment, {
+      headers: {
+        "Content-Type": "application/json",  
+      },
+    });
+    console.log("Loại thiết bị đã được cập nhật thành công:", response.data);
+  } catch (error) {
+    console.error("Lỗi khi cập nhật loại thiết bị:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
+
 
 
 

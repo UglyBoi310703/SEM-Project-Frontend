@@ -83,6 +83,8 @@ export default function AddClassroomModal({ onUpdateRoom }) {
   }, [roomName, roomList]);
 
   const onSubmit = async (data) => {
+    console.log(data);
+    
     setOpen(false)
     try {
       const isDuplicate = roomList.some(

@@ -61,7 +61,7 @@ export function ClassroomCard({ classroom, onUpdateRoom }: ClassroomCardProps): 
             gap: 1,
           }}
           >
-          <Button variant="outlined" color="error" >Xoá</Button>
+          <Button variant="outlined" color="error"  >Xoá</Button>
           <ClassRoomInformation room={classroom} onUpdateRoom = {onUpdateRoom} />
           </Box>
       </Stack>
