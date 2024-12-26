@@ -7,9 +7,9 @@ import Typography from '@mui/material/Typography';
 // import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 // import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { config } from '@/config';
-import EquipmentBorrowTable from '@/components/user/borrowequipmentrequests/equipmentborrowrequests/equipmentborrowtable';
+import EquipmentBorrowTable from '@/components/user/borrowequipmentrequests/equipmentborrowtable';
 
-export const metadata = { title: `BorrowEquipment | Dashboard | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `BorrowEquipment | User | ${config.site.name}` } satisfies Metadata;
 
 
 export default function Page(): React.JSX.Element {

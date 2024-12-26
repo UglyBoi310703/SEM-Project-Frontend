@@ -12,6 +12,7 @@ import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import { Box } from '@mui/material';
+
 export function UpdatePasswordForm(): React.JSX.Element {
   return (
    <Box sx={{flex:1,m:2}}>

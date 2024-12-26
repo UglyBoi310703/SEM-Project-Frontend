@@ -179,7 +179,7 @@ export function Reports(): React.JSX.Element {
                 <TableCell>{report.idEquip}</TableCell>
                 <TableCell>{report.nameEquip}</TableCell>
                 <TableCell>
-                  {dayjs(report.createdAt).format("DD/MM/YYYY HH:mm")}
+                  {dayjs(report.createdAt).format("DD-MM-YYYY")}
                 </TableCell>
                 <TableCell>
                   <Chip color={color} label={label} size="small" />

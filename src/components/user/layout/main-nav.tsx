@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import { Bell as BellIcon } from '@phosphor-icons/react/dist/ssr/Bell';
+import CreateCrashReport from '../crashreports/create-crashreport';
 import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 import { NotificationsPopover } from '../popover/notifications/notifications-popover';
 import { usePopover } from '@/hooks/use-popover';
@@ -17,7 +18,6 @@ import { UserPopover } from '../popover/user-popover';
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
   const userPopover = usePopover<HTMLDivElement>();
-
   // State for Notifications Popover                                         
   const [notificationsAnchorEl, setNotificationsAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -59,6 +59,7 @@ export function MainNav(): React.JSX.Element {
             </IconButton>
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
+            <CreateCrashReport/>
             {/* Notifications */}
             <Tooltip title="Thông báo">
               <Badge badgeContent={4} color="success" variant="dot">

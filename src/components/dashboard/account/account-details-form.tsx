@@ -12,7 +12,7 @@ import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 
-
+const user = JSON.parse(localStorage.getItem('user'));
 export function AccountDetailsForm(): React.JSX.Element {
   return (
     <form
@@ -27,11 +27,11 @@ export function AccountDetailsForm(): React.JSX.Element {
           <Stack spacing={2}>
             <FormControl fullWidth required>
               <InputLabel>Họ và tên</InputLabel>
-              <OutlinedInput defaultValue="Boi" label="Last name" name="lastName" />
+              <OutlinedInput defaultValue={user.username} label="Last name" name="lastName" />
             </FormControl>
             <FormControl fullWidth required>
               <InputLabel>Email</InputLabel>
-              <OutlinedInput defaultValue="uglyboi3107@gmail.com" label="Email address" name="email" />
+              <OutlinedInput defaultValue={user.email} label="Email address" name="email" />
             </FormControl>
           </Stack>
         </CardContent>

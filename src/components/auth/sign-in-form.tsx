@@ -29,7 +29,7 @@ const schema = zod.object({
 
 type Values = zod.infer<typeof schema>;
 
-const defaultValues = { email: 'uglyboi3107@gmail.com', password: 'vuong2003a' } satisfies Values;
+const defaultValues = { email: '', password: '' } satisfies Values;
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
@@ -50,9 +50,7 @@ export function SignInForm(): React.JSX.Element {
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
-
       const { error } = await authClient.signInWithPassword(values);
-
       if (error) {
         setError('root', { type: 'server', message: error });
         setIsPending(false);
@@ -98,7 +96,7 @@ export function SignInForm(): React.JSX.Element {
             name="password"
             render={({ field }) => (
               <FormControl error={Boolean(errors.password)}>
-                <InputLabel>Mật khẩu</InputLabel>
+                <InputLabel>Password</InputLabel>
                 <OutlinedInput
                   {...field}
                   endAdornment={
@@ -127,24 +125,16 @@ export function SignInForm(): React.JSX.Element {
               </FormControl>
             )}
           />
-          {/* <div>
-            <Link component={RouterLink} href={paths.auth.resetPassword} variant="subtitle2">
-              Quên mật khẩu?
-            </Link>
-          </div> */}
+        
           {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
           <Button disabled={isPending} type="submit" variant="contained">
             Đăng nhập
           </Button>
         </Stack>
       </form>
-      <Alert color="warning">
-    
-        <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
-          Ứng dụng dành cho Cán bộ và học sinh nhà trường
-       
-        </Typography>
-      </Alert>
+     
+        <Alert severity="info">Ứng dụng dành cho cán bộ và giáo viên nhà trường</Alert>
+      
     </Stack>
   );
 }

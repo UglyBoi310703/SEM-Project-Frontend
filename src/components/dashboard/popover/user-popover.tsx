@@ -1,3 +1,4 @@
+"use client"
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -24,9 +25,29 @@ export interface UserPopoverProps {
 
 export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
   const { checkSession } = useUser();
-
   const router = useRouter();
+  const [user, setUser] = React.useState<{ username: string; email: string } | null>(null);
 
+  const fetchUserInfo = React.useCallback(async (): Promise<void> => {
+    try {
+      const { data, error } = await authClient.getMyInfo();
+      if (error) {
+        logger.error('Failed to fetch user info', error);
+        return;
+      }
+      setUser(data || null);
+    } catch (err) {
+      logger.error('An error occurred while fetching user info', err);
+    }
+    }, []);
+
+  React.useEffect(() => {
+    fetchUserInfo().catch((err: unknown) => {
+      logger.error(err);
+      // noop
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Expected
+  }, []);
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
       const { error } = await authClient.signOut();
@@ -56,10 +77,18 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       slotProps={{ paper: { sx: { width: '240px' } } }}
     >
       <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">Ugly Boi</Typography>
-        <Typography color="text.secondary" variant="body2">
-          uglyboi3107@gmail.com
-        </Typography>
+        {user ? (
+          <>
+            <Typography variant="subtitle1">{user.username}</Typography>
+            <Typography color="text.secondary" variant="body2">
+              {user.email}
+            </Typography>
+          </>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            Đang tải thông tin người dùng...
+          </Typography>
+        )}
       </Box>
       <Divider />
       <MenuList disablePadding sx={{ p: '8px', '& .MuiMenuItem-root': { borderRadius: 1 } }}>
