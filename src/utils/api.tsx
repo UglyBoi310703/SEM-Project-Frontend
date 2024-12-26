@@ -69,7 +69,7 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
 };
 
 //APIGetAllEquipmentCategories
-export type EquipmentResponse = {
+export interface EquipmentResponse{
   content: Equipment[];  
   totalElements: number;  
   totalPages: number;  
