@@ -37,20 +37,16 @@ import {
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import AddRoomEquipments from './add-classroomequipment';
+import AddRoomEquipments, { EquipmentDetail } from './add-classroomequipment';
 import { APIGetAllRoom, APIGetRoomByName, APIModifyClassRoom } from '@/utils/api';
 import { Classroom } from './classrooms-card';
 
 
-interface Device {
-  seri: string;
-  name: string;
-  category: string;
-  status: 'available' | 'fixing';
-}
+ 
 const statusMap = {
-  fixing: { label: 'Đang bảo trì', color: 'secondary' },
-  available: { label: 'Sẵn sàng', color: 'success' },
+  'Có thể sử dụng': { label: 'Có thể sử dụng', color: 'success' },
+  'Hỏng': { label: 'Hỏng', color: 'error' },
+  'Đang sử dụng': { label: 'Đang sử dụng', color: 'warning' },
 } as const;
 
 const schema = yup.object({
@@ -114,7 +110,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
     setOpen(false);
   };
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = React.useState(false);
-  const [selectedDevices, setSelectedDevices] = React.useState<Device[]>([]);
+  const [selectedDevices, setSelectedDevices] = React.useState<EquipmentDetail[]>([]);
   const [roomList, setRoomList] = React.useState<Classroom[]>([]);
   const [roomNameError, setRoomNameError] = React.useState("");
 
@@ -145,13 +141,13 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
     }
   }, [roomName, roomList]);
 
-  const handleAddDevice = (device: Device) => {
-    if (!selectedDevices.find((d) => d.seri === device.seri)) {
+  const handleAddDevice = (device: EquipmentDetail) => {
+    if (!selectedDevices.find((d) => d.serialNumber === device.serialNumber)) {
       setSelectedDevices([...selectedDevices, device]);
     }
   };
   const handleRemoveDevice = (seri: string) => {
-    setSelectedDevices(selectedDevices.filter((d) => d.seri !== seri));
+    setSelectedDevices(selectedDevices.filter((d) => d.serialNumber !== seri));
   };
 
   const onSubmit = async (data) => {
@@ -160,7 +156,6 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
       const isDuplicate = roomList.some(
         (room) => room.roomName.toLowerCase() === data.roomName.trim().toLowerCase()
       );
-
       if (isDuplicate) {
         toast.error("Tên phòng đã tồn tại, vui lòng chọn tên khác.");
         return;
@@ -325,9 +320,9 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                               {selectedDevices.map((device) => {
                                 const { label, color } = statusMap[device.status];
                                 return (
-                                  <TableRow key={device.seri}>
-                                    <TableCell>{device.seri}</TableCell>
-                                    <TableCell>{device.name}</TableCell>
+                                  <TableRow key={device.serialNumber}>
+                                    <TableCell>{device.serialNumber}</TableCell>
+                                    <TableCell>{device.equipmentName}</TableCell>
                                     <TableCell>{device.category}</TableCell>
                                     <TableCell><Chip color={color} label={label} size="small" /></TableCell>
                                     <TableCell>
@@ -335,7 +330,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                                         color="error"
                                         onClick={() =>
                                           window.confirm('Bạn có chắc chắn muốn xóa?') &&
-                                          handleRemoveDevice(device.seri)
+                                          handleRemoveDevice(device.serialNumber)
                                         }
                                       >
                                         Xóa
@@ -368,7 +363,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                           open={addDeviceDialogOpen}
                           onClose={() => setAddDeviceDialogOpen(false)}
                           onAdd={handleAddDevice}
-                          selectedDeviceIds={selectedDevices.map((d) => d.seri)}
+                          selectedDeviceIds={selectedDevices.map((d) => d.id)}
                         />
                       </DialogContent>
                       <DialogActions>
