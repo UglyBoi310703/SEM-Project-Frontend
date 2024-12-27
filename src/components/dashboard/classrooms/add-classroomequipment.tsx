@@ -14,7 +14,8 @@ import {
   Chip,
 } from '@mui/material';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react';
-import { APIgetAllEquipmentDetail } from '@/utils/api';
+import { APIgetAllEquipmentDetail, APIgetAllEquipmentDetailByRoomID } from '@/utils/api';
+import { Classroom } from './classrooms-card';
 
 export interface EquipmentDetail {
   id: number;
@@ -28,6 +29,7 @@ export interface EquipmentDetail {
 }
 
 interface AddEquipmentsProps {
+  room: Classroom;
   onAdd: (device: EquipmentDetail) => void;
   selectedDeviceIds: number[];
 }
@@ -38,7 +40,7 @@ const statusMap = {
   'Đang sử dụng': { label: 'Đang sử dụng', color: 'warning' },
 } as const;
 
-function AddRoomEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.JSX.Element {
+function AddRoomEquipments({ room, onAdd, selectedDeviceIds }: AddEquipmentsProps): React.JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [equipments, setEquipments] = React.useState<EquipmentDetail[]>([]);
@@ -47,16 +49,30 @@ function AddRoomEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): Re
   React.useEffect(() => {
     const fetchEquipments = async () => {
       try {
-        const data = await APIgetAllEquipmentDetail('', 0, 10);
-        setEquipments(data.content);
+        // Gọi API để lấy tất cả thiết bị
+        const allEquipments = await APIgetAllEquipmentDetail('', 0, 10);
+        console.log(allEquipments);
+        // // Gọi API để lấy thiết bị thuộc phòng cụ thể
+        const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
+        console.log(equipmentsInRoom);
+        // // Lọc ra các thiết bị chưa thuộc phòng
+        const equipmentsNotInRoom = allEquipments.content.filter(
+          (equipment) =>
+            !equipmentsInRoom.content.some(
+              (roomEquipment) => roomEquipment.id === equipment.id
+            )
+        );
+        setEquipments(equipmentsNotInRoom);
       } catch (err) {
         console.error('Error fetching equipments', err);
       } finally {
         setIsLoading(false);
       }
     };
+  
     fetchEquipments();
   }, []);
+  
 
   const filteredEquipments = equipments.filter((equipment) => {
     const isSearchMatch =
