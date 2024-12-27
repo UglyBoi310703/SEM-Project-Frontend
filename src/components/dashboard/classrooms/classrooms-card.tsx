@@ -15,7 +15,7 @@ import { Button, Box, IconButton, Menu, MenuItem } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 export interface Classroom {
-  id: string;
+  id: number,
   roomName: string;
   type: string;
   capacity: number;

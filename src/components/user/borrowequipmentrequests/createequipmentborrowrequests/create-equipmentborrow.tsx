@@ -1,5 +1,6 @@
-"use client"
-import React, { useState } from 'react';
+"use client";
+
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -17,20 +18,23 @@ import {
   TableHead,
   TableRow,
   Stack,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers';
-import dayjs, { Dayjs } from 'dayjs';
-import AddEquipments from './addequipments';
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers";
+import AddEquipments from "./AddEquipments";
+import { APICreateBorrowEquipmentRequest } from "@/utils/api";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Device {
   id: number;
-  name: string;
-  quantity: number;
-  category:string;
+  equipmentName: string;
+  category: string;
+  usableQuantity: number;
 }
+
 interface SelectedDevice extends Device {
   maxQuantity: number;
   currentQuantity: number;
@@ -38,7 +42,8 @@ interface SelectedDevice extends Device {
 
 function CreateBorrowEquipmentRequest(): React.JSX.Element {
   const [open, setOpen] = useState(false);
-  const [borrowDate, setBorrowDate] = useState<Dayjs | null>(null);
+  const [message, setMessage] = useState("");
+  const [conditionBeforeBorrow, setConditionBeforeBorrow] = useState("");
   const [returnDate, setReturnDate] = useState<Dayjs | null>(null);
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState<SelectedDevice[]>([]);
@@ -62,7 +67,8 @@ function CreateBorrowEquipmentRequest(): React.JSX.Element {
         d.id === id
           ? {
               ...d,
-              currentQuantity: value === '' ? 0 : Math.min(Math.max(Number(value), 1), d.maxQuantity),
+              currentQuantity:
+                value === "" ? 0 : Math.min(Math.max(Number(value), 1), d.maxQuantity),
             }
           : d
       )
@@ -79,115 +85,179 @@ function CreateBorrowEquipmentRequest(): React.JSX.Element {
     );
   };
 
+  const handleSave = async () => {
+    if (!returnDate || selectedDevices.length === 0) {
+      toast.error("Vui lòng nhập đầy đủ thông tin và chọn ít nhất một thiết bị.");
+      return;
+    }
+
+    const userData = localStorage.getItem("user");
+    if (!userData) {
+      toast.error("Không tìm thấy thông tin người dùng.");
+      return;
+    }
+
+    const user = JSON.parse(userData);
+
+    const requestBody = {
+      userId: user.id,
+      comment: message,
+      expectedReturnDate: returnDate.format("YYYY-MM-DD"),
+      equipmentItems: selectedDevices.map((device) => ({
+        equipmentName: device.equipmentName,
+        quantityBorrowed: device.currentQuantity,
+        conditionBeforeBorrow: conditionBeforeBorrow || "Good",
+      })),
+    };
+
+    const confirm = window.confirm("Bạn có chắc chắn muốn gửi đơn mượn?");
+    if (!confirm) return;
+
+    try {
+      await APICreateBorrowEquipmentRequest(requestBody);
+      toast.success("Đơn mượn đã được gửi thành công. Đang chờ xét duyệt.");
+      setOpen(false); // Đóng dialog
+      setSelectedDevices([]); // Reset danh sách thiết bị
+      setMessage("");
+      setConditionBeforeBorrow("");
+      setReturnDate(null);
+    } catch (error) {
+      toast.error("Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại.");
+    }
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Button variant="contained" onClick={() => {setOpen(true)}}>
+      <ToastContainer />
+      <Button variant="contained" onClick={() => setOpen(true)}>
         Tạo đơn mượn thiết bị
       </Button>
-      <Dialog open={open} onClose={() => setOpen(false)}  maxWidth="md">
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md">
         <DialogTitle>
           <Typography variant="h6">Tạo đơn mượn</Typography>
           <IconButton
             aria-label="close"
             onClick={() => setOpen(false)}
-            sx={{ position: 'absolute', right: 8, top: 8 }}
+            sx={{ position: "absolute", right: 8, top: 8 }}
           >
-          <CloseIcon />
+            <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent dividers>
-          {/* Thông tin đơn mượn */}
-          <Box display="flex"  gap={2}>
-            {/* Borrow date */}
-            <DatePicker
-              label="Ngày mượn"
-              value={borrowDate}
-              onChange={(date) => setBorrowDate(date)}
-              renderInput={(params) => <TextField {...params} fullWidth />}
-            />
-            {/* Return date */}
-            <DatePicker
-              label="Ngày hẹn trả"
-              value={returnDate}
-              onChange={(date) => setReturnDate(date)}
-              renderInput={(params) => <TextField {...params} fullWidth />}
+          <Box gap={2} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Box display="flex" gap={2}>
+              <DatePicker
+                label="Ngày hẹn trả"
+                value={returnDate}
+                onChange={(date) => setReturnDate(date)}
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+              <TextField
+                label="Tình trạng trước khi mượn"
+                value={conditionBeforeBorrow}
+                onChange={(e) => setConditionBeforeBorrow(e.target.value)}
+                fullWidth
+                multiline
+              />
+            </Box>
+            <TextField
+              label="Tin nhắn"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              multiline
+              sx={{ width: "60%" }}
+              rows={2}
             />
           </Box>
-
-        {/* Danh sách thiết bị mượn */}
-       <Box sx={{ height:450, display: "flex",flexDirection:"column",alignItems:"center", gap: 3, mt: 2 }}>
-       <Typography variant="h6" sx={{ mt: 2 }}>
-            Danh sách thiết bị
-          </Typography>
-          {selectedDevices.length === 0 ? (
-           <Box sx={{ height:300 }}>
-             <Typography variant="body2" color="textSecondary">
-              Danh sách trống
-            </Typography>
-           </Box>
-          ) : (
-            <TableContainer sx={{height:300}}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Tên thiết bị</TableCell>
-                    <TableCell>Loại thiết bị</TableCell>
-                    <TableCell>Số lượng</TableCell>
-                    <TableCell>Hành động</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {selectedDevices.map((device) => (
-                    <TableRow key={device.id}>
-                      <TableCell>{device.name}</TableCell>
-                      <TableCell>{device.category}</TableCell>
-                      <TableCell>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <TextField
-                            type="number"
-                            value={device.currentQuantity === 0 ? '' : device.currentQuantity}
-                            onChange={(e) => handleQuantityChange(device.id, e.target.value)}
-                            onBlur={() => handleBlur(device.id)}
-                            inputProps={{ min: 1, max: device.maxQuantity }}
-                            sx={{ width: 80 }}
-                          />
-                          <Typography>/ {device.maxQuantity}</Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          color="error"
-                          onClick={() =>
-                            window.confirm('Bạn có chắc chắn muốn xóa?') &&
-                            handleRemoveDevice(device.id)
-                          }
-                        >
-                          Xóa
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-          <Button
-            variant="outlined"
-            onClick={() => setAddDeviceDialogOpen(true)}
-            sx={{ mt: 2 }}
+          <Box
+            sx={{
+              height: 400,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 3,
+              mt: 1,
+            }}
           >
-            Thêm thiết bị
-          </Button>
-       </Box>
+            <Typography variant="h6" sx={{ mt: 2 }}>
+              Danh sách thiết bị
+            </Typography>
+            {selectedDevices.length === 0 ? (
+              <Box sx={{ height: 300 }}>
+                <Typography variant="body2" color="textSecondary">
+                  Danh sách trống
+                </Typography>
+              </Box>
+            ) : (
+              <TableContainer sx={{ height: 300 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Tên thiết bị</TableCell>
+                      <TableCell>Loại thiết bị</TableCell>
+                      <TableCell>Số lượng</TableCell>
+                      <TableCell>Hành động</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {selectedDevices.map((device) => (
+                      <TableRow key={device.id}>
+                        <TableCell>{device.equipmentName}</TableCell>
+                        <TableCell>{device.category}</TableCell>
+                        <TableCell>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <TextField
+                              type="number"
+                              value={
+                                device.currentQuantity === 0 ? "" : device.currentQuantity
+                              }
+                              onChange={(e) =>
+                                handleQuantityChange(device.id, e.target.value)
+                              }
+                              onBlur={() => handleBlur(device.id)}
+                              inputProps={{ min: 1, max: device.maxQuantity }}
+                              sx={{ width: 80 }}
+                            />
+                            <Typography>/ {device.maxQuantity}</Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            color="error"
+                            onClick={() =>
+                              window.confirm("Bạn có chắc chắn muốn xóa?") &&
+                              handleRemoveDevice(device.id)
+                            }
+                          >
+                            Xóa
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+            <Button
+              variant="outlined"
+              onClick={() => setAddDeviceDialogOpen(true)}
+              sx={{ mt: 2 }}
+            >
+              Thêm thiết bị
+            </Button>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Hủy</Button>
-          <Button variant="contained">Lưu</Button>
+          <Button variant="contained" onClick={handleSave}>
+            Gửi
+          </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Add device dialog */}
-      <Dialog fullWidth maxWidth="md"
+      <Dialog
+        fullWidth
+        maxWidth="md"
         open={addDeviceDialogOpen}
         onClose={() => setAddDeviceDialogOpen(false)}
       >
