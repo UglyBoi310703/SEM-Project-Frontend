@@ -147,3 +147,27 @@ export const login = async (user:UserLogin): Promise<string> => {
 
 
 
+export const register = async (user: UserRegister): Promise<void> => {
+  return axios.post(`${BASE_URL}/api/auth/sign-up`, user);
+};
+
+export const login = async (user:UserLogin): Promise<string> => {
+  const response = await axios.post(`${BASE_URL}/login`, user);
+  return response;
+
+};
+
+//API get All Equipment
+export interface Equipments {
+  content:[];  
+  totalElements: number;  
+  totalPages: number;  
+  size: number;  
+};
+
+
+export async function APIGetAllEquipments(): Promise<RoomApiResponse> {
+  const response = await axios.get<RoomApiResponse>(`${BASE_URL}/api/v1/room/filter`);
+  return response.data;
+}
+
