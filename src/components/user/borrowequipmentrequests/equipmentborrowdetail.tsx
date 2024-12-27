@@ -115,7 +115,7 @@ function BorrowDeviceDialog({ open, onClose, borrower, devices }: Props): React.
                 <Accordion key={index}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <ListItemText
-                      primary={`${device.name}`}
+                      primary={device.name}
                       secondary={`Số lượng mượn: ${device.quantity}`}
                     />
                   </AccordionSummary>

@@ -119,10 +119,9 @@ function EquipmentBorrowTable(){
         </Select>
       </FormControl>
       </Box>
-    </Box>
-          <CreateBorrowEquipmentRequest/>
-          </Box>
-   
+      </Box>
+        <CreateBorrowEquipmentRequest/>
+      </Box>
       <TableContainer component={Paper}>
     <Table>
       <TableHead>

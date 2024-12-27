@@ -2,10 +2,12 @@ import axios from "axios";
 import type { Classroom } from "@/components/dashboard/classrooms/classrooms-card";
 import { Equipment } from "@/components/dashboard/equipments/equipment-categories-table";
 
+import type { User } from "@/types/user";
+
 const BASE_URL = 'http://localhost:8080';
 
 // //APIGetAllRooms
-export type RoomApiResponse = {
+export interface RoomApiResponse {
   content: Classroom[];  
   totalElements: number;  
   totalPages: number;  
@@ -18,7 +20,7 @@ export async function APIGetAllRoom(): Promise<RoomApiResponse> {
   return response.data;
 }
 
-// //APIAddRoom
+//APIAddRoom
 export interface NewRoom {
   roomName: string;
   type: string;
@@ -132,6 +134,16 @@ export const APIUpdateEquipmentCategory = async (equipmentCategoryId: number, ne
 
 
 
+
+
+export const register = async (user: UserRegister): Promise<void> => {
+  return axios.post(`${BASE_URL}/api/auth/sign-up`, user);
+};
+export const login = async (user:UserLogin): Promise<string> => {
+  const response = await axios.post(`${BASE_URL}/login`, user);
+  return response;
+
+};
 
 
 

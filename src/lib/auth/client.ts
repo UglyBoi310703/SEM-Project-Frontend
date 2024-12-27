@@ -1,28 +1,13 @@
-'use client';
 
 import type { User } from '@/types/user';
 
-function generateToken(): string {
-  const arr = new Uint8Array(12);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
-}
-
-const user = {
-  id: 'USR-009',
-  avatar: '/assets/AVT.jpg',
-  Name: 'Ugly Boi',
-  email: 'uglyboi3107@gmail.com',
-} satisfies User;
+const API_URL = "http://localhost:8080/api";
 
 export interface SignUpParams {
-  name:string;
+  username: string;
   email: string;
+  role: string;
   password: string;
-}
-
-export interface SignInWithOAuthParams {
-  provider: 'google' | 'discord';
 }
 
 export interface SignInWithPasswordParams {
@@ -35,60 +20,121 @@ export interface ResetPasswordParams {
 }
 
 class AuthClient {
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
-    // Make API request
+  async signUp(params: SignUpParams): Promise<{ error?: string }> {
+    try {
+      const response = await fetch(`${API_URL}/auth/sign-up`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      });
 
-    // We do not handle the API, so we'll just generate a token and store it in localStorage.
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { error: errorData.detail };
+      }
 
-    return {};
-  }
-
-  async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
-    return { error: 'Social authentication not implemented' };
-  }
-
-  async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    const { email, password } = params;
-
-    // Make API request
-
-    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'uglyboi3107@gmail.com' || password !== 'vuong2003a') {
-      return { error: 'Tên đăng nhập hoặc mật khẩu không chính xác' };
+      return {};
+    } catch (error) {
+      return { error: 'An error occurred during sign-up' };
     }
-
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-    return {};
   }
 
-  async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Password reset not implemented' };
-  }
+  async signInWithPassword(params: SignInWithPasswordParams): Promise<{ data?: User; error?: string }> {
+    try {
+      const response = await fetch(`${API_URL}/auth/sign-in`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+        credentials: 'include',
+      });
 
-  async updatePassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Update reset not implemented' };
-  }
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { error: errorData.message || 'Sign-in failed' };
+      }
 
-  async getUser(): Promise<{ data?: User | null; error?: string }> {
-    // Make API request
-
-    // We do not handle the API, so just check if we have a token in localStorage.
-    const token = localStorage.getItem('custom-auth-token');
-
-    if (!token) {
-      return { data: null };
+      const data = await response.json();
+      localStorage.setItem('user', JSON.stringify(data));
+      return { data };
+    } catch (error) {
+      return { error: 'An error occurred during sign-in' };
     }
-
-    return { data: user };
   }
 
   async signOut(): Promise<{ error?: string }> {
-    localStorage.removeItem('custom-auth-token');
+    try {
+      const response = await fetch(`${API_URL}/auth/sign-out`, {
+        method: 'POST',
+        credentials: 'include',
+      });
 
-    return {};
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { error: errorData.message || 'Sign-out failed' };
+      }
+
+      localStorage.removeItem('user');
+      return {};
+    } catch (error) {
+      return { error: 'An error occurred during sign-out' };
+    }
+  }
+
+  async getUser(): Promise<{ data?: User | null; error?: string }> {
+    try {
+      const user = localStorage.getItem('user');
+      if (!user) {
+        return { data: null };
+      }
+      return { data: JSON.parse(user) };
+    } catch (error) {
+      return { error: 'An error occurred while fetching user data' };
+    }
+  }
+
+  async refreshToken(): Promise<{ error?: string }> {
+    try {
+      const response = await fetch(`${API_URL}/auth/refresh-token`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { error: errorData.message || 'Refresh token failed' };
+      }
+
+      const data = await response.json();
+      return { data };
+    } catch (error) {
+      return { error: 'An error occurred during token refresh' };
+    }
+  }
+
+  async getMyInfo(): Promise<{ data?: User; error?: string }> {
+    try {
+      const response = await fetch(`${API_URL}/v1/user/my-info`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { error: errorData.message || 'Failed to fetch user info' };
+      }
+
+      const data = await response.json();
+      return { data };
+    } catch (error) {
+      return { error: 'An error occurred while fetching user info' };
+    }
   }
 }
 

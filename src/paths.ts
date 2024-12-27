@@ -11,7 +11,6 @@ export const paths = {
     settings: '/dashboard/settings',
   },
   user: {
-    crashreports: '/user/crashreports',
     account: '/user/account',
     equipments:'/user/equipments',
     borrowequipmentrequests: '/user/borrowequipmentrequests',

@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Box from '@mui/material/Box';
+import { Warning } from '@phosphor-icons/react';
+import Tooltip from '@mui/material/Tooltip';
 
 function CreateCrashReport (): React.JSX.Element{
   // Sử dụng useState để quản lý trạng thái mở/đóng dialog và nội dung báo cáo
@@ -40,11 +42,14 @@ function CreateCrashReport (): React.JSX.Element{
 
   return (
     <Box
-    sx={{p:2}}
+    
     >
-      <Button variant="contained" color="primary" onClick={handleOpen}>
-        Tạo báo cáo sự cố
-      </Button>
+        <Tooltip title="Báo cáo sự cố">       
+                <IconButton onClick={handleOpen}>
+                  <Warning />
+                </IconButton>
+              
+          </Tooltip>
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
         <DialogTitle>
           Báo cáo sự cố
