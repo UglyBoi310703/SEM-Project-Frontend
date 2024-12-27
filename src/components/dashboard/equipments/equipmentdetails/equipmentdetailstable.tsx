@@ -22,7 +22,7 @@ import dayjs from 'dayjs';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import EditEquipmentModal from '../editequipment/editequipment';
 
-export interface EquipmentDetail {
+ interface EquipmentDetail {
   name: string;
   seri: string;
   purchasedate: Date;

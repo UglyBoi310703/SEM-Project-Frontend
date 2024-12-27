@@ -1,21 +1,31 @@
 import axios from "axios";
 import type { Classroom } from "@/components/dashboard/classrooms/classrooms-card";
 import { Equipment } from "@/components/dashboard/equipments/equipment-categories-table";
+import { EquipmentDetail } from "@/components/dashboard/equipments/equipmentdetails/equipmentdetailstable";
+import { number } from "zod";
 
 const BASE_URL = 'http://localhost:8080';
 
-// APIGetAllRooms
+// //APIGetRoomsByKeyword, type, status
 export type RoomApiResponse = {
-  content: Classroom[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
+  content: Classroom[];  
+  page:  {
+    size: number,
+    number: number,
+    totalElements: number,
+    totalPages: number
+  };  
 };
 
-export async function APIGetAllRoom(): Promise<RoomApiResponse> {
-  const response = await axios.get<RoomApiResponse>(`${BASE_URL}/api/v1/room/search`, {
-    withCredentials: true, // Gửi thông tin xác thực
-  });
+
+export async function APIGetRoom(  type: string = '', 
+  status: string = '', 
+  keyword: string = '', 
+  page: number = 0, 
+  
+  size: number = 4): Promise<RoomApiResponse> {
+  console.log(`${BASE_URL}/api/v1/room/search?type=${type}&status=${status}&keyword=${keyword}&page=${page}&size=${size}`);
+  const response = await axios.get<RoomApiResponse>(`${BASE_URL}/api/v1/room/search?type=${type}&status=${status}&keyword=${keyword}&page=${page}&size=${size}`);
   return response.data;
 }
 
@@ -72,12 +82,34 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
   }
 };
 
-// APIGetAllEquipmentCategories
-export interface EquipmentResponse {
-  content: Equipment[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
+//APIUpdateEquipmentDetailLocation
+export interface ClassRoomEquipmentId {
+  equipmentDetailIds: number[]
+}
+export const APIUpdateEquipmentDetailLocation = async (classroom_id: number, ClassRoomEquipmentId: ClassRoomEquipmentId): Promise<void> => {
+  try {
+    const response = await axios.put(`${BASE_URL}/api/v1/equipment-detail/location/room/${classroom_id}`, ClassRoomEquipmentId, {
+      headers: {
+        "Content-Type": "application/json",  
+      },
+    });
+    console.log("Thiết bị gắn với phòng học đã được cập nhật thành công:", response.data);
+  } catch (error) {
+    console.error("Lỗi khi cập nhật thiết bị gắn với phòng học:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
+
+
+
+//APIGetAllEquipmentCategories
+export type EquipmentResponse = {
+  content: Equipment[];  
+  totalElements: number;  
+  totalPages: number;  
+  size: number;  
 };
 
 export async function APIGetAllEquipment(
@@ -85,7 +117,6 @@ export async function APIGetAllEquipment(
   page: number = 0,
   size: number = 15
 ): Promise<EquipmentResponse> {
-  console.log(`${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}`);
   const response = await axios.get<EquipmentResponse>(
     `${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}`,
     { withCredentials: true } // Gửi thông tin xác thực
@@ -149,6 +180,17 @@ export interface CreateBorrowEquipmentRequest {
   expectedReturnDate: string;
   equipmentItems: BorrowEquipmentItem[];
 }
+//APIgetEquipmentDetailByRoomID
+export async function APIgetAllEquipmentDetailByRoomID(
+  roomID: number
+): Promise<EquipmentResponse> {
+  console.log( `${BASE_URL}/api/v1/equipment-detail/room/${roomID}`);
+  const response = await axios.get<EquipmentDetailResponse>(
+    `${BASE_URL}/api/v1/equipment-detail/room/${roomID}`
+  );
+  return response.data;
+}
+
 
 export const APICreateBorrowEquipmentRequest = async (
   request: CreateBorrowEquipmentRequest

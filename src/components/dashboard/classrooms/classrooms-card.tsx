@@ -10,7 +10,7 @@ import Chip from '@mui/material/Chip';
 import { Button,Box } from '@mui/material';
 
 export interface Classroom {
-  id: string,
+  id: number,
   roomName: string;
   type: string;
   capacity:number;

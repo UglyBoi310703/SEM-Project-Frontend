@@ -38,7 +38,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AddRoomEquipments, { EquipmentDetail } from './add-classroomequipment';
-import { APIGetAllRoom, APIGetRoomByName, APIModifyClassRoom } from '@/utils/api';
+import {  APIGetRoom, APIGetRoomByName, APIModifyClassRoom, APIUpdateEquipmentDetailLocation } from '@/utils/api';
 import { Classroom } from './classrooms-card';
 
 
@@ -118,7 +118,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
     if (open) {
       const fetchRooms = async () => {
         try {
-          const data = await APIGetAllRoom();
+          const data = await APIGetRoom();
           const filteredRooms = data.content.filter((Dataroom) => Dataroom.id !== room.id);
           setRoomList(filteredRooms);
         } catch (error) {
@@ -151,6 +151,8 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
   };
 
   const onSubmit = async (data) => {
+    const equipmentDetailIds = selectedDevices.map((device) => device.id);
+  
     setOpen(false)
     try {
       const isDuplicate = roomList.some(
@@ -182,8 +184,11 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
         type: data.type,
         capacity: parseInt(data.capacity, 10),
       };
-
-      await APIModifyClassRoom(parseInt(room.id, 10), newClassroom);
+      const ClassRoomEquipmentId = {
+        equipmentDetailIds : equipmentDetailIds
+      }
+      await APIUpdateEquipmentDetailLocation(room.id, ClassRoomEquipmentId)
+      await APIModifyClassRoom(room.id, newClassroom);
 
        
       if (newClassroom) {
@@ -360,6 +365,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                       <DialogTitle>Thêm thiết bị</DialogTitle>
                       <DialogContent>
                         <AddRoomEquipments
+                          room  = {room}
                           open={addDeviceDialogOpen}
                           onClose={() => setAddDeviceDialogOpen(false)}
                           onAdd={handleAddDevice}
