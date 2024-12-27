@@ -12,7 +12,10 @@ import { EquipmentsDetailsTable } from './equipmentdetailstable';
 import AddEquipmentModal from '../addequipment/add-equipment';
 
 
-export default function EquipmentDetails(): React.JSX.Element {
+export default function EquipmentDetails({equipmentCategory}): React.JSX.Element {
+   React.useEffect(()=> {
+      console.log(equipmentCategory);
+    }, [])
     const [open, setOpen] = React.useState(false);
     const handleClickOpen = () => {
         setOpen(true);
@@ -20,6 +23,11 @@ export default function EquipmentDetails(): React.JSX.Element {
       const handleClose = () => {
         setOpen(false);
       };
+
+    const [updated, setUpdated] = React.useState(false)
+    const handleChangetUpdate = () => {
+      setUpdated(true)
+    }
   return (
     <React.Fragment>
     <Button
@@ -56,10 +64,10 @@ export default function EquipmentDetails(): React.JSX.Element {
           <Typography variant="h4">Danh sách thiết bị</Typography>
         </Stack>
         <div>
-        <AddEquipmentModal/>
+        <AddEquipmentModal setUpdate = {() => handleChangetUpdate()} equipmentCategory={equipmentCategory}/>
         </div>
       </Stack>
-      <EquipmentsDetailsTable
+      <EquipmentsDetailsTable updated = {updated} equipmentCategory={equipmentCategory}
       />
     </Stack>
       </DialogContent>

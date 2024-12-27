@@ -191,6 +191,45 @@ export async function APIgetAllEquipmentDetailByRoomID(
   return response.data;
 }
 
+//APIgetEquipmentDetailByEquipmentID
+export async function APIgetAllEquipmentDetailByEquipmentID(
+  equipmentID: number
+): Promise<EquipmentDetailResponse> {
+  console.log( `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentID}/search`);
+  const response = await axios.get<EquipmentDetailResponse>(
+    `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentID}/search`
+  );
+  return response.data;
+}
+
+//APIAddNewEquipmentDetail
+export interface NewEquipmentRequest {
+  "description": string,
+  "purchaseDate": string,
+  "equipmentId": number,
+  "roomId": number
+}
+export const APIAddNewEquipmentDetail = async (equipment: NewEquipmentRequest): Promise<void> => {
+  try {
+     
+    const response = await axios.post(`${BASE_URL}/api/v1/equipment-detail`, equipment, {
+      headers: {
+        "Content-Type": "application/json",  
+      },
+    });
+    console.log("Thiết bị đã được thêm thành công", response.data);
+  } catch (error) {
+    console.error("Lỗi khi thêm thiết bị:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
+
+
+
+
+
 
 
 

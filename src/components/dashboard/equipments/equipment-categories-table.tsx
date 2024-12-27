@@ -192,7 +192,7 @@ export function EquipmentsTable(): React.JSX.Element {
                       gap: 1,
                     }}
                   >
-                    <EquipmentDetails />
+                    <EquipmentDetails equipmentCategory = {row} />
                     <EditEquipmentCategoryModal equipmentCategory = {row} onUpdateEquipmentCategory={handleUpdateEquipmentCategory}/>
                   </Box>
                 </TableCell>

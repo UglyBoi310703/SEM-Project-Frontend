@@ -18,56 +18,41 @@ import {
   MenuItem,
   Divider
 } from '@mui/material';
-import dayjs from 'dayjs';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import EditEquipmentModal from '../editequipment/editequipment';
+import { APIgetAllEquipmentDetailByEquipmentID } from '@/utils/api';
+import { EquipmentDetail } from '../../classrooms/add-classroomequipment';
 
- interface EquipmentDetail {
-  name: string;
-  seri: string;
-  purchasedate: Date;
-  room: string;
-  status: 'used' | 'available' | 'fixing';
-  note: string;
-}
+ 
 
 const statusMap = {
-  fixing: { label: 'Đang bảo trì', color: 'secondary' },
-  available: { label: 'Sẵn sàng', color: 'success' },
-  used: { label: 'Đang được sử dụng', color: 'warning' },
+  'Có thể sử dụng': { label: 'Có thể sử dụng', color: 'success' },
+  'Hỏng': { label: 'Hỏng', color: 'error' },
+  'Đang sử dụng': { label: 'Đang sử dụng', color: 'warning' },
 } as const;
 
-const equipmentdetails: EquipmentDetail[] = [
-  {
+export function EquipmentsDetailsTable({equipmentCategory, updated}): React.JSX.Element {
+  const [equipmentdetails, setEquipmentDetail] = React.useState<EquipmentDetail[]>([])
+  React.useEffect(()=> {
+     const fetchEquipmentDetail = async (id:number) => {
+          const data = await APIgetAllEquipmentDetailByEquipmentID(id)
+          console.log(data.content);
+          
+          setEquipmentDetail(data.content)
+       };
+       fetchEquipmentDetail(equipmentCategory.id)
+  }, [equipmentCategory])
 
-    name: 'Máy chiếu',
-    seri: 'DTLT-3107',
-    purchasedate: dayjs().subtract(2, 'hours').toDate(),
-    room: 'Kho',
-    status: 'available',
-    note: 'Thiết bị mới',
-  },
-  {
-    name: 'Máy chiếu',
-    seri: 'PC-2023',
-    purchasedate: dayjs().subtract(5, 'days').toDate(),
-    room: 'Phòng Lab',
-    status: 'used',
-    note: 'Đã qua sử dụng',
-  },
-  {
+  React.useEffect(()=> {
+    if(updated){
+      const fetchEquipmentDetail = async (id:number) => {
+        const data = await APIgetAllEquipmentDetailByEquipmentID(id)
+        setEquipmentDetail(data.content)
+     };
+     fetchEquipmentDetail(equipmentCategory.id)
+    }
+  }, [updated])
 
-    name: 'Máy chiếu',
-    seri: 'PRT-123',
-    purchasedate: dayjs().subtract(1, 'year').toDate(),
-    room: 'Kho',
-    status: 'fixing',
-    note: 'Hỏng phần cứng',
-  },
-  // Thêm các thiết bị khác nếu cần
-];
-
-export function EquipmentsDetailsTable(): React.JSX.Element {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [deviceStatus, setDeviceStatus] = React.useState('Tất cả');
@@ -88,9 +73,9 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
 
   const filteredRows = equipmentdetails.filter((row) => {
     if (deviceStatus === 'Tất cả') return true;
-    if (deviceStatus === 'Sẵn có' && row.status === 'available') return true;
-    if (deviceStatus === 'Đang sử dụng' && row.status === 'used') return true;
-    if (deviceStatus === 'Đang bảo trì' && row.status === 'fixing') return true;
+    if (deviceStatus === 'Sẵn có' && row.status === 'Có thể sử dụng') return true;
+    if (deviceStatus === 'Đang sử dụng' && row.status === 'Đang sử dụng') return true;
+    if (deviceStatus === 'Đang bảo trì' && row.status === 'Hỏng') return true;
     return false;
   });
 
@@ -164,15 +149,15 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
             {rowsToDisplay.map((row) => {
               const { label, color } = statusMap[row.status];
               return (
-                <TableRow hover key={row.seri}>
-                  <TableCell>{row.seri}</TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{dayjs(row.purchasedate).format('MMM D, YYYY')}</TableCell>
-                  <TableCell>{row.room}</TableCell>
+                <TableRow hover key={row.id}>
+                  <TableCell>{row.id}</TableCell>
+                  <TableCell>{row.equipmentName}</TableCell>
+                  <TableCell>{row.purchaseDate}</TableCell>
+                  <TableCell>{row.roomName}</TableCell>
                   <TableCell>
                     <Chip color={color} label={label} size="small" />
                   </TableCell>
-                  <TableCell>{row.note}</TableCell>
+                  <TableCell>{row.description}</TableCell>
                   <TableCell>
                     <Box
                       sx={{

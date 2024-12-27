@@ -163,6 +163,8 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
   };
 
   const onSubmit = async (data) => {
+    console.log(data);
+    
     const equipmentDetailIds = selectedDevices.map((device) => device.id);
 
     setOpen(false)
@@ -196,10 +198,13 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
         type: data.type,
         capacity: parseInt(data.capacity, 10),
       };
-      const ClassRoomEquipmentId = {
-        equipmentDetailIds: equipmentDetailIds
+      if(equipmentDetailIds.length > 0){
+        const ClassRoomEquipmentId = {
+          equipmentDetailIds: equipmentDetailIds
+        }
+        await APIUpdateEquipmentDetailLocation(room.id, ClassRoomEquipmentId)
       }
-      await APIUpdateEquipmentDetailLocation(room.id, ClassRoomEquipmentId)
+      
       await APIModifyClassRoom(room.id, newClassroom);
 
 

@@ -11,6 +11,7 @@ import {
   Select,
   MenuItem,
   InputLabel,
+  SelectChangeEvent,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import * as yup from 'yup';
@@ -25,12 +26,23 @@ function EditEquipmentCategoryModal({
   equipmentCategory,
   onUpdateEquipmentCategory,
 }) {
+  const ClassMapping: Record<
+    "Thiết bị giảng dạy" | "Thiết bị điện" | "Thiết bị thể thao" | "Thiết bị phòng thí nghiệm",
+    string
+  > = {
+    "Thiết bị giảng dạy": "TEACHING_EQUIPMENT",
+    "Thiết bị điện": "ELECTRIC_EQUIPMENT",
+    "Thiết bị thể thao": "SPORTS_EQUIPMENT",
+
+    "Thiết bị phòng thí nghiệm": "LABORATORY_EQUIPMENT",
+  };
   const equipmentCategoryId = equipmentCategory.id
   const [open, setOpen] = useState(false);
   const [existingCategories, setExistingCategories] = React.useState<Equipment[]>([]);
+  const [selectedCategory, setSelectedCategory] = React.useState(ClassMapping[equipmentCategory.category as keyof typeof ClassMapping]);
 
   useEffect(() => {
- 
+
     const fetchCategories = async () => {
       try {
         const response = await APIGetAllEquipment();
@@ -43,10 +55,14 @@ function EditEquipmentCategoryModal({
     };
     fetchCategories();
 
-    console.log(equipmentCategory);
+
 
   }, []);
 
+
+  const handleCateogyChange = (event: SelectChangeEvent) => {
+    setSelectedCategory(event.target.value);
+  };
   // Schema xác thực
   const schema = yup.object({
     equipmentName: yup
@@ -75,14 +91,13 @@ function EditEquipmentCategoryModal({
     register,
     handleSubmit,
     reset,
-    setValue,
     control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       equipmentName: equipmentCategory.name || '',
-      category: equipmentCategory.type || '',
+      category: ClassMapping[equipmentCategory.category as keyof typeof ClassMapping] || '',
       code: equipmentCategory.code || '',
     },
   });
@@ -91,14 +106,17 @@ function EditEquipmentCategoryModal({
     if (open) {
       reset({
         equipmentName: equipmentCategory.equipmentName || '',
-        category: equipmentCategory.category || '',
+        category: ClassMapping[equipmentCategory.category as keyof typeof ClassMapping] || '',
         code: equipmentCategory.code || '',
       });
     }
   }, [equipmentCategory, open, reset]);
   
 
+
   const onSubmit = async (data) => {
+    console.log(data);
+    console.log(selectedCategory);
     setOpen(false)
     const nameExists = existingCategories.some(
       (cat) => cat.equipmentName === data.equipmentName && cat.id !== equipmentCategoryId
@@ -184,24 +202,30 @@ function EditEquipmentCategoryModal({
 
               <Grid item xs={12}>
                 <FormControl fullWidth error={!!errors.category}>
-                  <InputLabel>Loại thiết bị</InputLabel>
+                  <InputLabel id="room-type-label">Loại thiết bị</InputLabel>
                   <Controller
                     name="category"
                     control={control}
-                    defaultValue={equipmentCategory.type || ''}
                     render={({ field }) => (
-                      <Select {...field}>
-                        <MenuItem value="TEACHING_EQUIPMENT">Phòng học</MenuItem>
-                        <MenuItem value="ELECTRIC_EQUIPMENT">Điện</MenuItem>
-                        <MenuItem value="SPORTS_EQUIPMENT">Thể dục</MenuItem>
-                        <MenuItem value="LABORATORY_EQUIPMENT">Thí nghiệm</MenuItem>
+                      <Select
+                        {...field}
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        labelId="room-type-label"
+                        label="Loại thiết bị"
+                      >
+                        <MenuItem value="TEACHING_EQUIPMENT">Thiết bị giảng dạy</MenuItem>
+                        <MenuItem value="ELECTRIC_EQUIPMENT">Thiết bị điện</MenuItem>
+                        <MenuItem value="SPORTS_EQUIPMENT">Thiết bị thể thao</MenuItem>
+                        <MenuItem value="LABORATORY_EQUIPMENT">Thiết bị phòng thí nghiệm</MenuItem>
                       </Select>
                     )}
                   />
-                  <Typography variant="caption" color="error">
+                  <Typography variant="body2" color="error">
                     {errors.category?.message}
                   </Typography>
                 </FormControl>
+
               </Grid>
 
               <Grid item xs={12}>
