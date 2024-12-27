@@ -10,20 +10,20 @@ import Chip from '@mui/material/Chip';
 import ClassroomInfoDialog from './classroom-equipment-info';
 
 export interface Classroom {
-  id: string;
-  title: string;
-  description: string;
-  seats: number;
-  status:'used' | 'available' | 'fixing';
+  id: number,
+  roomName: string;
+  type: string;
+  capacity:number;
+  status:'OCCUPIED' | 'AVAILABLE' | 'BROKEN';
 }
 
 export interface ClassroomCardProps {
   classroom: Classroom;
 }
 const statusMap = {
-  fixing: { label: 'Đang bảo trì', color: 'secondary' },
-  available: { label: 'Sẵn sàng', color: 'success' },
-  used: { label: 'Đang được sử dụng', color: 'warning' },
+  BROKEN: { label: 'Đang bảo trì', color: 'secondary' },
+  AVAILABLE: { label: 'Sẵn sàng', color: 'success' },
+  OCCUPIED: { label: 'Đang được sử dụng', color: 'warning' },
 } as const;
 
 export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Element {
@@ -34,13 +34,13 @@ export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Elem
         <Stack spacing={2}>
           <Stack spacing={1}>
             <Typography align="center" variant="h5">
-              {classroom.title}
+              {classroom.roomName}
             </Typography>
             <Typography align="center" variant="body1">
-              {classroom.description}
+              {classroom.type}
             </Typography>
             <Typography align="center" variant="body1">
-              Số lượng chỗ ngồi: {classroom.seats}
+              Số lượng chỗ ngồi: {classroom.capacity}
             </Typography>
           </Stack>
         </Stack>
