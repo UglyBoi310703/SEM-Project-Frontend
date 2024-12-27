@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Box,
@@ -10,47 +11,51 @@ import {
   TableHead,
   TableRow,
   Typography,
-  TextField,
-  MenuItem,
-  Select,
-  InputLabel,
+  OutlinedInput,
+  InputAdornment,
   FormControl,
-} from '@mui/material';
-import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
+  Select,
+  MenuItem,
+  InputLabel
+} from "@mui/material";
+import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import { APIGetAllEquipment } from "@/utils/api";
+import type { Equipment } from "@/components/dashboard/equipments/equipment-categories-table";
 
-interface Equipment {
-  id: string;
-  name: string;
-  category: string;
-  totalQuantity: number;
-  usableQuantity: number;
-}
 
 interface AddEquipmentsProps {
   onAdd: (device: Equipment, maxQuantity: number) => void;
   selectedDeviceIds: string[];
 }
 
-const equipments: Equipment[] = [
-  { id: 'E-001', name: 'Máy chiếu', category: 'Phòng học', totalQuantity: 50, usableQuantity: 45 },
-  { id: 'E-002', name: 'Loa JBL', category: 'Phòng học', totalQuantity: 50, usableQuantity: 45 },
-  { id: 'E-003', name: 'Mic', category: 'Phòng học', totalQuantity: 50, usableQuantity: 45 },
-  { id: 'E-004', name: 'abc', category: 'Hỗ trợ', totalQuantity: 50, usableQuantity: 45 },
-  { id: 'E-005', name: 'cdf', category: 'Hỗ trợ', totalQuantity: 50, usableQuantity: 45 },
-  { id: 'E-006', name: 'fhfg', category: 'Thể dục', totalQuantity: 50, usableQuantity: 45 },
-  { id: 'E-007', name: 'hjy', category: 'Phòng học', totalQuantity: 50, usableQuantity: 45 },
-];
-
 function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.JSX.Element {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>(''); // Lưu loại thiết bị được chọn
+  const [equipmentCategories, setEquipmentCategories] = useState<Equipment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-  // Lọc thiết bị theo tên và loại
-  const filteredEquipments = equipments.filter((equipment) => {
-    const isNameMatch = equipment.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const isCategoryMatch = selectedCategory ? equipment.category === selectedCategory : true;
+  // Fetch dữ liệu từ API
+  useEffect(() => {
+    const fetchEquipment = async () => {
+      try {
+        const data = await APIGetAllEquipment();
+        setEquipmentCategories(data.content);
+      } catch (err) {
+        console.error("Error fetching equipment data", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchEquipment();
+  }, []);
+
+  const filteredEquipments = equipmentCategories.filter((equipment) => {
+    const isNameMatch = equipment.equipmentName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const isCategoryMatch = selectedCategory
+      ? equipment.category === selectedCategory
+      : true;
     return isNameMatch && isCategoryMatch;
   });
 
@@ -63,16 +68,18 @@ function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.
   };
 
   // Lấy tất cả các loại thiết bị
-  const categories = [...new Set(equipments.map((equipment) => equipment.category))];
+  const categories = Array.from(
+    new Set(equipmentCategories.map((equipment) => equipment.category))
+  );
 
   return (
     <Card>
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           gap: 2,
-          bgcolor: 'background.paper',
+          bgcolor: "background.paper",
           p: 2,
           borderRadius: 2,
           boxShadow: 1,
@@ -86,13 +93,13 @@ function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.
               <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
             </InputAdornment>
           }
-          sx={{ maxWidth: '500px' }}
+          sx={{ maxWidth: "500px" }}
           value={searchTerm}
           onChange={handleSearchChange}
         />
 
         {/* Bộ lọc loại thiết bị */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Bộ lọc:
           </Typography>
@@ -116,17 +123,21 @@ function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.
 
       <Box
         sx={{
-          overflowY: 'auto',
+          overflowY: "auto",
           height: 400, // Thiết lập chiều cao cố định và cuộn
         }}
       >
         {/* Hiển thị thông báo nếu không có thiết bị nào phù hợp */}
-        {filteredEquipments.length === 0 ? (
-          <Box sx={{ padding: 2, textAlign: 'center' }}>
+        {isLoading ? (
+          <Box sx={{ padding: 2, textAlign: "center" }}>
+            <Typography variant="h6">Đang tải dữ liệu...</Typography>
+          </Box>
+        ) : filteredEquipments.length === 0 ? (
+          <Box sx={{ padding: 2, textAlign: "center" }}>
             <Typography variant="h6">Danh sách thiết bị trống</Typography>
           </Box>
         ) : (
-          <Table stickyHeader >
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell>Tên thiết bị</TableCell>
@@ -139,7 +150,7 @@ function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.
               {filteredEquipments.map((row) => (
                 <TableRow hover key={row.id}>
                   <TableCell>
-                    <Typography variant="subtitle2">{row.name}</Typography>
+                    <Typography variant="subtitle2">{row.equipmentName}</Typography>
                   </TableCell>
                   <TableCell>{row.category}</TableCell>
                   <TableCell>{row.usableQuantity}</TableCell>
@@ -149,7 +160,7 @@ function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.
                       onClick={() => onAdd(row, row.usableQuantity)}
                       disabled={selectedDeviceIds.includes(row.id)}
                     >
-                      {selectedDeviceIds.includes(row.id) ? 'Đã chọn' : 'Thêm'}
+                      {selectedDeviceIds.includes(row.id) ? "Đã chọn" : "Thêm"}
                     </Button>
                   </TableCell>
                 </TableRow>

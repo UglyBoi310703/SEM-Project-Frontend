@@ -1,36 +1,37 @@
 import axios from "axios";
 import type { Classroom } from "@/components/dashboard/classrooms/classrooms-card";
 import { Equipment } from "@/components/dashboard/equipments/equipment-categories-table";
-import { EquipmentDetail } from "@/components/dashboard/equipments/equipmentdetails/equipmentdetailstable";
 
 const BASE_URL = 'http://localhost:8080';
 
-// //APIGetAllRooms
+// APIGetAllRooms
 export type RoomApiResponse = {
-  content: Classroom[];  
-  totalElements: number;  
-  totalPages: number;  
-  size: number;  
+  content: Classroom[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
 };
 
-
 export async function APIGetAllRoom(): Promise<RoomApiResponse> {
-  const response = await axios.get<RoomApiResponse>(`${BASE_URL}/api/v1/room/filter`);
+  const response = await axios.get<RoomApiResponse>(`${BASE_URL}/api/v1/room/search`, {
+    withCredentials: true, // Gửi thông tin xác thực
+  });
   return response.data;
 }
 
-// //APIAddRoom
+// APIAddRoom
 export interface NewRoom {
   roomName: string;
   type: string;
-  capacity:number;
+  capacity: number;
 }
 export const addClassRoom = async (classroom: NewRoom): Promise<void> => {
   try {
     const response = await axios.post(`${BASE_URL}/api/v1/room`, classroom, {
       headers: {
-        "Content-Type": "application/json",  
+        "Content-Type": "application/json",
       },
+      withCredentials: true, // Gửi thông tin xác thực
     });
     console.log("Phòng học đã được tạo thành công:", response.data);
   } catch (error) {
@@ -41,24 +42,26 @@ export const addClassRoom = async (classroom: NewRoom): Promise<void> => {
   }
 };
 
- 
 export async function APIGetRoomByName(roomName: string) {
- 
-  const response = await fetch(`${BASE_URL}/api/v1/room/search?keyword=${roomName}`);
+  const response = await fetch(`${BASE_URL}/api/v1/room/search?keyword=${roomName}`, {
+    method: 'GET',
+    credentials: 'include', // Gửi thông tin xác thực
+  });
+
   if (!response.ok) {
     throw new Error("Failed to fetch room data");
   }
   return response.json();
 }
 
-
-//API Update Room
+// API Update Room
 export const APIModifyClassRoom = async (classroom_id: number, newClassroom: NewRoom): Promise<void> => {
   try {
     const response = await axios.put(`${BASE_URL}/api/v1/room/${classroom_id}`, newClassroom, {
       headers: {
-        "Content-Type": "application/json",  
+        "Content-Type": "application/json",
       },
+      withCredentials: true, // Gửi thông tin xác thực
     });
     console.log("Phòng học đã được cập nhật thành công:", response.data);
   } catch (error) {
@@ -69,42 +72,40 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
   }
 };
 
-
-
-//APIGetAllEquipmentCategories
-export type EquipmentResponse = {
-  content: Equipment[];  
-  totalElements: number;  
-  totalPages: number;  
-  size: number;  
+// APIGetAllEquipmentCategories
+export interface EquipmentResponse {
+  content: Equipment[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
 };
 
 export async function APIGetAllEquipment(
-  keyword: string = '', 
-  page: number = 0, 
+  keyword: string = '',
+  page: number = 0,
   size: number = 15
 ): Promise<EquipmentResponse> {
   console.log(`${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}`);
   const response = await axios.get<EquipmentResponse>(
-    `${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}`
+    `${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}`,
+    { withCredentials: true } // Gửi thông tin xác thực
   );
-  
-  
   return response.data;
 }
 
-//APIAddNewEquipmentCategory
+// APIAddNewEquipmentCategory
 export interface NewEquipmentCategoryRequest {
   equipmentName: string;
   category: string;
-  code:number;
+  code: number;
 }
 export const APIAddNewEquipmentCategory = async (equipment: NewEquipmentCategoryRequest): Promise<void> => {
   try {
     const response = await axios.post(`${BASE_URL}/api/v1/equipment`, equipment, {
       headers: {
-        "Content-Type": "application/json",  
+        "Content-Type": "application/json",
       },
+      withCredentials: true, // Gửi thông tin xác thực
     });
     console.log("Loại thiết bị đã được tạo thành công", response.data);
   } catch (error) {
@@ -115,14 +116,14 @@ export const APIAddNewEquipmentCategory = async (equipment: NewEquipmentCategory
   }
 };
 
-//APIUpdateEquipmentCategory
- 
+// APIUpdateEquipmentCategory
 export const APIUpdateEquipmentCategory = async (equipmentCategoryId: number, newUpdateEquipment: NewEquipmentCategoryRequest): Promise<void> => {
   try {
     const response = await axios.put(`${BASE_URL}/api/v1/equipment/${equipmentCategoryId}`, newUpdateEquipment, {
       headers: {
-        "Content-Type": "application/json",  
+        "Content-Type": "application/json",
       },
+      withCredentials: true, // Gửi thông tin xác thực
     });
     console.log("Loại thiết bị đã được cập nhật thành công:", response.data);
   } catch (error) {
@@ -132,27 +133,75 @@ export const APIUpdateEquipmentCategory = async (equipmentCategoryId: number, ne
     }
   }
 };
-export type EquipmentDetailResponse = {
-  content: EquipmentDetail[];  
-  totalElements: number;  
-  totalPages: number;  
-  size: number;  
-};
 
-//APIgetAllEquipmentDetail
-export async function APIgetAllEquipmentDetail(
-  keyword: string = '', 
-  page: number = 0, 
-  size: number = 15
-): Promise<EquipmentResponse> {
-  const response = await axios.get<EquipmentDetailResponse>(
-    `${BASE_URL}/api/v1/equipment-detail/search?keyword=${keyword}&page=${page}&size=${size}`
-  );
-  return response.data;
+//API CreateBorrowEquipmentRequest
+
+// API CreateBorrowEquipmentRequest
+export interface BorrowEquipmentItem {
+  equipmentName: string;
+  quantityBorrowed: number;
+  conditionBeforeBorrow: string;
 }
 
+export interface CreateBorrowEquipmentRequest {
+  userId: string;
+  comment: string;
+  expectedReturnDate: string;
+  equipmentItems: BorrowEquipmentItem[];
+}
 
+export const APICreateBorrowEquipmentRequest = async (
+  request: CreateBorrowEquipmentRequest
+): Promise<void> => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/v1/borrow/equipment`, request, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true, // Gửi thông tin xác thực
+    });
+    console.log("Yêu cầu mượn thiết bị đã được tạo thành công:", response.data);
+  } catch (error) {
+    console.error("Lỗi khi tạo yêu cầu mượn thiết bị:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
 
+// APIGetAllBorrowEquipmentRequests
+export interface BorrowEquipmentRequest {
+  uniqueID: number;
+  userId: number;
+  comment: string;
+  expectedReturnDate: string;
+  equipmentItems: BorrowEquipmentItem[];
+  userName: string;
+  status: string;
+  createdAt: string;
+}
 
+export interface BorrowEquipmentRequestsResponse {
+  content: BorrowEquipmentRequest[];
+  page: {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+  };
+}
 
-
+export const APIGetAllBorrowEquipmentRequests = async (): Promise<BorrowEquipmentRequestsResponse> => {
+  try {
+    const response = await axios.get<BorrowEquipmentRequestsResponse>(
+      `${BASE_URL}/api/v1/borrow/equipment/list`,
+      {
+        withCredentials: true, // Gửi thông tin xác thực
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách yêu cầu mượn thiết bị:", error);
+    throw error;
+  }
+};
