@@ -23,7 +23,7 @@ export async function APIGetRoom(  type: string = '',
   keyword: string = '', 
   page: number = 0, 
   
-  size: number = 4): Promise<RoomApiResponse> {
+  size: number = 6): Promise<RoomApiResponse> {
   console.log(`${BASE_URL}/api/v1/room/search?type=${type}&status=${status}&keyword=${keyword}&page=${page}&size=${size}`);
   const response = await axios.get<RoomApiResponse>(`${BASE_URL}/api/v1/room/search?type=${type}&status=${status}&keyword=${keyword}&page=${page}&size=${size}`);
   return response.data;

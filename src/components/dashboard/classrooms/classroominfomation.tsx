@@ -38,11 +38,11 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AddRoomEquipments, { EquipmentDetail } from './add-classroomequipment';
-import {  APIGetRoom, APIGetRoomByName, APIModifyClassRoom, APIUpdateEquipmentDetailLocation } from '@/utils/api';
+import { APIGetRoom, APIGetRoomByName, APIModifyClassRoom, APIUpdateEquipmentDetailLocation } from '@/utils/api';
 import { Classroom } from './classrooms-card';
 
 
- 
+
 const statusMap = {
   'Có thể sử dụng': { label: 'Có thể sử dụng', color: 'success' },
   'Hỏng': { label: 'Hỏng', color: 'error' },
@@ -76,14 +76,17 @@ interface ClassroomProps {
   room: Classroom;
   onUpdateRoom: (room: Classroom) => Promise<void>;
 }
-function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX.Element {
+function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX.Element {
   const [open, setOpen] = React.useState(false);
-  const ClassMapping = {
-    "Phòng học": "CLASSROOM",
+  const ClassMapping: Record<
+    "phòng học" | "văn phòng cán bộ" | "phòng thí nghiệm" | "phòng kho thiết bị" | "phòng hội thảo",
+    string
+  > = {
+    "phòng học": "CLASSROOM",
     "văn phòng cán bộ": "OFFICE",
-    "Phòng thí nghiệm": "LABORATORY",
-    "Phòng kho": "WAREHOUSE",
-    "Phòng họp": "MEETING_ROOM",
+    "phòng thí nghiệm": "LABORATORY",
+    "phòng kho thiết bị": "WAREHOUSE",
+    "phòng hội thảo": "MEETING_ROOM",
   };
 
   const {
@@ -96,7 +99,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
     resolver: yupResolver(schema),
     defaultValues: {
       roomName: room.roomName || "",
-      type: ClassMapping[room.type],
+      type: ClassMapping[room.type as keyof typeof ClassMapping],
       capacity: room.capacity || 0,
     },
   });
@@ -113,6 +116,14 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
   const [selectedDevices, setSelectedDevices] = React.useState<EquipmentDetail[]>([]);
   const [roomList, setRoomList] = React.useState<Classroom[]>([]);
   const [roomNameError, setRoomNameError] = React.useState("");
+  const [selectedType, setSelectedType] = React.useState(
+    ClassMapping[room.type as keyof typeof ClassMapping]
+  );
+
+  const handleTypeChange = (event: SelectChangeEvent) => {
+    setSelectedType(event.target.value); // Cập nhật giá trị được chọn
+  };
+  
 
   React.useEffect(() => {
     if (open) {
@@ -125,7 +136,8 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
           console.error("Error fetching rooms:", error);
         }
       };
-
+      console.log(room.type);
+      console.log(ClassMapping[room.type as keyof typeof ClassMapping]);
       fetchRooms();
     }
   }, [open]);
@@ -152,7 +164,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
 
   const onSubmit = async (data) => {
     const equipmentDetailIds = selectedDevices.map((device) => device.id);
-  
+
     setOpen(false)
     try {
       const isDuplicate = roomList.some(
@@ -185,17 +197,17 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
         capacity: parseInt(data.capacity, 10),
       };
       const ClassRoomEquipmentId = {
-        equipmentDetailIds : equipmentDetailIds
+        equipmentDetailIds: equipmentDetailIds
       }
       await APIUpdateEquipmentDetailLocation(room.id, ClassRoomEquipmentId)
       await APIModifyClassRoom(room.id, newClassroom);
 
-       
+
       if (newClassroom) {
         onUpdateRoom(newClassroom);
       }
 
-       
+
       toast.success("Phòng học đã được sửa thành công!");
     } catch (error) {
       toast.error("Có lỗi xảy ra khi thêm phòng học.");
@@ -262,15 +274,18 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                           <InputLabel id="room-type-label">Loại phòng</InputLabel>
                           <Select
                             {...register("type")}
+                            value={selectedType}
+                            onChange={(e) => {
+                              handleTypeChange(e);  
+                            }}
                             labelId="room-type-label"
-
                             label="Loại phòng"
                           >
                             <MenuItem value="CLASSROOM">Phòng học</MenuItem>
-                            <MenuItem value="OFFICE">Phòng làm việc</MenuItem>
+                            <MenuItem value="OFFICE">Văn phòng cán bộ</MenuItem>
                             <MenuItem value="LABORATORY">Phòng thí nghiệm</MenuItem>
-                            <MenuItem value="WAREHOUSE">Phòng kho</MenuItem>
-                            <MenuItem value="MEETING_ROOM">Phòng họp</MenuItem>
+                            <MenuItem value="WAREHOUSE">Phòng kho thiết bị</MenuItem>
+                            <MenuItem value="MEETING_ROOM">Phòng hội thảo</MenuItem>
                           </Select>
                           <Typography variant="body2" color="error">
                             {errors.type?.message}
@@ -365,7 +380,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                       <DialogTitle>Thêm thiết bị</DialogTitle>
                       <DialogContent>
                         <AddRoomEquipments
-                          room  = {room}
+                          room={room}
                           open={addDeviceDialogOpen}
                           onClose={() => setAddDeviceDialogOpen(false)}
                           onAdd={handleAddDevice}
