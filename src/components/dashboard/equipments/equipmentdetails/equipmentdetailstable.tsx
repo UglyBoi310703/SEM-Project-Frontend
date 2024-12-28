@@ -166,7 +166,7 @@ export function EquipmentsDetailsTable({equipmentCategory, updated}): React.JSX.
                         gap: 1,
                       }}
                     >
-                      <EditEquipmentModal />
+                      <EditEquipmentModal equipmentCategory = {equipmentCategory} equipmentDetail = {row}/>
                       <Button variant="outlined" color="error">
                         Xoá
                       </Button>

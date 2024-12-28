@@ -226,6 +226,24 @@ export const APIAddNewEquipmentDetail = async (equipment: NewEquipmentRequest): 
   }
 };
 
+//APIUpdateEquipmentDetail
+export const APIUpdateEquipmentDetail = async (equipmentDetailId: number, newUpdateEquipmentDetail: NewEquipmentRequest): Promise<void> => {
+  try {
+    console.log(`${BASE_URL}/api/v1/equipment-detail/${equipmentDetailId}`);
+    
+    const response = await axios.patch(`${BASE_URL}/api/v1/equipment-detail/${equipmentDetailId}`, newUpdateEquipmentDetail, {
+      headers: {
+        "Content-Type": "application/json",  
+      },
+    });
+    console.log("Thiết bị đã được cập nhật thành công:", response.data);
+  } catch (error) {
+    console.error("Lỗi khi cập nhật thiết bị:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
 
 
 
