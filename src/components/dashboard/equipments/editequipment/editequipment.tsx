@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -14,62 +14,166 @@ import {
   InputLabel,
   Box,
 } from '@mui/material';
+import dayjs, { Dayjs } from 'dayjs';
 import CloseIcon from '@mui/icons-material/Close';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Autocomplete } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { EquipmentDetail } from '../../classrooms/add-classroomequipment';
+import { Classroom } from '../../classrooms/classrooms-card';
+import { APIGetRoom, APIUpdateEquipmentDetail, NewEquipmentCategoryRequest, NewEquipmentRequest } from '@/utils/api';
+import _ from 'lodash';
+import { Equipment } from '../equipment-categories-table';
 
-function EditEquipmentDialog(): React.JSX.Element {
+const validationSchema = yup.object().shape({
+  purchaseDate: yup
+    .mixed<Dayjs>()
+    .test('isValidDate', 'Ngày không hợp lệ', (value) => value?.isValid() || false)
+    .required('Ngày mua là bắt buộc'),
+  roomName: yup.string().required('Tên phòng chứa là bắt buộc'),
+  status: yup.string().required('Trạng thái là bắt buộc'),
+  notes: yup.string().max(500, 'Ghi chú không được vượt quá 500 ký tự'),
+});
+
+function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: { equipmentDetail: EquipmentDetail, equipmentCategory:Equipment }): React.JSX.Element {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    purchaseDate: null,
-    roomName: 'TC-310',
-    status: 'sẵn có',
-    notes: '',
+  const [roomCategories, setRoomCategories] = useState<Classroom[]>([])
+
+  const {
+    getValues,
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      purchaseDate: equipmentDetail.purchaseDate
+        ? dayjs(equipmentDetail.purchaseDate, 'DD-MM-YYYY')
+        :  '',
+      roomName: equipmentDetail.roomName,
+      status: equipmentDetail.status,
+      notes: equipmentDetail.description,
+    },
+    resolver: yupResolver(validationSchema),
   });
 
-  const roomCategories = [
-    {
-      category: 'Phòng học',
-      options: ['Phòng học 101', 'Phòng học 102', 'Phòng học 103'],
-    },
-    {
-      category: 'Phòng hội đồng',
-      options: ['Phòng hội đồng A', 'Phòng hội đồng B'],
-    },
-    {
-      category: 'Kho',
-      options: ['Kho thiết bị 1', 'Kho thiết bị 2'],
-    },
-  ];
+  useEffect(() => {
+    if (equipmentDetail) {
+      reset({
+        purchaseDate: equipmentDetail.purchaseDate
+          ? dayjs(equipmentDetail.purchaseDate, 'DD-MM-YYYY')
+          : '',
+        roomName: equipmentDetail.roomName,
+        status: equipmentDetail.status,
+        notes: equipmentDetail.description,
+      });
+    }
+  }, [equipmentDetail, reset]);
+  const fetchRoomOptions = async (query: string) => {
+    if (!query) {
+      setRoomCategories([]);
+      return;
+    }
 
+    try {
+      const [classrooms, meetingRooms, laboratories, offices] = await Promise.all([
+        APIGetRoom('CLASSROOM', '', query),
+        APIGetRoom('MEETING_ROOM', '', query),
+        APIGetRoom('LABORATORY', '', query),
+        APIGetRoom('OFFICE', '', query),
+      ]);
+
+      const roomCategories = [
+        {
+          category: 'Phòng học',
+          options: classrooms.content || [],
+        },
+        {
+          category: 'Phòng hội đồng',
+          options: meetingRooms.content || [],
+        },
+        {
+          category: 'Kho',
+          options: laboratories.content || [],
+        },
+        {
+          category: 'Văn phòng',
+          options: offices.content || [],
+        },
+      ];
+      setRoomCategories(roomCategories);
+    } catch (error) {
+      console.error('Lỗi khi gọi API:', error);
+      toast.error('Không thể tải danh sách phòng.');
+    }
+  };
+  const debounceFetchRooms = React.useCallback(_.debounce(fetchRoomOptions, 300), []);
   const groupedRoomOptions = roomCategories.flatMap((category) =>
-    category.options.map((option) => ({ label: option, category: category.category }))
+    category.options.map((option) => ({
+      label: option.roomName,   
+      value: option.id,         
+      category: category.category,
+    }))
   );
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name as string]: value }));
+  const onSubmit = async (data: any) => {
+    console.log(data);
+    
+    try {
+      // Gọi API để lấy danh sách phòng dựa trên roomName
+      const response = await APIGetRoom('', '', data.roomName);
+      
+      // Kiểm tra nếu tìm thấy phòng
+      if (response.content && response.content.length > 0) {
+        const roomId = response.content[0].id;  // Lấy id của phòng đầu tiên khớp với roomName
+        
+        // Định dạng lại ngày mua
+        const purchaseDate = data.purchaseDate
+          ? dayjs(data.purchaseDate.toDate()).format("DD-MM-YYYY")
+          :  '';
+  
+        // Tạo đối tượng dữ liệu chỉnh sửa
+        const EditedData = {
+          "description": data.notes, 
+          "purchaseDate": purchaseDate,
+          "equipmentId": equipmentCategory.id,
+          "roomId": roomId  
+        }  ;
+   
+        
+        await APIUpdateEquipmentDetail(equipmentDetail.id, EditedData)
+        // Gửi dữ liệu đến API hoặc thực hiện xử lý tiếp theo
+        console.log("Dữ liệu chỉnh sửa:", EditedData);
+        if (setUpdated) {
+          setUpdated(true);
+        }
+        toast.success('Lưu thông tin thành công!');
+        setOpen(false);
+      } else {
+        // Trường hợp không tìm thấy phòng
+        toast.error('Không tìm thấy phòng. Vui lòng kiểm tra lại tên phòng.');
+      }
+    } catch (error) {
+      console.error('Lỗi khi gọi API:', error);
+      toast.error('Lỗi khi lấy thông tin phòng. Vui lòng thử lại.');
+    }
   };
-
-  const handleRoomChange = (event: any, value: { label: string; category: string } | null) => {
-    setFormData((prev) => ({ ...prev, roomName: value ? value.label : '' }));
-  };
+  
 
   const handleReset = () => {
-    setFormData({
-      purchaseDate: null,
-      roomName: '',
-      status: 'sẵn có',
-      notes: '',
+    reset({
+      purchaseDate: equipmentDetail.purchaseDate
+        ? dayjs(equipmentDetail.purchaseDate, 'DD-MM-YYYY')
+        : null,
+      roomName: equipmentDetail.roomName,
+      status: equipmentDetail.status,
+      notes: equipmentDetail.description,
     });
   };
-
-  // const handleSave = () => {
-  //   console.log('Updated Device Data:', formData);
-  //   setOpen(false);
-  // };
 
   return (
     <>
@@ -87,68 +191,81 @@ function EditEquipmentDialog(): React.JSX.Element {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <form
-         onSubmit={(event) => {
-          event.preventDefault();
-        }}
-        >
-           <DialogContent dividers>
-          <Box component="form" noValidate autoComplete="off">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogContent dividers>
             <DatePicker
               label="Ngày mua"
-              value={formData.purchaseDate}
-              onChange={(date) =>
-                setFormData((prev) => ({ ...prev, purchaseDate: date }))
-              }
-              renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+              value={getValues('purchaseDate') || null}
+              onChange={(date) => setValue('purchaseDate', date || null, { shouldValidate: true })}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.purchaseDate}
+                  helperText={errors.purchaseDate?.message}
+                />
+              )}
             />
+
             <Autocomplete
               options={groupedRoomOptions}
               groupBy={(option) => option.category}
               getOptionLabel={(option) => option.label}
-              value={
-                groupedRoomOptions.find((option) => option.label === formData.roomName) || null
+              defaultValue={
+                equipmentDetail.roomName
+                  ? { label: equipmentDetail.roomName, category: 'Unknown' }
+                  : null
               }
-              onChange={handleRoomChange}
+              
+              onInputChange={(event, value) => debounceFetchRooms(value)}
+              onChange={(_, value) => setValue('roomName', value?.value || '', { shouldValidate: true })}
               renderInput={(params) => (
-                <TextField {...params} label="Tên phòng chứa" fullWidth margin="normal" />
+                <TextField
+                  {...params}
+                  label="Tên phòng chứa"
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.roomName}
+                  helperText={errors.roomName?.message}
+                  {...register('roomName')}
+                />
               )}
             />
-
             <FormControl fullWidth margin="normal">
               <InputLabel>Trạng thái</InputLabel>
               <Select
-                name="status"
-                label="Trạng thái"
-                value={formData.status}
-                onChange={handleInputChange}
+                defaultValue={equipmentDetail.status || 'Có thể sử dụng'}
+                {...register('status')}
+                error={!!errors.status}
               >
-                <MenuItem value="sẵn có">Sẵn có</MenuItem>
-                <MenuItem value="đang được sử dụng">Đang được sử dụng</MenuItem>
-                <MenuItem value="đang bảo trì">Đang bảo trì</MenuItem>
+                <MenuItem value="Có thể sử dụng">Có thể sử dụng</MenuItem>
+                <MenuItem value="Hỏng">Hỏng</MenuItem>
+                <MenuItem value="Đang sử dụng">Đang sử dụng</MenuItem>
               </Select>
+              <Typography variant="caption" color="error">
+                {errors.status?.message}
+              </Typography>
             </FormControl>
-
             <TextField
               label="Ghi chú"
-              name="notes"
-              value={formData.notes}
-              onChange={handleInputChange}
               fullWidth
               multiline
               rows={3}
               margin="normal"
+              error={!!errors.notes}
+              helperText={errors.notes?.message}
+              {...register('notes')}
             />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleReset} variant="outlined">
-            Đặt lại
-          </Button>
-          <Button type='submit' variant="contained" color="primary">
-            Lưu
-          </Button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleReset} variant="outlined">
+              Đặt lại
+            </Button>
+            <Button type="submit" variant="contained" color="primary">
+              Lưu
+            </Button>
+          </DialogActions>
         </form>
       </Dialog>
     </>

@@ -13,7 +13,7 @@ export default function Page(): React.JSX.Element {
   const [rooms, setRooms] = React.useState<Classroom[]>([]);
   const [data, setData] = React.useState<RoomApiResponse>();
   const [isLoading, setIsLoading] = React.useState(true);
-  const [page, setPage] = React.useState(0); // Trang hiện tại
+  const [page, setPage] = React.useState(0);  
 
   // Hàm gọi API
   const fetchRooms = async (newPage: number) => {
@@ -21,11 +21,26 @@ export default function Page(): React.JSX.Element {
     try {
       const data = await APIGetRoom("", "", "", newPage, 6);
       setRooms(data.content);
+      console.log(data.content)
       setData(data);
     } catch (err) {
       console.error("Error fetching rooms", err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+
+  const handleUpdateRoom = async (newRoom) => {
+    if(newRoom){
+      try {
+        const data = await APIGetRoom("", "", "", page, 6);
+        setRooms(data.content);
+      } catch (err) {
+        console.error("Error fetching rooms", err);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -53,7 +68,8 @@ export default function Page(): React.JSX.Element {
         rooms={rooms}
         data={data}
         isLoading={isLoading}
-        onPageChange={handlePageChange} // Truyền hàm xuống component con
+        onPageChange={handlePageChange}  
+        onUpdateRoom={handleUpdateRoom} 
       />
     </Stack>
   );

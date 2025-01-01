@@ -1,6 +1,5 @@
 import React from "react";
 import axios from "axios";
-import Stack from "@mui/material/Stack";
 import {
   Box,
   Button,
@@ -53,17 +52,24 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
     setRoomType(event.target.value as string);
   };
 
-  // Áp dụng bộ lọc
   const handleApplyFilter = async () => {
     try {
-      const response = await APIGetRoom(RoomType, RoomStatus)
-      setFilteredRooms(response.content)
+      
+      const roomTypeFilter = RoomType === "All" ? "" : RoomType;
+      const roomStatusFilter = RoomStatus === "All" ? "" : RoomStatus;
+  
+   
+      const response = await APIGetRoom(roomTypeFilter, roomStatusFilter);
+      
+   
+      setFilteredRooms(response.content || []);
     } catch (error) {
       console.error("Lỗi khi áp dụng bộ lọc:", error);
     }
   };
+  
 
-  // Xử lý chuyển trang
+ 
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     const newPage = page - 1;  
     setCurrentPage(newPage);
@@ -77,7 +83,7 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
     return <Typography>Đang tải danh sách phòng học...</Typography>;
   }
   return (
-    <Stack spacing={3}>
+    <>
       {/* Search and Filter */}
       <Box
         sx={{
@@ -111,7 +117,7 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
           <FormControl sx={{ minWidth: 200 }} size="small">
             <InputLabel>Trạng thái</InputLabel>
             <Select value={RoomStatus} onChange={handleRoomStatusFilterChange}>
-              <MenuItem value=" ">Tất cả</MenuItem>
+              <MenuItem value="All">Tất cả</MenuItem>
               <MenuItem value="AVAILABLE">Sẵn có</MenuItem>
               <MenuItem value="OCCUPIED">Đang sử dụng</MenuItem>
               <MenuItem value="BROKEN">Đang bảo trì</MenuItem>
@@ -119,9 +125,8 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
           </FormControl>
           <FormControl sx={{ minWidth: 200 }} size="small">
             <InputLabel>Loại phòng</InputLabel>
-          
-            <Select label="Loại phòng" value={RoomType} onChange={handleRoomTypeFilterChange}>
-              <MenuItem value="">Tất cả</MenuItem>
+            <Select value={RoomType} onChange={handleRoomTypeFilterChange}>
+              <MenuItem value="All">Tất cả</MenuItem>
               <MenuItem value="CLASSROOM">Phòng học</MenuItem>
               <MenuItem value="EQUIPMENT_ROOM">Phòng thiết bị</MenuItem>
               <MenuItem value="MEETING_ROOM">Phòng hội thảo</MenuItem>
@@ -156,6 +161,6 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
           disabled={data?.page?.totalPages === 0}
         />
       </Box>
-    </Stack>
+    </>
   );
 }

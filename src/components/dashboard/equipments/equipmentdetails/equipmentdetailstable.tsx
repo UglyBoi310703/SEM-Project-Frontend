@@ -18,86 +18,138 @@ import {
   MenuItem,
   Divider
 } from '@mui/material';
-import dayjs from 'dayjs';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import EditEquipmentModal from '../editequipment/editequipment';
+import { APIgetAllEquipmentDetailByEquipmentID, APIgetEquipmentDetail } from '@/utils/api';
+import { EquipmentDetail } from '../../classrooms/add-classroomequipment';
 
- interface EquipmentDetail {
-  name: string;
-  seri: string;
-  purchasedate: Date;
-  room: string;
-  status: 'used' | 'available' | 'fixing';
-  note: string;
-}
+
 
 const statusMap = {
-  fixing: { label: 'Đang bảo trì', color: 'secondary' },
-  available: { label: 'Sẵn sàng', color: 'success' },
-  used: { label: 'Đang được sử dụng', color: 'warning' },
+  'Có thể sử dụng': { label: 'Có thể sử dụng', color: 'success' },
+  'Hỏng': { label: 'Hỏng', color: 'error' },
+  'Đang sử dụng': { label: 'Đang sử dụng', color: 'warning' },
 } as const;
 
-const equipmentdetails: EquipmentDetail[] = [
-  {
+export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated }): React.JSX.Element {
+  const [equipmentdetails, setEquipmentDetail] = React.useState<EquipmentDetail[]>([])
+  React.useEffect(() => {
+    const fetchEquipmentDetail = async (id: number) => {
+      const data = await APIgetAllEquipmentDetailByEquipmentID(id)
+      setEquipmentDetail(data.content)
+      setTotalElements(data.page.totalElements)
+      setRowsPerPage(data.page.size)
+      setTotalPage(data.page.totalPages)
+    };
+    fetchEquipmentDetail(equipmentCategory.id)
+  }, [equipmentCategory])
 
-    name: 'Máy chiếu',
-    seri: 'DTLT-3107',
-    purchasedate: dayjs().subtract(2, 'hours').toDate(),
-    room: 'Kho',
-    status: 'available',
-    note: 'Thiết bị mới',
-  },
-  {
-    name: 'Máy chiếu',
-    seri: 'PC-2023',
-    purchasedate: dayjs().subtract(5, 'days').toDate(),
-    room: 'Phòng Lab',
-    status: 'used',
-    note: 'Đã qua sử dụng',
-  },
-  {
+  React.useEffect(() => {
+    if (updated) {
+      const fetchEquipmentDetail = async (id: number) => {
+        const data = await APIgetAllEquipmentDetailByEquipmentID(id)
+        setEquipmentDetail(data.content)
+        // setTotalPage(data.totalPage)
+        setUpdated(false);
+      };
+      fetchEquipmentDetail(equipmentCategory.id)
+    }
+  }, [updated])
 
-    name: 'Máy chiếu',
-    seri: 'PRT-123',
-    purchasedate: dayjs().subtract(1, 'year').toDate(),
-    room: 'Kho',
-    status: 'fixing',
-    note: 'Hỏng phần cứng',
-  },
-  // Thêm các thiết bị khác nếu cần
-];
-
-export function EquipmentsDetailsTable(): React.JSX.Element {
   const [page, setPage] = React.useState(0);
+  const [totalPage, setTotalPage] = React.useState<number>()
+  const [totalElements, setTotalElements] = React.useState<number>(0)
+  const [searchKeyword, setSearchKeyword] = React.useState("");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [deviceStatus, setDeviceStatus] = React.useState('Tất cả');
-  const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setDeviceStatus(event.target.value as string);
+  const [deviceStatus, setDeviceStatus] = React.useState('');
+  const handleFilterChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
+    const status = event.target.value as string;
+    const CategoryFilter = status === "All" ? "" : status;
+    setDeviceStatus(CategoryFilter);
+
+    const response = await APIgetEquipmentDetail(equipmentCategory.id, '', CategoryFilter);
+    setEquipmentDetail(response.content);
+    setTotalElements(response.page.totalElements);  
+    setTotalPage(response.page.totalPages); 
   };
 
-  const handlePageChange = (event: unknown, newPage: number) => {
-    setPage(newPage);
+
+  const handlePageChange = async (event: unknown, newPage: number) => {
+    try {
+      const response = await APIgetEquipmentDetail(equipmentCategory.id, searchKeyword, deviceStatus, newPage, rowsPerPage);
+      setEquipmentDetail(response.content);
+      setPage(newPage); 
+      setTotalElements(response.page.totalElements); 
+      setTotalPage(response.page.totalPages);
+    } catch (error) {
+      console.error("Lỗi khi chuyển trang:", error);
+    }
+  };
+  
+
+
+
+  const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const keyword = event.target.value;
+    setSearchKeyword(keyword);
+
+    if (keyword.trim() !== "") {
+      try {
+        const response = await APIgetEquipmentDetail(equipmentCategory.id, keyword)
+        setEquipmentDetail(response.content);
+      } catch (error) {
+        console.error("Lỗi khi tìm kiếm:", error);
+      }
+    }
   };
 
-  const handleRowsPerPageChange = (
+
+  const handleRowsPerPageChange = async (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    const itemPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(itemPerPage);
+    const response = await APIgetEquipmentDetail(equipmentCategory.id, '', '', 0, itemPerPage);
+    setEquipmentDetail(response.content);
     setPage(0);
+    console.log(response);
+    
+    setTotalElements(response.page.totalElements);  
+    setTotalPage(response.page.totalPages);  
   };
 
+
   const filteredRows = equipmentdetails.filter((row) => {
-    if (deviceStatus === 'Tất cả') return true;
-    if (deviceStatus === 'Sẵn có' && row.status === 'available') return true;
-    if (deviceStatus === 'Đang sử dụng' && row.status === 'used') return true;
-    if (deviceStatus === 'Đang bảo trì' && row.status === 'fixing') return true;
+    if (deviceStatus === '') return true;
+    if (deviceStatus === 'USABLE' && row.status === 'Có thể sử dụng') return true;
+    if (deviceStatus === 'OCCUPIED' && row.status === 'Đang sử dụng') return true;
+    if (deviceStatus === 'BROKEN' && row.status === 'Hỏng') return true;
     return false;
   });
 
-  const rowsToDisplay = filteredRows.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  // const rowsToDisplay = filteredRows.slice(
+  //   page * rowsPerPage,
+  //   page * rowsPerPage + rowsPerPage
+  // );
+  React.useEffect(()=> {
+    // console.log(equipmentdetails);
+    
+    // console.log(page);
+    // console.log(rowsPerPage);
+    
+    
+    // console.log(filteredRows);
+    console.log(totalElements);
+    
+    
+  }, [filteredRows, page, rowsPerPage, equipmentdetails])
+
+  React.useEffect(() => {
+    console.log('Filtered Rows:', filteredRows);
+    console.log('Device Status:', deviceStatus);
+    console.log('Equipment Details:', equipmentdetails);
+  }, [filteredRows, deviceStatus, equipmentdetails]);
+  
 
   return (
     <Box>
@@ -116,6 +168,7 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
         {/* Search */}
         <OutlinedInput
           placeholder="Tìm kiếm"
+          onChange={handleSearchChange}
           startAdornment={
             <InputAdornment position="start">
               <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
@@ -123,7 +176,7 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
           }
           sx={{ maxWidth: '500px' }}
         />
-          {/* Filter */}
+        {/* Filter */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2 }}>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Bộ lọc:
@@ -137,16 +190,16 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
               name="equipmentstatus"
               label="Trạng thái"
             >
-              <MenuItem value="Tất cả">Tất cả</MenuItem>
-              <MenuItem value="Sẵn có">Sẵn có</MenuItem>
-              <MenuItem value="Đang sử dụng">Đang sử dụng</MenuItem>
-              <MenuItem value="Đang bảo trì">Đang bảo trì</MenuItem>
+              <MenuItem value="All">Tất cả</MenuItem>
+              <MenuItem value="USABLE">Sẵn có</MenuItem>
+              <MenuItem value="OCCUPIED">Đang sử dụng</MenuItem>
+              <MenuItem value="BROKEN">Đang bảo trì</MenuItem>
             </Select>
           </FormControl>
         </Box>
       </Box>
 
-        {/* Bảng danh sách thiết bị */}
+      {/* Bảng danh sách thiết bị */}
       <Box sx={{ overflowX: 'auto' }}>
         <Table sx={{ minWidth: '900px' }}>
           <TableHead>
@@ -161,18 +214,18 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rowsToDisplay.map((row) => {
+            {filteredRows.map((row) => {
               const { label, color } = statusMap[row.status];
               return (
-                <TableRow hover key={row.seri}>
-                  <TableCell>{row.seri}</TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{dayjs(row.purchasedate).format('MMM D, YYYY')}</TableCell>
-                  <TableCell>{row.room}</TableCell>
+                <TableRow hover key={row.id}>
+                  <TableCell>{row.serialNumber}</TableCell>
+                  <TableCell>{row.equipmentName}</TableCell>
+                  <TableCell>{row.purchaseDate}</TableCell>
+                  <TableCell>{row.roomName}</TableCell>
                   <TableCell>
                     <Chip color={color} label={label} size="small" />
                   </TableCell>
-                  <TableCell>{row.note}</TableCell>
+                  <TableCell>{row.description}</TableCell>
                   <TableCell>
                     <Box
                       sx={{
@@ -181,7 +234,7 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
                         gap: 1,
                       }}
                     >
-                      <EditEquipmentModal />
+                      <EditEquipmentModal equipmentCategory={equipmentCategory} equipmentDetail={row} setUpdated={setUpdated} />
                       <Button variant="outlined" color="error">
                         Xoá
                       </Button>
@@ -197,11 +250,12 @@ export function EquipmentsDetailsTable(): React.JSX.Element {
       <Divider />
       <TablePagination
         component="div"
-        count={filteredRows.length}
+        count={totalElements}
         page={page}
         onPageChange={handlePageChange}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleRowsPerPageChange}
+        rowsPerPageOptions={[5, 10, 20]}
       />
     </Box>
   );
