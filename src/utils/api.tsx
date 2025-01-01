@@ -647,3 +647,32 @@ export const APIBatchDeleteBorrowRoom = async (ids: number[]): Promise<void> => 
   }
 };
 
+//API Message
+
+//SendAlertNotify
+export const APISendAlertNotify = async (message: string): Promise<void> => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/notifications/sendAlertNotify`,
+      { message }, // gửi dưới dạng đối tượng
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Gửi thông tin xác thực
+      }
+    );
+    console.log("Gửi thông báo thành công:", response.data);
+  } catch (error) {
+    console.error("Gửi thông báo thất bại.");
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", {
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    } else {
+      console.error("Lỗi không xác định:", error);
+    }
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+  }
+};

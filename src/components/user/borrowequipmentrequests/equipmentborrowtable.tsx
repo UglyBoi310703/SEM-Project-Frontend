@@ -57,12 +57,22 @@ function EquipmentBorrowTable() {
   const fetchBorrowRequests = async () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const userId = user.id;
+    const localISOStartDate = startDate
+    ? new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000)
+        .toISOString()
+        .split("T")[0]
+    : "";
+    const localISOEndDate = endDate
+    ? new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000)
+        .toISOString()
+        .split("T")[0]
+    : "";
     try {
       const response = await APIGetFilteredBorrowEquipmentRequests({
         userId: userId,
         statuses: status,
-        expectedReturnDateBefore: endDate ? endDate.toISOString().split("T")[0] : "",
-        expectedReturnDateAfter: startDate ? startDate.toISOString().split("T")[0] : "",
+        expectedReturnDateBefore: localISOEndDate, 
+        expectedReturnDateAfter: localISOStartDate, 
         page,
         size: rowsPerPage,
       });
@@ -97,17 +107,10 @@ function EquipmentBorrowTable() {
   const handleDateChange = (type: "start" | "end", date: Date | null) => {
     if (type === "start") {
       setStartDate(date);
-    } else if (type === "end") {
-      // Tăng thêm 1 ngày nếu type là "end"
-      if (date) {
-        const adjustedDate = new Date(date);
-        adjustedDate.setDate(adjustedDate.getDate() + 2);
-        setEndDate(adjustedDate);
-      } else {
-        setEndDate(null);
-      }
+    } else {
+      setEndDate(date);
     }
-    setPage(0); // Đặt lại trang về 0
+    setPage(0);
   };
   
   const handleChangePage = (event: unknown, newPage: number) => {

@@ -25,12 +25,12 @@ export default function ClassroomList(): React.JSX.Element {
   const [totalPages, setTotalPages] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(0);
   const [keyword, setKeyword] = React.useState('');
-  const [roomStatus, setRoomStatus] = React.useState('Tất cả');
-  const [roomType, setRoomType] = React.useState('Tất cả');
+  const [roomStatus, setRoomStatus] = React.useState('ALL');
+  const [roomType, setRoomType] = React.useState('ALL');
 
   const fetchRooms = async () => {
-    const status = roomStatus === 'Tất cả' ? '' : roomStatus;
-    const type = roomType === 'Tất cả' ? '' : roomType;
+    const status = roomStatus === 'ALL' ? '' : roomStatus;
+    const type = roomType === 'ALL' ? '' : roomType;
     try {
       const data = await APIGetRoom(type, status, keyword, currentPage, 6);
       setClassrooms(data.content);
@@ -105,10 +105,10 @@ export default function ClassroomList(): React.JSX.Element {
               name="roomstatus"
               label="Trạng thái"
             >
-              <MenuItem value="Tất cả">Tất cả</MenuItem>
-              <MenuItem value="Sẵn có">Sẵn có</MenuItem>
-              <MenuItem value="Đang sử dụng">Đang sử dụng</MenuItem>
-              <MenuItem value="Đang bảo trì">Đang bảo trì</MenuItem>
+              <MenuItem value="ALL">Tất cả</MenuItem>
+              <MenuItem value="AVAILABLE">Sẵn có</MenuItem>
+              <MenuItem value="OCCUPIED">Đang sử dụng</MenuItem>
+              <MenuItem value="BROKEN">Đang bảo trì</MenuItem>
             </Select>
           </FormControl>
 
@@ -120,10 +120,12 @@ export default function ClassroomList(): React.JSX.Element {
               name="roomtype"
               label="Loại phòng"
             >
-              <MenuItem value="Tất cả">Tất cả</MenuItem>
-              <MenuItem value="Phòng học">Phòng học</MenuItem>
-              <MenuItem value="Phòng hội đồng">Phòng hội đồng</MenuItem>
-              <MenuItem value="Phòng thí nghiệm">Phòng thí nghiệm</MenuItem>
+              <MenuItem value="ALL">Tất cả</MenuItem>
+              <MenuItem value="CLASSROOM">Phòng học</MenuItem>
+              <MenuItem value="EQUIPMENT_ROOM">Phòng thiết bị</MenuItem>
+              <MenuItem value="MEETING_ROOM">Phòng hội thảo</MenuItem>
+              <MenuItem value="LABORATORY">Phòng thí nghiệm</MenuItem>
+              <MenuItem value="OFFICE">Văn phòng</MenuItem>
             </Select>
           </FormControl>
 
