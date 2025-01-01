@@ -101,7 +101,7 @@ function EquipmentBorrowTable() {
       // Tăng thêm 1 ngày nếu type là "end"
       if (date) {
         const adjustedDate = new Date(date);
-        adjustedDate.setDate(adjustedDate.getDate() + 1);
+        adjustedDate.setDate(adjustedDate.getDate() + 2);
         setEndDate(adjustedDate);
       } else {
         setEndDate(null);
