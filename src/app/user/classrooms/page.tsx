@@ -17,14 +17,15 @@ export const metadata = { title: `ClassRooms | User | ${config.site.name}` } sat
 export default function Page(): React.JSX.Element {
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
+      <Stack direction="row" spacing={3}
+      sx={{ flex: '1 1 auto' }}>
+        
           <Typography variant="h4">Danh sách phòng học tại trường</Typography>
-        </Stack>
+      
       </Stack>
-      <Grid container spacing={3}>
+      <Stack spacing={1}>
       <ClassRoomList/>
-      </Grid>
+      </Stack>
     </Stack>
   );
 }

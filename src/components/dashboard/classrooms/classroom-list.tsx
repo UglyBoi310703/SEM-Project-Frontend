@@ -83,7 +83,7 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
     return <Typography>Đang tải danh sách phòng học...</Typography>;
   }
   return (
-    <>
+    <Stack spacing={3}>
       {/* Search and Filter */}
       <Box
         sx={{
@@ -161,6 +161,6 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
           disabled={data?.page?.totalPages === 0}
         />
       </Box>
-    </>
+    </Stack>
   );
 }
