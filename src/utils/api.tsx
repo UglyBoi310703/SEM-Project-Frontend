@@ -292,7 +292,13 @@ export async function APIgetEquipmentDetail(
   console.log( `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentId}/search?keyword=${keyword}&status=${status}&page=${page}&size=${size}`);
   
   const response = await axios.get<EquipmentDetailResponse>(
-    `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentId}/search?keyword=${keyword}&status=${status}&page=${page}&size=${size}`
+    `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentId}/search?keyword=${keyword}&status=${status}&page=${page}&size=${size}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true, // Gửi thông tin xác thực
+    }
   );
   
   
@@ -646,4 +652,22 @@ export const APIBatchDeleteBorrowRoom = async (ids: number[]): Promise<void> => 
     throw error;
   }
 };
+
+//APIGetRoomBorrowRequest
+export async function APIGetRoomBorrowRequestAdmin(
+  email: string,
+  startDate: string = '', 
+  endDate: string = '',
+  page: number = 0, 
+  size: number = 5,
+  sort: string = ''
+): Promise<EquipmentDetailResponse> {
+  console.log( `${BASE_URL}/api/v1/borrow/room/admin-request?email=${email}&page=${page}&size=${size}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`);
+  const response = await axios.get<EquipmentDetailResponse>(
+    `${BASE_URL}/api/v1/borrow/room/admin-request?email=${email}&page=${page}&size=${size}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`
+  );
+  
+  
+  return response.data;
+}
 
