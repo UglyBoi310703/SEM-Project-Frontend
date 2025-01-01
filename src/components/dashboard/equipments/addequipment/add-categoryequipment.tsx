@@ -30,7 +30,7 @@ function AddCategoryEquipmentModal({ onUpdateEquipmentCategory }): JSX.Element {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await APIGetAllEquipment();  
+        const response = await APIGetAllEquipment();
         setExistingCategories(response.content || []);
       } catch (error) {
         console.error("Lỗi khi tải danh sách loại thiết bị:", error);
@@ -40,7 +40,7 @@ function AddCategoryEquipmentModal({ onUpdateEquipmentCategory }): JSX.Element {
     fetchCategories();
   }, []);
 
- 
+
   const schema = yup.object({
     equipmentName: yup
       .string()
@@ -64,6 +64,7 @@ function AddCategoryEquipmentModal({ onUpdateEquipmentCategory }): JSX.Element {
     register,
     handleSubmit,
     reset,
+    watch,
     setValue,
     formState: { errors },
   } = useForm({
@@ -76,6 +77,7 @@ function AddCategoryEquipmentModal({ onUpdateEquipmentCategory }): JSX.Element {
   });
 
   const onSubmit = async (data: any) => {
+    console.log(data);
     // Kiểm tra lại trước khi gửi
     const nameExists = existingCategories.some((cat) => cat.name === data.equipmentName);
     const codeExists = existingCategories.some((cat) => cat.code === data.code);
@@ -111,9 +113,12 @@ function AddCategoryEquipmentModal({ onUpdateEquipmentCategory }): JSX.Element {
       }
     });
   };
-
   const handleReset = () => {
-    reset();
+    reset({
+      equipmentName: "",
+      category: "",
+      code: "",
+    });
     toast.info("Dữ liệu đã được đặt lại.");
   };
 
@@ -167,8 +172,8 @@ function AddCategoryEquipmentModal({ onUpdateEquipmentCategory }): JSX.Element {
               <FormControl fullWidth error={!!errors.category}>
                 <InputLabel>Loại thiết bị</InputLabel>
                 <Select
-                  {...register("category")}
-                  onChange={(e) => setValue("category", e.target.value)}
+                  value={watch("category")} // Đồng bộ giá trị
+                  onChange={(e) => setValue("category", e.target.value)} // Cập nhật giá trị
                 >
                   <MenuItem value="TEACHING_EQUIPMENT">Phòng học</MenuItem>
                   <MenuItem value="ELECTRIC_EQUIPMENT">Điện</MenuItem>

@@ -37,20 +37,16 @@ import {
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import AddRoomEquipments from './add-classroomequipment';
-import { APIGetAllRoom, APIGetRoomByName, APIModifyClassRoom } from '@/utils/api';
+import AddRoomEquipments, { EquipmentDetail } from './add-classroomequipment';
+import { APIGetRoom, APIGetRoomByName, APIModifyClassRoom, APIUpdateEquipmentDetailLocation } from '@/utils/api';
 import { Classroom } from './classrooms-card';
 
 
-interface Device {
-  seri: string;
-  name: string;
-  category: string;
-  status: 'available' | 'fixing';
-}
+
 const statusMap = {
-  fixing: { label: 'Đang bảo trì', color: 'secondary' },
-  available: { label: 'Sẵn sàng', color: 'success' },
+  'Có thể sử dụng': { label: 'Có thể sử dụng', color: 'success' },
+  'Hỏng': { label: 'Hỏng', color: 'error' },
+  'Đang sử dụng': { label: 'Đang sử dụng', color: 'warning' },
 } as const;
 
 const schema = yup.object({
@@ -80,15 +76,17 @@ interface ClassroomProps {
   room: Classroom;
   onUpdateRoom: (room: Classroom) => Promise<void>;
 }
-function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX.Element {
+function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX.Element {
   const [open, setOpen] = React.useState(false);
-  const [isEditing, setIsEditing] = React.useState(false); 
-  const ClassMapping = {
-    "Phòng học": "CLASSROOM",
+  const ClassMapping: Record<
+    "phòng học" | "văn phòng cán bộ" | "phòng thí nghiệm" | "phòng kho thiết bị" | "phòng hội thảo",
+    string
+  > = {
+    "phòng học": "CLASSROOM",
     "văn phòng cán bộ": "OFFICE",
-    "Phòng thí nghiệm": "LABORATORY",
-    "Phòng kho": "WAREHOUSE",
-    "Phòng họp": "MEETING_ROOM",
+    "phòng thí nghiệm": "LABORATORY",
+    "phòng kho thiết bị": "WAREHOUSE",
+    "phòng hội thảo": "MEETING_ROOM",
   };
 
   const {
@@ -101,7 +99,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
     resolver: yupResolver(schema),
     defaultValues: {
       roomName: room.roomName || "",
-      type: ClassMapping[room.type],
+      type: ClassMapping[room.type as keyof typeof ClassMapping],
       capacity: room.capacity || 0,
     },
   });
@@ -116,22 +114,31 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
     setOpen(false);
   };
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = React.useState(false);
-  const [selectedDevices, setSelectedDevices] = React.useState<Device[]>([]);
+  const [selectedDevices, setSelectedDevices] = React.useState<EquipmentDetail[]>([]);
   const [roomList, setRoomList] = React.useState<Classroom[]>([]);
   const [roomNameError, setRoomNameError] = React.useState("");
+  const [selectedType, setSelectedType] = React.useState(
+    ClassMapping[room.type as keyof typeof ClassMapping]
+  );
+
+  const handleTypeChange = (event: SelectChangeEvent) => {
+    setSelectedType(event.target.value); // Cập nhật giá trị được chọn
+  };
+  
 
   React.useEffect(() => {
     if (open) {
       const fetchRooms = async () => {
         try {
-          const data = await APIGetAllRoom();
+          const data = await APIGetRoom();
           const filteredRooms = data.content.filter((Dataroom) => Dataroom.id !== room.id);
           setRoomList(filteredRooms);
         } catch (error) {
           console.error("Error fetching rooms:", error);
         }
       };
-
+      console.log(room.type);
+      console.log(ClassMapping[room.type as keyof typeof ClassMapping]);
       fetchRooms();
     }
   }, [open]);
@@ -147,22 +154,25 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
     }
   }, [roomName, roomList]);
 
-  const handleAddDevice = (device: Device) => {
-    if (!selectedDevices.find((d) => d.seri === device.seri)) {
+  const handleAddDevice = (device: EquipmentDetail) => {
+    if (!selectedDevices.find((d) => d.serialNumber === device.serialNumber)) {
       setSelectedDevices([...selectedDevices, device]);
     }
   };
   const handleRemoveDevice = (seri: string) => {
-    setSelectedDevices(selectedDevices.filter((d) => d.seri !== seri));
+    setSelectedDevices(selectedDevices.filter((d) => d.serialNumber !== seri));
   };
 
   const onSubmit = async (data) => {
+    console.log(data);
+    
+    const equipmentDetailIds = selectedDevices.map((device) => device.id);
+
     setOpen(false)
     try {
       const isDuplicate = roomList.some(
         (room) => room.roomName.toLowerCase() === data.roomName.trim().toLowerCase()
       );
-
       if (isDuplicate) {
         toast.error("Tên phòng đã tồn tại, vui lòng chọn tên khác.");
         return;
@@ -189,15 +199,21 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
         type: data.type,
         capacity: parseInt(data.capacity, 10),
       };
+      if(equipmentDetailIds.length > 0){
+        const ClassRoomEquipmentId = {
+          equipmentDetailIds: equipmentDetailIds
+        }
+        await APIUpdateEquipmentDetailLocation(room.id, ClassRoomEquipmentId)
+      }
+      
+      await APIModifyClassRoom(room.id, newClassroom);
 
-      await APIModifyClassRoom(parseInt(room.id, 10), newClassroom);
 
-       
       if (newClassroom) {
         onUpdateRoom(newClassroom);
       }
 
-       
+
       toast.success("Phòng học đã được sửa thành công!");
     } catch (error) {
       toast.error("Có lỗi xảy ra khi thêm phòng học.");
@@ -264,16 +280,19 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                           <InputLabel id="room-type-label">Loại phòng</InputLabel>
                           <Select
                             {...register("type")}
+                            value={selectedType}
+                            onChange={(e) => {
+                              handleTypeChange(e);  
+                            }}
                             labelId="room-type-label"
-
                             label="Loại phòng"
                             // disabled={!isEditing}  
                           >
                             <MenuItem value="CLASSROOM">Phòng học</MenuItem>
-                            <MenuItem value="OFFICE">Phòng làm việc</MenuItem>
+                            <MenuItem value="OFFICE">Văn phòng cán bộ</MenuItem>
                             <MenuItem value="LABORATORY">Phòng thí nghiệm</MenuItem>
-                            <MenuItem value="WAREHOUSE">Phòng kho</MenuItem>
-                            <MenuItem value="MEETING_ROOM">Phòng họp</MenuItem>
+                            <MenuItem value="WAREHOUSE">Phòng kho thiết bị</MenuItem>
+                            <MenuItem value="MEETING_ROOM">Phòng hội thảo</MenuItem>
                           </Select>
                           <Typography variant="body2" color="error">
                             {errors.type?.message}
@@ -328,9 +347,9 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                               {selectedDevices.map((device) => {
                                 const { label, color } = statusMap[device.status];
                                 return (
-                                  <TableRow key={device.seri}>
-                                    <TableCell>{device.seri}</TableCell>
-                                    <TableCell>{device.name}</TableCell>
+                                  <TableRow key={device.serialNumber}>
+                                    <TableCell>{device.serialNumber}</TableCell>
+                                    <TableCell>{device.equipmentName}</TableCell>
                                     <TableCell>{device.category}</TableCell>
                                     <TableCell><Chip color={color} label={label} size="small" /></TableCell>
                                     <TableCell>
@@ -338,7 +357,7 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                                         color="error"
                                         onClick={() =>
                                           window.confirm('Bạn có chắc chắn muốn xóa?') &&
-                                          handleRemoveDevice(device.seri)
+                                          handleRemoveDevice(device.serialNumber)
                                         }
                                       >
                                         Xóa
@@ -368,10 +387,11 @@ function ClassRoomInformation({ room , onUpdateRoom}: ClassroomProps): React.JSX
                       <DialogTitle>Thêm thiết bị</DialogTitle>
                       <DialogContent>
                         <AddRoomEquipments
+                          room={room}
                           open={addDeviceDialogOpen}
                           onClose={() => setAddDeviceDialogOpen(false)}
                           onAdd={handleAddDevice}
-                          selectedDeviceIds={selectedDevices.map((d) => d.seri)}
+                          selectedDeviceIds={selectedDevices.map((d) => d.id)}
                         />
                       </DialogContent>
                       <DialogActions>
