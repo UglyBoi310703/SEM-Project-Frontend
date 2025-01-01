@@ -28,7 +28,7 @@ import { APIGetAllEquipment, NewEquipmentCategoryRequest } from '@/utils/api';
  
 
 export interface Equipment {
-  id: string;
+  id: number;
   equipmentName: string;
   code: string;
   category: string;

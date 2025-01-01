@@ -1,5 +1,7 @@
-"use client"
-import React, { useState } from 'react';
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import {
   Table,
   TableBody,
@@ -10,156 +12,208 @@ import {
   Paper,
   TablePagination,
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-} from '@mui/material';
-import InputAdornment from '@mui/material/InputAdornment';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import Chip from '@mui/material/Chip';
-import BorrowRoomDetail from './classroomborrowdetail';
-import CreateBorrowRoomRequest from './create-classroom-request';
+  Button,
+  Typography
+} from "@mui/material";
+
+import CreateBorrowRoomRequest from "./create-classroom-request";
+import { APIGetBorrowRoomRequests, BorrowRoomRequest,APIBatchDeleteBorrowRoom } from "@/utils/api";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 interface RoomBorrowRecord {
-  RequestId: string;
-  teacherName: string;
-  roomname:string;
-  borrowTime: string;
-  expectedReturnTime: string;
-  status: 'pending' | 'approved';
+  uniqueId: number;
+  roomName: string;
+  username: string;
+  email: string;
+  startTime: string;
+  cancelable:boolean;
+  endTime: string;
+  comment: string;
 }
-const statusMap = {
-  approved: { label: 'Đã duyệt', color: 'success' },
-  pending: { label: 'Chờ duyệt', color: 'warning' },
-} as const;
-const roomBorrowData: RoomBorrowRecord[] = [
-  { RequestId: 'GV006', teacherName: 'Le Thi F',roomname:"TC-310", borrowTime: '2024-12-01 08:00', expectedReturnTime: '2024-12-01 10:00', status: 'approved' },
-  { RequestId: 'GV007', teacherName: 'Hoang Van G',roomname:"TC-310", borrowTime: '2024-12-02 14:00', expectedReturnTime: '2024-12-02 16:00', status: 'pending' },
-  { RequestId: 'GV008', teacherName: 'Pham Van H',roomname:"TC-310", borrowTime: '2024-12-03 09:00', expectedReturnTime: '2024-12-03 11:00', status: 'approved' },
-  { RequestId: 'GV009', teacherName: 'Nguyen Van I',roomname:"TC-310", borrowTime: '2024-12-04 13:00', expectedReturnTime: '2024-12-04 15:00', status: 'approved' },
-  { RequestId: 'GV010', teacherName: 'Tran Thi J',roomname:"TC-310", borrowTime: '2024-12-05 10:00', expectedReturnTime: '2024-12-05 12:00', status: 'approved' },
-];
 
-function RoomBorrowTable (): React.JSX.Element {
+function RoomBorrowTable(): React.JSX.Element {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(3);
-  const [RoomBorrowRequestStatus, setRoomBorrowRequestStatus] = useState<string>("Tất cả");
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [roomBorrowData, setRoomBorrowData] = useState<RoomBorrowRecord[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [BorrowDate, setBorrowDate] = useState<Date | null>(null);
 
-  const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setRoomBorrowRequestStatus(event.target.value as string);
+  const handleDateChange = ( date: Date | null) => {
+
+    setBorrowDate(date);
+    setPage(0);
   };
+  const fetchBorrowRequests = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const userId = user.id;
+      const localISODate = BorrowDate
+      ? new Date(BorrowDate.getTime() - BorrowDate.getTimezoneOffset() * 60000)
+          .toISOString()
+          .split("T")[0]
+      : "";
+      const request: BorrowRoomRequest = {
+        userId,
+        startDate: localISODate,
+        endDate: "",
+        page, // Trang hiện tại
+        size: rowsPerPage, // Số lượng bản ghi trên mỗi trang
+        sort: [],
+      };
+
+      const response = await APIGetBorrowRoomRequests(request);
+
+      setRoomBorrowData(
+        response.content.map((item) => ({
+          uniqueId: item.uniqueId,
+          roomName: item.roomName,
+          username: item.username,
+          email: item.email,
+          startTime: item.startTime,
+          cancelable: item.cancelable,
+          endTime: item.endTime,
+          comment: item.comment,
+        }))
+      );
+
+      setTotalRecords(response.page.totalElements); // Số lượng bản ghi tổng cộng
+    } catch (error) {
+      console.error("Error fetching borrow room data:", error);
+    }
+  };
+
+  useEffect(() => {
+    setRoomBorrowData([]); // Xóa dữ liệu cũ
+    fetchBorrowRequests();
+  }, [page, rowsPerPage,BorrowDate]);
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
+
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
- 
- 
+
+  const handleCancelBorrowRequest = async (id: number) => {
+    Swal.fire({
+      title: `Bạn có chắc chắn muốn hủy đơn mượn phòng mã ${id} ?`,
+      text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Đồng ý!",
+      cancelButtonText: "Hủy",
+      customClass: {
+        popup: "swal-small-popup",
+        title: "swal-small-title",
+        content: "swal-small-content",
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await APIBatchDeleteBorrowRoom([id]); // Gọi API hủy
+          Swal.fire("Đã hủy!", "Đơn mượn đã được hủy thành công.", "success");
+          fetchBorrowRequests(); // Cập nhật danh sách
+        } catch (error) {
+          console.error("Lỗi khi hủy đơn mượn:", error);
+          Swal.fire("Lỗi!", "Không thể hủy đơn mượn. Vui lòng thử lại sau.", "error");
+        }
+      }
+    });
+  };
+
   return (
     <Box>
-       <Box  sx={{
+      <Box
+        sx={{
           display: "flex",
           alignItems: "center",
           justifyContent:"space-between",
           bgcolor: "background.paper",
           boxShadow: 1,
-          mb:2
-      }} >
-       <Box
-        sx={{
+          mb: 2,
+        }}
+      >
+         <Box  sx={{
+          width:"300px",
           display: "flex",
           alignItems: "center",
-          gap: 2,
-      
-        }}
-    >
-      <OutlinedInput
-        placeholder="Tìm kiếm "
-        startAdornment={
-          <InputAdornment position="start">
-            <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
-          </InputAdornment>
-        }
-        sx={{ maxWidth: '500px' }}
-      />  
-      {/* Tiêu đề */}
-      <Box
-       sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 2,
-        p: 2,
-      }}
-      >
-      <Typography variant="h6" sx={{ flexGrow: 1 }}>
-        Bộ lọc:
-      </Typography>
-      {/* Trường trạng thái đơn */}
-      <FormControl sx={{ minWidth: 200 }} size="small">
-        <InputLabel>Trạng thái</InputLabel>
-        <Select
-          value={RoomBorrowRequestStatus}
-          onChange={handleFilterChange}
-          name="RoomBorrowRequestStatus"
-          label = "Trạng thái"
-        >
-          <MenuItem value="Tất cả">Tất cả</MenuItem>
-          <MenuItem value="Đã duyệt">Đã duyệt</MenuItem>
-          <MenuItem value="Chờ duyệt">Chờ duyệt</MenuItem>
-        </Select>
-      </FormControl>
+          justifyContent:"space-between",
+          bgcolor: "background.paper",
+          boxShadow: 1,
+          mb: 2,
+        }}>
+         <Typography variant="h6" sx={{ flexGrow: 2 }}>
+            Bộ lọc:
+          </Typography>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+             sx={{ maxWidth: 200 }}
+              label="Ngày mượn từ:"
+              value={BorrowDate}
+              onChange={(date) => handleDateChange(date)}
+              renderInput={(params) => <FormControl {...params} size="small" />}
+            />
+          </LocalizationProvider>
+         </Box>
+        <CreateBorrowRoomRequest onBorrowRequestCreated={fetchBorrowRequests} />
       </Box>
-    </Box>
-          <CreateBorrowRoomRequest/>
-      </Box>
+
       <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Mã đơn mượn</TableCell>
-            <TableCell>Tên giáo viên</TableCell>
-            <TableCell>Tên phòng</TableCell>
-            <TableCell>Thời gian mượn</TableCell>
-            <TableCell>Thời gian trả phòng dự kiến</TableCell>
-            <TableCell>Trạng thái</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-  {roomBorrowData
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    .map((row) => {
-      const { label, color } = statusMap[row.status] ?? { label: 'Unknown', color: 'default' };
-      return(
-        <TableRow key={row.RequestId}>
-          <TableCell>{row.RequestId}</TableCell>
-          <TableCell>{row.teacherName}</TableCell>
-          <TableCell>{row.roomname}</TableCell>
-          <TableCell>{row.borrowTime}</TableCell>
-          <TableCell>{row.expectedReturnTime}</TableCell>
-          <TableCell><Chip color={color} label={label} size="small" /></TableCell>
-          <TableCell><BorrowRoomDetail/></TableCell>
-        </TableRow>
-      );
-    })}
-</TableBody>
-      </Table>
-      <TablePagination
-        component="div"
-        count={roomBorrowData.length}
-        page={page}
-        onPageChange={handleChangePage}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Mã đơn mượn</TableCell>
+              <TableCell>Tên phòng</TableCell>
+              <TableCell>Tên người mượn</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Thời gian mượn</TableCell>
+              <TableCell>Thời gian trả</TableCell>
+              <TableCell>Ghi chú</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {roomBorrowData.map((row) => (
+              <TableRow key={row.uniqueId}>
+                <TableCell>{row.uniqueId}</TableCell>
+                <TableCell>{row.roomName}</TableCell>
+                <TableCell>{row.username}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.startTime}</TableCell>
+                <TableCell>{row.endTime}</TableCell>
+                <TableCell>{row.comment}</TableCell>
+                <TableCell>
+                  {row.cancelable === true && (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => handleCancelBorrowRequest(row.uniqueId)}
+                    >
+                      Hủy
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <TablePagination
+          component="div"
+          count={totalRecords}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </TableContainer>
     </Box>
   );
-};
+}
 
 export default RoomBorrowTable;

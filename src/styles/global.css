@@ -18,6 +18,7 @@
   --icon-fontSize-sm: 1rem;
   --icon-fontSize-md: 1.25rem;
   --icon-fontSize-lg: 1.5rem;
+  --mui-palette-common-white: #ffffff;
 }
 
 *:focus-visible {
@@ -37,4 +38,10 @@ body {
 }
 .mui-z3c6am-MuiFormControl-root-MuiTextField-root{
   width: 100%;
+}
+.MuiDialog-paper{
+  z-index: 1300 !important;
+}
+.swal2-container {
+  z-index: 2000 !important; /* Đảm bảo SweetAlert2 nằm trên Dialog */
 }

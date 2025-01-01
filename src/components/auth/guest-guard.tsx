@@ -8,6 +8,7 @@ import { paths } from '@/paths';
 import { logger } from '@/lib/default-logger';
 import { useUser } from '@/hooks/use-user';
 
+
 export interface GuestGuardProps {
   children: React.ReactNode;
 }
@@ -32,8 +33,10 @@ export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | n
       logger.debug('[GuestGuard]: User is logged in, redirecting to dashboard');
       if(user.role ==="ROLE_ADMIN"){
         router.replace(paths.dashboard.equipments);
+        
       }else{
         router.replace(paths.user.equipments);
+          
       }
     
       return;

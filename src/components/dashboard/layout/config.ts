@@ -2,7 +2,6 @@ import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 
 export const navItems = [
-  { key: 'baocao', title: 'Báo Cáo', href: paths.dashboard.crashreports, icon: 'warning' },
   { key: 'thietbi', title: 'Thiết bị', href: paths.dashboard.equipments, icon: 'plugs-connected' },
   { key: 'donmuon', title: 'Mượn trả thiết bị', href: paths.dashboard.borrowequipmentrequests, icon: 'BorrowEquipmentRequest' },
   { key: 'donmuon', title: 'Mượn trả phòng', href: paths.dashboard.borrowroomrequests, icon: 'BorrowRoomRequest' },

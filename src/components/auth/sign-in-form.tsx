@@ -1,5 +1,4 @@
-'use client';
-
+"use client"
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -17,10 +16,12 @@ import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
-
+import { toast, ToastContainer } from 'react-toastify'; // Import Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
+
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
@@ -33,11 +34,8 @@ const defaultValues = { email: '', password: '' } satisfies Values;
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
-
   const { checkSession } = useUser();
-
-  const [showPassword, setShowPassword] = React.useState<boolean>();
-
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [isPending, setIsPending] = React.useState<boolean>(false);
 
   const {
@@ -56,85 +54,87 @@ export function SignInForm(): React.JSX.Element {
         setIsPending(false);
         return;
       }
-
+      toast.success('Xin chào!', { position: 'top-center' });
       // Refresh the auth state
       await checkSession?.();
 
-      // UserProvider, for this case, will not refresh the router
-      // After refresh, GuestGuard will handle the redirect
+      // Refresh router and show toast
+      
       router.refresh();
+      
+      setIsPending(false);
     },
     [checkSession, router, setError]
   );
 
   return (
-    <Stack spacing={4}>
-      <Stack spacing={1}>
-        <Typography variant="h4">Đăng nhập</Typography>
-        <Typography color="text.secondary" variant="body2">
-          Bạn chưa có tài khoản?{' '}
-          <Link component={RouterLink} href={paths.auth.signUp} underline="hover" variant="subtitle2">
-            Đăng ký
-          </Link>
-        </Typography>
-      </Stack>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={2}>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.email)}>
-                <InputLabel>Email</InputLabel>
-                <OutlinedInput {...field} label="Email" type="email" />
-                {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
-              </FormControl>
-            )}
-          />
-          <Controller
-            control={control}
-            name="password"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.password)}>
-                <InputLabel>Password</InputLabel>
-                <OutlinedInput
-                  {...field}
-                  endAdornment={
-                    showPassword ? (
-                      <EyeIcon
-                        cursor="pointer"
-                        fontSize="var(--icon-fontSize-md)"
-                        onClick={(): void => {
-                          setShowPassword(false);
-                        }}
-                      />
-                    ) : (
-                      <EyeSlashIcon
-                        cursor="pointer"
-                        fontSize="var(--icon-fontSize-md)"
-                        onClick={(): void => {
-                          setShowPassword(true);
-                        }}
-                      />
-                    )
-                  }
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                />
-                {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
-              </FormControl>
-            )}
-          />
-        
-          {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
-          <Button disabled={isPending} type="submit" variant="contained">
-            Đăng nhập
-          </Button>
+    <>
+      <Stack spacing={4}>
+        <Stack spacing={1}>
+          <Typography variant="h4">Đăng nhập</Typography>
+          <Typography color="text.secondary" variant="body2">
+            Bạn chưa có tài khoản?{' '}
+            <Link component={RouterLink} href={paths.auth.signUp} underline="hover" variant="subtitle2">
+              Đăng ký
+            </Link>
+          </Typography>
         </Stack>
-      </form>
-     
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={2}>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field }) => (
+                <FormControl error={Boolean(errors.email)}>
+                  <InputLabel>Email</InputLabel>
+                  <OutlinedInput {...field} label="Email" type="email" />
+                  {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
+                </FormControl>
+              )}
+            />
+            <Controller
+              control={control}
+              name="password"
+              render={({ field }) => (
+                <FormControl error={Boolean(errors.password)}>
+                  <InputLabel>Password</InputLabel>
+                  <OutlinedInput
+                    {...field}
+                    endAdornment={
+                      showPassword ? (
+                        <EyeIcon
+                          cursor="pointer"
+                          fontSize="var(--icon-fontSize-md)"
+                          onClick={(): void => {
+                            setShowPassword(false);
+                          }}
+                        />
+                      ) : (
+                        <EyeSlashIcon
+                          cursor="pointer"
+                          fontSize="var(--icon-fontSize-md)"
+                          onClick={(): void => {
+                            setShowPassword(true);
+                          }}
+                        />
+                      )
+                    }
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                  />
+                  {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
+                </FormControl>
+              )}
+            />
+            {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
+            <Button disabled={isPending} type="submit" variant="contained">
+              Đăng nhập
+            </Button>
+          </Stack>
+        </form>
         <Alert severity="info">Ứng dụng dành cho cán bộ và giáo viên nhà trường</Alert>
-      
-    </Stack>
+      </Stack>
+      <ToastContainer />
+    </>
   );
 }

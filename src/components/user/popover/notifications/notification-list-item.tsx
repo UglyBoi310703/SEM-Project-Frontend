@@ -29,9 +29,7 @@ export function NotificationListItem({
     if (type === 'BorrowRoomRequest') {
       return paths.user.borrowroomrequests;
     }
-    if (type === 'CrashReports') {
-      return paths.user.crashreports;
-    }
+   
     return '#';
   };
 

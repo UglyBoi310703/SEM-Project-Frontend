@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -23,18 +23,21 @@ import CloseIcon from "@mui/icons-material/Close";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
-import AddEquipments from "./addequipments";
-import { APICreateBorrowEquipmentRequest } from "@/utils/api";
+import AddEquipments from "./createequipmentborrowrequests/addequipments";
+import { APIUpdateBorrowEquipmentRequest, GetBorrowDetails,APIGetAllEquipment } from "@/utils/api";
+import dayjs from "dayjs";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-import dayjs from "dayjs";
-interface CreateBorrowEquipmentRequestProps {
-  onBorrowRequestCreated?: () => void; // Optional callback prop
-}
+
+// interface BorrowRecordDetail{
+//     borrowRequestId: Number;
+//     conditionbeforborrow: String;
+//     message: String;
+//     returnDate: Dayjs;
+// }
 interface Device {
   id: number;
   equipmentName: string;
-  category: string;
   usableQuantity: number;
 }
 
@@ -43,18 +46,62 @@ interface SelectedDevice extends Device {
   currentQuantity: number;
 }
 
-function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEquipmentRequestProps): React.JSX.Element {
+function UpdateBorrowEquipmentRequest({
+    borrowRequestId,
+    conditionbeforborrow,
+    message,
+    returnDate,
+  }: {
+    borrowRequestId: number;
+    conditionbeforborrow: string;
+    message: string;
+    returnDate: string;
+  }): React.JSX.Element {
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [conditionBeforeBorrow, setConditionBeforeBorrow] = useState("");
-  const [returnDate, setReturnDate] = useState<Dayjs | null>(null);
+  const [Message, setMessage] = useState(message);
+  const [conditionBeforeBorrow, setConditionBeforeBorrow] = useState(conditionbeforborrow);
+  const [ReturnDate, setReturnDate] = useState<Dayjs | null>(dayjs(returnDate));
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = useState(false);
   const [selectedDevices, setSelectedDevices] = useState<SelectedDevice[]>([]);
 
+ useEffect(() => {
+    const loadDetails = async () => {
+      const data = await GetBorrowDetails({ id: borrowRequestId });
+      const EquipmentsBorrowed = data?.details || []; // Danh sách thiết bị đã mượn
+      const Equipments = (await APIGetAllEquipment())?.content || []; // Danh sách tất cả thiết bị
+  
+       console.log("EquipmentsBorrowed:", EquipmentsBorrowed);
+    //   console.log("Equipments:", Equipments);
+  
+      if (EquipmentsBorrowed.length > 0 && Equipments.length > 0) {
+        const updatedSelectedDevices = EquipmentsBorrowed.map((detail) => {
+          const matchingEquipment = Equipments.find(
+            (equipment) => equipment.equipmentName === detail.equipmentName
+          );
+  
+          return {
+            id: detail.id,
+            equipmentName: detail.equipmentName,
+            usableQuantity: detail.quantityBorrowed,
+            maxQuantity: matchingEquipment
+              ? matchingEquipment.usableQuantity
+              : detail.quantityBorrowed,
+            currentQuantity: detail.quantityBorrowed,
+          };
+        });
+        setSelectedDevices(updatedSelectedDevices);
+        setConditionBeforeBorrow(data.details[0]?.conditionBeforeBorrow || "");
+      }
+    };
+    
+    loadDetails();
+  }, [borrowRequestId]);
+  
+
   const handleAddDevice = (device: Device, maxQuantity: number) => {
-    if (!selectedDevices.find((d) => d.id === device.id)) {
-      setSelectedDevices([
-        ...selectedDevices,
+    if (!selectedDevices.some((d) => d.id === device.id)) {
+      setSelectedDevices((prev) => [
+        ...prev,
         { ...device, maxQuantity, currentQuantity: 1 },
       ]);
     }
@@ -98,7 +145,7 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
     );
   };
   const handleSave = async () => {
-    if (!returnDate || selectedDevices.length === 0) {
+    if (!ReturnDate || selectedDevices.length === 0) {
       await Swal.fire({
         title: "Lỗi",
         text: "Vui lòng nhập đầy đủ thông tin và chọn ít nhất một thiết bị.",
@@ -106,7 +153,7 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
       });
       return;
     }
-  
+
     const userData = localStorage.getItem("user");
     if (!userData) {
       await Swal.fire({
@@ -116,36 +163,38 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
       });
       return;
     }
-  
+
     const user = JSON.parse(userData);
+
     const requestBody = {
+        uniqueID:borrowRequestId,  
       userId: user.id,
-      comment: message,
-      expectedReturnDate: returnDate.format("YYYY-MM-DD"),
+      comment: Message,
+      expectedReturnDate: ReturnDate.format("YYYY-MM-DD"),
       equipmentItems: selectedDevices.map((device) => ({
         equipmentName: device.equipmentName,
         quantityBorrowed: device.currentQuantity,
+        equipmentDetailCodes:[],
         conditionBeforeBorrow: conditionBeforeBorrow || "Good",
       })),
     };
-  
+
     const result = await Swal.fire({
       title: "Xác nhận",
-      text: "Bạn có chắc chắn muốn gửi đơn mượn?",
+      text: "Bạn có chắc chắn muốn cập nhật lại đơn mượn?",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Gửi",
       cancelButtonText: "Hủy",
-
     });
-  
+
     if (result.isConfirmed) {
       try {
-        await APICreateBorrowEquipmentRequest(requestBody);
+        await APIUpdateBorrowEquipmentRequest(requestBody);
         setOpen(false);
         await Swal.fire({
           title: "Thành công",
-          text: "Đơn mượn đã được gửi thành công. Đang chờ xét duyệt.",
+          text: "Đơn mượn đã được cập nhật thành công.",
           icon: "success",
         });
         setOpen(false);
@@ -153,7 +202,6 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
         setMessage("");
         setConditionBeforeBorrow("");
         setReturnDate(null);
-        onBorrowRequestCreated && onBorrowRequestCreated();
       } catch (error) {
         await Swal.fire({
           title: "Lỗi",
@@ -163,16 +211,16 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
       }
     }
   };
-  
+
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Button variant="contained" onClick={() => setOpen(true)}>
-        Tạo đơn mượn thiết bị
+      <Button size="small" variant="outlined" onClick={() => setOpen(true)}>
+        Sửa 
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md">
         <DialogTitle>
-          <Typography variant="h6">Tạo đơn mượn</Typography>
+          <Typography variant="h6">Sửa đơn mượn thiết bị</Typography>
           <IconButton
             aria-label="close"
             onClick={() => setOpen(false)}
@@ -186,7 +234,7 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
             <Box display="flex" gap={2}>
               <DatePicker
                 label="Ngày hẹn trả"
-                value={returnDate}
+                value={ReturnDate}
                 onChange={(date) => setReturnDate(date)}
                 minDate={dayjs()}
                 renderInput={(params) => <TextField {...params} fullWidth />}
@@ -201,7 +249,7 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
             </Box>
             <TextField
               label="Tin nhắn"
-              value={message}
+              value={Message}
               onChange={(e) => setMessage(e.target.value)}
               multiline
               sx={{ width: "60%" }}
@@ -233,7 +281,6 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
                   <TableHead>
                     <TableRow>
                       <TableCell>Tên thiết bị</TableCell>
-                      <TableCell>Loại thiết bị</TableCell>
                       <TableCell>Số lượng</TableCell>
                       <TableCell>Hành động</TableCell>
                     </TableRow>
@@ -242,7 +289,6 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
                     {selectedDevices.map((device) => (
                       <TableRow key={device.id}>
                         <TableCell>{device.equipmentName}</TableCell>
-                        <TableCell>{device.category}</TableCell>
                         <TableCell>
                           <Stack direction="row" spacing={1} alignItems="center">
                             <TextField
@@ -299,10 +345,10 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
       >
         <DialogTitle>Thêm thiết bị</DialogTitle>
         <DialogContent>
-          <AddEquipments
+        <AddEquipments
             onAdd={handleAddDevice}
             selectedDeviceNames={selectedDevices.map((d) => d.equipmentName)}
-          />
+            />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setAddDeviceDialogOpen(false)}>Xong</Button>
@@ -312,4 +358,4 @@ function CreateBorrowEquipmentRequest({ onBorrowRequestCreated }: CreateBorrowEq
   );
 }
 
-export default CreateBorrowEquipmentRequest;
+export default UpdateBorrowEquipmentRequest;

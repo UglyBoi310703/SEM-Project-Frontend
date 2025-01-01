@@ -25,15 +25,15 @@ import type { Equipment } from "@/components/dashboard/equipments/equipment-cate
 
 interface AddEquipmentsProps {
   onAdd: (device: Equipment, maxQuantity: number) => void;
-  selectedDeviceIds: string[];
+  selectedDeviceNames: string[];
 }
 
-function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.JSX.Element {
+function AddEquipments({ onAdd, selectedDeviceNames }: AddEquipmentsProps): React.JSX.Element {
   const [equipmentCategories, setEquipmentCategories] = useState<Equipment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-
+  
   // Fetch dữ liệu từ API
   useEffect(() => {
     const fetchEquipment = async () => {
@@ -158,9 +158,9 @@ function AddEquipments({ onAdd, selectedDeviceIds }: AddEquipmentsProps): React.
                     <Button
                       variant="contained"
                       onClick={() => onAdd(row, row.usableQuantity)}
-                      disabled={selectedDeviceIds.includes(row.id)}
+                      disabled={selectedDeviceNames.includes(row.equipmentName)}
                     >
-                      {selectedDeviceIds.includes(row.id) ? "Đã chọn" : "Thêm"}
+                      {selectedDeviceNames.includes(row.equipmentName) ? "Đã chọn" : "Thêm"}
                     </Button>
                   </TableCell>
                 </TableRow>

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '@mui/material/Button';
 import { Radio, RadioGroup } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -141,6 +142,7 @@ export function SignUpForm(): React.JSX.Element {
           </Button>
         </Stack>
       </form>
+      <Alert severity="info">Ứng dụng dành cho cán bộ và giáo viên nhà trường</Alert>
     </Stack>
   );
 }
