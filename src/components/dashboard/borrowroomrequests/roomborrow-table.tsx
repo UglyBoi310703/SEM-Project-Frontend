@@ -23,32 +23,44 @@ import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import BorrowRoomDetail from './roomborrow-detail';
+import { APIGetBorrowRoomRequests, APIGetRoomBorrowRequestAdmin } from '@/utils/api';
 
-interface RoomBorrowRecord {
-  RequestId: string;
-  teacherName: string;
-  roomname:string;
-  borrowTime: string;
-  expectedReturnTime: string;
-  status: 'pending' | 'approved';
+interface RoomBorrowRecord  {
+  uniqueId: number,
+  roomName: string,
+  username: string,
+  email: string,
+  startTime: string,
+  endTime: string,
+  comment: string,
+  cancelable: boolean
 }
 const statusMap = {
   approved: { label: 'Đã duyệt', color: 'success' },
   pending: { label: 'Chờ duyệt', color: 'warning' },
 } as const;
-const roomBorrowData: RoomBorrowRecord[] = [
-  { RequestId: 'GV006', teacherName: 'Le Thi F',roomname:"TC-310", borrowTime: '2024-12-01 08:00', expectedReturnTime: '2024-12-01 10:00', status: 'approved' },
-  { RequestId: 'GV007', teacherName: 'Hoang Van G',roomname:"TC-310", borrowTime: '2024-12-02 14:00', expectedReturnTime: '2024-12-02 16:00', status: 'pending' },
-  { RequestId: 'GV008', teacherName: 'Pham Van H',roomname:"TC-310", borrowTime: '2024-12-03 09:00', expectedReturnTime: '2024-12-03 11:00', status: 'approved' },
-  { RequestId: 'GV009', teacherName: 'Nguyen Van I',roomname:"TC-310", borrowTime: '2024-12-04 13:00', expectedReturnTime: '2024-12-04 15:00', status: 'approved' },
-  { RequestId: 'GV010', teacherName: 'Tran Thi J',roomname:"TC-310", borrowTime: '2024-12-05 10:00', expectedReturnTime: '2024-12-05 12:00', status: 'approved' },
-];
-
 function RoomBorrowTable (): React.JSX.Element {
   const [BorrowRoomStatus, setBorrowRoomStatus] = useState<string>("Tất cả");
+  const [roomBorrowData, setRoomBorrowData] = useState<RoomBorrowRecord[]>([])
+
   const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setBorrowRoomStatus(event.target.value as string);
   };
+  const fetchRooms = async (newPage: number) => {
+      try {
+        const data = await APIGetRoomBorrowRequestAdmin('', '', '', 0, 5, '');
+        // setRooms(data.content);
+        console.log(data.content)
+        setRoomBorrowData(data.content)
+        
+      } catch (err) {
+        console.error("Error fetching rooms", err);
+      }  
+    };
+  React.useEffect(()=> {
+    fetchRooms()
+     
+  }, [])
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(3);
 
@@ -126,24 +138,22 @@ function RoomBorrowTable (): React.JSX.Element {
             <TableCell>Tên phòng</TableCell>
             <TableCell>Thời gian mượn</TableCell>
             <TableCell>Thời gian trả phòng dự kiến</TableCell>
-            <TableCell>Trạng thái</TableCell>
-            <TableCell></TableCell>
+            <TableCell>Ghi chú</TableCell>
+            {/* <TableCell></TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
   {roomBorrowData
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     .map((row)=> {
-      const { label, color } = statusMap[row.status] ?? { label: 'Unknown', color: 'default' };
       return (
-        <TableRow key={row.RequestId}>
-          <TableCell>{row.RequestId}</TableCell>
-          <TableCell>{row.teacherName}</TableCell>
-          <TableCell>{row.roomname}</TableCell>
-          <TableCell>{row.borrowTime}</TableCell>
-          <TableCell>{row.expectedReturnTime}</TableCell>
-          <TableCell><Chip color={color} label={label} size="small" /></TableCell>
-          <TableCell><BorrowRoomDetail/></TableCell>
+        <TableRow key={row.uniqueId}>
+          <TableCell>{row.uniqueId}</TableCell>
+          <TableCell>{row.username}</TableCell>
+          <TableCell>{row.roomName}</TableCell>
+          <TableCell>{(row.startTime).replace("T", " ")}</TableCell>
+          <TableCell>{(row.endTime).replace("T", " ")}</TableCell>
+          <TableCell>{row.comment}</TableCell>
+          {/* <TableCell><BorrowRoomDetail /></TableCell> */}
         </TableRow>
       );
     })}
