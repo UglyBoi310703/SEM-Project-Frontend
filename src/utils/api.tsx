@@ -104,18 +104,22 @@ export const APIUpdateEquipmentDetailLocation = async (classroom_id: number, Cla
 //APIGetAllEquipmentCategories
 export type EquipmentResponse = {
   content: Equipment[];  
-  totalElements: number;  
-  totalPages: number;  
-  size: number;  
+  page:  {
+    size: number,
+    number: number,
+    totalElements: number,
+    totalPages: number
+  };  
 };
 
 export async function APIGetAllEquipment(
+  category: string = '',
   keyword: string = '', 
   page: number = 0, 
   size: number = 15
 ): Promise<EquipmentResponse> {
   const response = await axios.get<EquipmentResponse>(
-    `${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}`
+    `${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}&category=${category}`
   );
   
   
@@ -163,16 +167,19 @@ export const APIUpdateEquipmentCategory = async (equipmentCategoryId: number, ne
 };
 export type EquipmentDetailResponse = {
   content: EquipmentDetail[];  
-  totalElements: number;  
-  totalPages: number;  
-  size: number;  
+  page:  {
+    size: number,
+    number: number,
+    totalElements: number,
+    totalPages: number
+  };  
 };
 
 //APIgetAllEquipmentDetail
 export async function APIgetAllEquipmentDetail(
   keyword: string = '', 
   page: number = 0, 
-  size: number = 15
+  size: number = 10
 ): Promise<EquipmentResponse> {
   const response = await axios.get<EquipmentDetailResponse>(
     `${BASE_URL}/api/v1/equipment-detail/search?keyword=${keyword}&page=${page}&size=${size}`
@@ -244,6 +251,23 @@ export const APIUpdateEquipmentDetail = async (equipmentDetailId: number, newUpd
     }
   }
 };
+
+export async function APIgetEquipmentDetail(
+  equipmentId: number,
+  keyword: string = '', 
+  status: string = '',
+  page: number = 0, 
+  size: number = 5
+): Promise<EquipmentDetailResponse> {
+  console.log( `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentId}/search?keyword=${keyword}&status=${status}&page=${page}&size=${size}`);
+  
+  const response = await axios.get<EquipmentDetailResponse>(
+    `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentId}/search?keyword=${keyword}&status=${status}&page=${page}&size=${size}`
+  );
+  
+  
+  return response.data;
+}
 
 
 

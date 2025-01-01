@@ -39,7 +39,7 @@ const validationSchema = yup.object().shape({
   notes: yup.string().max(500, 'Ghi chú không được vượt quá 500 ký tự'),
 });
 
-function EditEquipmentDialog({equipmentCategory, equipmentDetail }: { equipmentDetail: EquipmentDetail, equipmentCategory:Equipment }): React.JSX.Element {
+function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: { equipmentDetail: EquipmentDetail, equipmentCategory:Equipment }): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [roomCategories, setRoomCategories] = useState<Classroom[]>([])
 
@@ -148,7 +148,9 @@ function EditEquipmentDialog({equipmentCategory, equipmentDetail }: { equipmentD
         await APIUpdateEquipmentDetail(equipmentDetail.id, EditedData)
         // Gửi dữ liệu đến API hoặc thực hiện xử lý tiếp theo
         console.log("Dữ liệu chỉnh sửa:", EditedData);
-  
+        if (setUpdated) {
+          setUpdated(true);
+        }
         toast.success('Lưu thông tin thành công!');
         setOpen(false);
       } else {

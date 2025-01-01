@@ -33,7 +33,7 @@ const validationSchema = Yup.object({
   notes: Yup.string().max(200, 'Ghi chú không được vượt quá 200 ký tự'),
 });
 
-function AddEquipmentDialog({ equipmentCategory , setUpdate}) {
+function AddEquipmentDialog({ equipmentCategory , setUpdated}) {
   const [open, setOpen] = useState(false);
   const [roomOptions, setRoomOptions] = useState<Classroom[]>([]);
 
@@ -73,7 +73,9 @@ function AddEquipmentDialog({ equipmentCategory , setUpdate}) {
         
         // Reset form sau khi thêm thành công
         formik.resetForm();
-        setUpdate()
+        if (setUpdated) {
+          setUpdated(true);
+        }
         // Đóng dialog
         setOpen(false);
       } catch (error) {
