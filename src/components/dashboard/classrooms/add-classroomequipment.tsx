@@ -31,7 +31,7 @@ export interface EquipmentDetail {
 interface AddEquipmentsProps {
   room: Classroom;
   onAdd: (device: EquipmentDetail) => void;
-  selectedDeviceIds: number[];
+  selectedDeviceseRialNumbers: string[];
 }
 
 const statusMap = {
@@ -72,6 +72,11 @@ function AddRoomEquipments({ room, onAdd, selectedDeviceIds }: AddEquipmentsProp
   
     fetchEquipments();
   }, []);
+
+  React.useEffect(()=> {
+    console.log(selectedDeviceIds);
+    
+  }, [selectedDeviceIds])
   
 
   const filteredEquipments = equipments.filter((equipment) => {
@@ -132,11 +137,11 @@ function AddRoomEquipments({ room, onAdd, selectedDeviceIds }: AddEquipmentsProp
                         variant="contained"
                         onClick={() => onAdd(equipment)}
                         disabled={
-                          equipment.status === 'Đang sử dụng' || selectedDeviceIds.includes(equipment.id)
+                          equipment.status === 'Đang sử dụng' || selectedDeviceIds.includes(equipment.serialNumber)
                         }
                       >
                         {
-                        selectedDeviceIds.includes(equipment.id) ? 'Đã chọn' : 'Thêm'}
+                        selectedDeviceIds.includes(equipment.serialNumber) ? 'Đã chọn' : 'Thêm'}
                       </Button>
                     </TableCell>
                   </TableRow>

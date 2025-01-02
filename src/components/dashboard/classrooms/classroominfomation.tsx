@@ -38,7 +38,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AddRoomEquipments, { EquipmentDetail } from './add-classroomequipment';
-import { APIGetRoom, APIModifyClassRoom, APIUpdateEquipmentDetailLocation } from '@/utils/api';
+import { APIgetAllEquipmentDetail, APIgetAllEquipmentDetailByRoomID, APIGetRoom, APIModifyClassRoom, APIUpdateEquipmentDetail, APIUpdateEquipmentDetailLocation } from '@/utils/api';
 import { Classroom } from './classrooms-card';
 
 
@@ -116,14 +116,23 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = React.useState(false);
   const [selectedDevices, setSelectedDevices] = React.useState<EquipmentDetail[]>([]);
   const [roomList, setRoomList] = React.useState<Classroom[]>([]);
+  const [roomData, setRoomD] = React.useState<Classroom>()
   const [roomNameError, setRoomNameError] = React.useState("");
   const [selectedType, setSelectedType] = React.useState(
     ClassMapping[room.type as keyof typeof ClassMapping]
   );
 
   const handleTypeChange = (event: SelectChangeEvent) => {
-    setSelectedType(event.target.value); // Cập nhật giá trị được chọn
+    setSelectedType(event.target.value);  
   };
+
+  React.useEffect(()=> {
+    const fetchEquipments = async () => {
+      const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
+      setSelectedDevices(equipmentsInRoom.content)
+    }
+    fetchEquipments()
+  }, [room])
   
 
   React.useEffect(() => {
@@ -155,13 +164,66 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
   }, [roomName, roomList]);
 
   const handleAddDevice = (device: EquipmentDetail) => {
-    if (!selectedDevices.find((d) => d.serialNumber === device.serialNumber)) {
-      setSelectedDevices([...selectedDevices, device]);
+    const fetchAPI = async ()=> {
+      const response = await APIgetAllEquipmentDetail(device.serialNumber) 
+      const roomNameExist = response.content[0].roomName
+      if( roomNameExist!= "WAREHOUSE"){
+        const result = await Swal.fire({
+          title: "Xác nhận thêm thiết bị",
+          text: `Thiết bị đã tồn tại tại phòng ${roomNameExist}, Bạn có muốn thay đổi ?`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Xác nhận",
+          cancelButtonText: "Hủy",
+        });
+        if(!result.isConfirmed){
+          toast.info("Bạn đã hủy thao tác thêm thiết bị.");
+            return
+        }else{
+          if (!selectedDevices.find((d) => d.serialNumber === device.serialNumber)) {
+            setSelectedDevices([...selectedDevices, device]);
+          }
+        }
+      }
     }
+    fetchAPI()
+
+  
   };
-  const handleRemoveDevice = (seri: string) => {
-    setSelectedDevices(selectedDevices.filter((d) => d.serialNumber !== seri));
-  };
+  // const handleRemoveDevice = async (seri: string) => {
+  //   try {
+     
+  //     const deviceDetailResponse =  await APIgetAllEquipmentDetail(seri) 
+  //     const deviceDetail = deviceDetailResponse.content[0] 
+  //     const roomsResponse = await APIGetRoom('WAREHOUSE');
+  //     const room =roomsResponse.content[0];
+  //       const updatePayload = {
+  //       description: deviceDetail.description,
+  //       purchaseDate: deviceDetail.purchaseDate,
+  //       equipmentId: deviceDetail.id,  
+  //       roomId: room.id, // `id` của phòng "Nhà kho"
+  //     };  
+  //     const result = await Swal.fire({
+  //       title: "Xác nhận thêm thiết bị",
+  //       text: `Bạn có muốn xóa thiết bị khỏi phòng ?`,
+  //       icon: "warning",
+  //       showCancelButton: true,
+  //       confirmButtonColor: "#3085d6",
+  //       cancelButtonColor: "#d33",
+  //       confirmButtonText: "Xác nhận",
+  //       cancelButtonText: "Hủy",
+  //     });
+  //     if(result.isConfirmed){
+  //       await APIUpdateEquipmentDetail(deviceDetail.id, updatePayload)
+  //       toast.info("Thiết bị đã được xóa khỏi phòng học");
+  //         return
+  //     }}catch {
+
+  //   }
+  // };
+  
 
   const onSubmit = async (data) => {
     console.log(data);
@@ -356,7 +418,7 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
                                       <Button
                                         color="error"
                                         onClick={() =>
-                                          window.confirm('Bạn có chắc chắn muốn xóa?') &&
+                                          
                                           handleRemoveDevice(device.serialNumber)
                                         }
                                       >
@@ -391,7 +453,7 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
                           open={addDeviceDialogOpen}
                           onClose={() => setAddDeviceDialogOpen(false)}
                           onAdd={handleAddDevice}
-                          selectedDeviceIds={selectedDevices.map((d) => d.id)}
+                          selectedDeviceIds={selectedDevices.map((d) => d.serialNumber)}
                         />
                       </DialogContent>
                       <DialogActions>
