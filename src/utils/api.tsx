@@ -1,8 +1,9 @@
 import axios from "axios";
+import { NextApiRequest, NextApiResponse } from 'next';
+
 import type { Classroom } from "@/components/dashboard/classrooms/classrooms-card";
 import { Equipment } from "@/components/dashboard/equipments/equipment-categories-table";
 import { EquipmentDetail } from "@/components/dashboard/equipments/equipmentdetails/equipmentdetailstable";
-import { number } from "zod";
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -110,26 +111,31 @@ export const APIUpdateEquipmentDetailLocation = async (classroom_id: number, Cla
 };
 
 
-
 //APIGetAllEquipmentCategories
-export interface EquipmentResponse{
-  content: Equipment[];  
-  page:  {
-    size: number,
-    number: number,
-    totalElements: number,
-    totalPages: number
-  };  
-};
+export interface EquipmentResponse {
+  content: Equipment[];
+  page: {
+    size: number;
+    number: number;
+    totalElements: number;
+    totalPages: number;
+  };
+}
+
+interface GetAllEquipmentCategoriesParam {
+  category?: string; // Đánh dấu tùy chọn nếu không bắt buộc
+  keyword?: string;  // Đánh dấu tùy chọn nếu không bắt buộc
+  page: number;
+  size: number;
+}
 
 export async function APIGetAllEquipment(
-  category: string = '',
-  keyword: string = '', 
-  page: number = 0, 
-  size: number = 15
+  param: GetAllEquipmentCategoriesParam
 ): Promise<EquipmentResponse> {
   const response = await axios.get<EquipmentResponse>(
-    `${BASE_URL}/api/v1/equipment/search?keyword=${keyword}&page=${page}&size=${size}&category=${category}`,{
+    `${BASE_URL}/api/v1/equipment/search`,
+    {
+      params: param, // Đặt tham số vào 'params'
       headers: {
         "Content-Type": "application/json",
       },
@@ -138,6 +144,7 @@ export async function APIGetAllEquipment(
   );
   return response.data;
 }
+
 
 // APIAddNewEquipmentCategory
 export interface NewEquipmentCategoryRequest {
@@ -179,7 +186,7 @@ export const APIUpdateEquipmentCategory = async (equipmentCategoryId: number, ne
     }
   }
 };
-export type EquipmentDetailResponse = {
+export interface EquipmentDetailResponse  {
   content: EquipmentDetail[];  
   page:  {
     size: number,
@@ -241,10 +248,10 @@ export async function APIgetAllEquipmentDetailByEquipmentID(
 
 //APIAddNewEquipmentDetail
 export interface NewEquipmentRequest {
-  "description": string,
-  "purchaseDate": string,
-  "equipmentId": number,
-  "roomId": number
+  description: string;
+  purchaseDate: string;
+  equipmentId: number;
+  roomId: number;
 }
 export const APIAddNewEquipmentDetail = async (equipment: NewEquipmentRequest): Promise<void> => {
   try {
@@ -253,6 +260,7 @@ export const APIAddNewEquipmentDetail = async (equipment: NewEquipmentRequest): 
       headers: {
         "Content-Type": "application/json",  
       },
+      withCredentials:true
     });
     console.log("Thiết bị đã được thêm thành công", response.data);
   } catch (error) {
@@ -271,8 +279,9 @@ export const APIUpdateEquipmentDetail = async (equipmentDetailId: number, newUpd
     const response = await axios.patch(`${BASE_URL}/api/v1/equipment-detail/${equipmentDetailId}`, newUpdateEquipmentDetail, {
       headers: {
         "Content-Type": "application/json",  
+
       },
-      withCredentials: true
+      withCredentials:true
     });
     console.log("Thiết bị đã được cập nhật thành công:", response.data);
   } catch (error) {
@@ -356,7 +365,12 @@ export interface BorrowEquipmentRequest {
   status: string;
   createdAt: string;
 }
-
+export interface BorrowRoomRequestParam {
+  filter:string;
+  page:number;
+  size:number;
+  sort: string[];
+}
 export interface BorrowEquipmentRequestsResponse {
   content: BorrowEquipmentRequest[];
   page: {
@@ -367,11 +381,14 @@ export interface BorrowEquipmentRequestsResponse {
   };
 }
 
-export const APIGetAllBorrowEquipmentRequests = async (): Promise<BorrowEquipmentRequestsResponse> => {
+export const APIGetAllBorrowEquipmentRequests = async (
+  params: BorrowRoomRequestParam
+): Promise<BorrowEquipmentRequestsResponse> => {
   try {
     const response = await axios.get<BorrowEquipmentRequestsResponse>(
       `${BASE_URL}/api/v1/borrow/equipment/list`,
       {
+        params, // Truyền tham số vào đây
         withCredentials: true, // Gửi thông tin xác thực
       }
     );
@@ -403,7 +420,7 @@ export const APIGetFilteredBorrowEquipmentRequests = async (
       `${BASE_URL}/api/v1/borrow/equipment/filter`,
       {
         params: {
-          userId: params.userId || 0,
+          userId: params.userId || undefined,
           statuses: params.statuses || [],
           expectedReturnDateBefore: params.expectedReturnDateBefore || null,
           expectedReturnDateAfter: params.expectedReturnDateAfter || null,
@@ -440,7 +457,7 @@ export interface BorrowEquipmentDetailsResponse {
   details: BorrowEquipmentDetail[];
 }
 
-export async function APIGetBorrowEquipmentDetails(
+export async function APIGetBorrowEquipmentDetailsById(
   borrowId: number
 ): Promise<BorrowEquipmentDetailsResponse> {
   try {
@@ -460,7 +477,63 @@ export async function APIGetBorrowEquipmentDetails(
     throw error;
   }
 }
+// API BorrowEquipmentActions
+//1.API ApproveBorrowEquipment
+export async function APIApproveBorrowEquipmentRequest(
+  borrowId: number
+): Promise<string> {
+  try {
+    const response = await axios.put<{ message: string }>(
+      `${BASE_URL}/api/v1/borrow/equipment/${borrowId}/approve`,
+      null, // PUT không có body
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Gửi cookie
+      }
+    );
+    console.log("Phê duyệt đơn mượn thành công:", response.data.message);
+    return response.data.message;
+  } catch (error) {
+    console.error("Lỗi khi phê duyệt đơn mượn:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+    throw error;
+  }
+}
 
+//2.API DenyBorrowEquipmentRequest
+export async function APIDenyBorrowEquipmentRequest(
+  requestId: number,
+  reason: string
+): Promise<string> {
+  try {
+    const response = await axios.patch<{ message: string }>(
+      `${BASE_URL}/api/v1/borrow/equipment/deny`,
+      {
+        requestId,
+        reason,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Gửi thông tin xác thực nếu cần
+      }
+    );
+
+    console.log("Từ chối đơn mượn thành công:", response.data.message);
+    return response.data.message;
+  } catch (error) {
+    console.error("Lỗi khi từ chối đơn mượn:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+    throw error;
+  }
+}
 // APIUpdateBorrowEquipmentRequest
 export interface UpdateBorrowEquipmentRequest {
   uniqueID: number;
@@ -614,6 +687,58 @@ export async function APIGetBorrowRoomRequests(
     throw error;
   }
 }
+//API GetBorrowRoomRequest-ADMIN
+export interface BorrowRoomBodyRequest {
+  email: number;
+  startDate: string;
+  endDate: string;
+  page: number;
+  size: number;
+  sort: string[];
+}
+
+export interface BorrowRoomListResponse {
+  content: {
+    uniqueId:number;
+    roomname: string;
+    username: string;
+    email:string;
+    startTime: string;
+    endTime: string;
+    comment: string;
+    cancelable:boolean;
+  }[];
+  page: {
+    page: number;
+    size: number;
+    sort:string[];
+  };
+}
+
+export async function APIGetAdminBorrowRoomRequests(
+  request: BorrowRoomBodyRequest
+): Promise<BorrowRoomListResponse> {
+  try {
+    const response = await axios.get<BorrowRoomResponse>(
+      `${BASE_URL}/api/v1/borrow/room/admin-request`,
+      {
+        params: request,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Gửi thông tin xác thực
+      }
+    );
+    console.log("Danh sách đơn mượn phòng:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách đơn mượn phòng:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+    throw error;
+  }
+}
 // APIBatchDeleteBorrowEquipments
 export const APIBatchDeleteBorrowEquipments = async (ids: number[]): Promise<void> => {
   try {
@@ -684,7 +809,7 @@ export const APISendAlertNotify = async (message: string): Promise<void> => {
   }
 };
 
-//APIGetRoomBorrowRequest
+//APIGetRoomBorrowRequest-Admin
 export async function APIGetRoomBorrowRequestAdmin(
   email: string,
   startDate: string = '', 
@@ -701,3 +826,28 @@ export async function APIGetRoomBorrowRequestAdmin(
   return response.data;
 }
 
+//API Subcribe to Server-Send Events
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'GET') {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      // Gửi một sự kiện ngay khi kết nối được mở
+      res.write(`data: Subscribed to SSE\n\n`);
+
+      // Ví dụ: Thực hiện công việc khác
+      const interval = setInterval(() => {
+          res.write(`data: Server is alive at ${new Date().toISOString()}\n\n`);
+      }, 1000);
+
+      // Dọn dẹp khi kết nối đóng
+      req.on('close', () => {
+          clearInterval(interval);
+          res.end();
+      });
+  } else {
+      res.status(405).json({ message: 'Method not allowed' });
+  }
+}

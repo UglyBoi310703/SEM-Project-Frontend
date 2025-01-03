@@ -37,14 +37,15 @@ import {
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import AddRoomEquipments, { EquipmentDetail } from './add-classroomequipment';
+import AddRoomEquipments from './add-classroomequipment';
+import type { EquipmentDetail } from './add-classroomequipment';
 import { APIgetAllEquipmentDetail, APIgetAllEquipmentDetailByRoomID, APIGetRoom, APIModifyClassRoom, APIUpdateEquipmentDetail, APIUpdateEquipmentDetailLocation } from '@/utils/api';
-import { Classroom } from './classrooms-card';
-
+import type { Classroom } from '../classrooms-card';
+import ChangeDeviceLocationDialog from './change-room-quipment';
 
 
 const statusMap = {
-  'Có thể sử dụng': { label: 'Có thể sử dụng', color: 'success' },
+  'Có thể sử dụng': { label: 'Sẵn sàng', color: 'success' },
   'Hỏng': { label: 'Hỏng', color: 'error' },
   'Đang sử dụng': { label: 'Đang sử dụng', color: 'warning' },
 } as const;
@@ -316,7 +317,7 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ flexGrow: 1 }}>
               <Grid container spacing={2} columns={16}>
-                <Grid item xs={6}>
+                <Grid item xs={5}>
                   <Card>
                     <CardHeader title="Thông tin" />
                     <CardContent>
@@ -381,7 +382,7 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
                     </CardActions>
                   </Card>
                 </Grid>
-                <Grid item xs={10}>
+                <Grid item xs={11}>
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <Box sx={{ height: 450, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, mt: 2 }}>
                       <Typography variant="h6" sx={{ mt: 2 }}>
@@ -415,15 +416,7 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
                                     <TableCell>{device.category}</TableCell>
                                     <TableCell><Chip color={color} label={label} size="small" /></TableCell>
                                     <TableCell>
-                                      <Button
-                                        color="error"
-                                        onClick={() =>
-                                          
-                                          handleRemoveDevice(device.serialNumber)
-                                        }
-                                      >
-                                        Xóa
-                                      </Button>
+                                     <ChangeDeviceLocationDialog/>
                                     </TableCell>
                                   </TableRow>
                                 )

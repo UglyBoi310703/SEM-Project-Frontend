@@ -90,7 +90,6 @@ function ClassroomInfoDialog({ RoomId }: Props): React.JSX.Element {
                     <TableCell>Tên thiết bị</TableCell>
                     <TableCell>Loại thiết bị</TableCell>
                     <TableCell>Trạng thái</TableCell>
-                   
                   </TableRow>
                 </TableHead>
                 <TableBody>

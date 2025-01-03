@@ -271,7 +271,6 @@ const handleCancelBorrowRequest = async (id: number) => {
             <>
               <Button size="small" variant="contained"  style={{ marginRight: 8 }} onClick={() => handleOpenDetailDialog(row.borrowId)}>
                 Chi tiết
-               
               </Button>
               <UpdateBorrowEquipmentRequest
                 borrowRequestId={row.borrowId}
@@ -293,7 +292,6 @@ const handleCancelBorrowRequest = async (id: number) => {
           ) : (
             <Button size="small" variant="contained" onClick={() => handleOpenDetailDialog(row.borrowId)}>
               Chi tiết
-             
             </Button>
           )}
         </TableCell>

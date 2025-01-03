@@ -1,4 +1,5 @@
-"use client"
+'use client';
+
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -16,12 +17,11 @@ import { Eye as EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 import { EyeSlash as EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
-import { toast, ToastContainer } from 'react-toastify'; // Import Toastify
-import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
-
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
@@ -37,6 +37,9 @@ export function SignInForm(): React.JSX.Element {
   const { checkSession } = useUser();
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [isPending, setIsPending] = React.useState<boolean>(false);
+  const [message,setmessage] = React.useState("")
+  // Sử dụng useRef để giữ tham chiếu đến EventSource
+  const eventSourceRef = React.useRef<EventSource | null>(null);
 
   const {
     control,
@@ -47,25 +50,49 @@ export function SignInForm(): React.JSX.Element {
 
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
+      if (isPending) return; // Ngăn gọi API khi đang tải
       setIsPending(true);
-      const { error } = await authClient.signInWithPassword(values);
-      if (error) {
-        setError('root', { type: 'server', message: error });
-        setIsPending(false);
-        return;
-      }
-      toast.success('Xin chào!', { position: 'top-center' });
-      // Refresh the auth state
-      await checkSession?.();
+      try {
+        const { error } = await authClient.signInWithPassword(values);
+        if (error) {
+          setError('root', { type: 'server', message: error });
+          toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại!', { position: 'top-center' });
+          return;
+        }
 
-      // Refresh router and show toast
       
-      router.refresh();
-      
-      setIsPending(false);
+        await checkSession?.();
+        toast.success('Xin chào!', { position: 'top-center' });
+        // Gọi SSE sau khi đăng nhập thành công
+        eventSourceRef.current = new EventSource('http://localhost:8080/api/v1/notifications/subscribe',{
+          withCredentials:true
+        });
+       console.log(eventSourceRef.current)
+        eventSourceRef.current.onmessage = (event) => {
+          setmessage(event.data)
+          console.log('SSE Message:', message);
+        };
+  
+        eventSourceRef.current.onerror = () => {
+          console.error('SSE encountered an error.');
+          eventSourceRef.current?.close();
+        };
+        // Refresh the auth state
+     
+
+        // Chuyển hướng hoặc refresh
+        router.refresh();
+      } catch (err) {
+        console.error('Unexpected error during login:', err);
+        toast.error('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại!', { position: 'top-center' });
+      } finally {
+        setIsPending(false);
+      }
     },
     [checkSession, router, setError]
   );
+
+  // Dọn dẹp kết nối SSE khi component bị unmount
 
   return (
     <>
@@ -105,17 +132,13 @@ export function SignInForm(): React.JSX.Element {
                         <EyeIcon
                           cursor="pointer"
                           fontSize="var(--icon-fontSize-md)"
-                          onClick={(): void => {
-                            setShowPassword(false);
-                          }}
+                          onClick={() => setShowPassword(false)}
                         />
                       ) : (
                         <EyeSlashIcon
                           cursor="pointer"
                           fontSize="var(--icon-fontSize-md)"
-                          onClick={(): void => {
-                            setShowPassword(true);
-                          }}
+                          onClick={() => setShowPassword(true)}
                         />
                       )
                     }

@@ -27,6 +27,7 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
   const { checkSession } = useUser();
   const router = useRouter();
   const [user, setUser] = React.useState<{ username: string; email: string } | null>(null);
+  const eventSourceRef = React.useRef<EventSource | null>(null); // Quản lý SSE
 
   const fetchUserInfo = React.useCallback(async (): Promise<void> => {
     try {
@@ -39,30 +40,28 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
     } catch (err) {
       logger.error('An error occurred while fetching user info', err);
     }
-    }, []);
+  }, []);
 
   React.useEffect(() => {
-    fetchUserInfo().catch((err: unknown) => {
-      logger.error(err);
-      // noop
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Expected
-  }, []);
+    fetchUserInfo().catch((err: unknown) => logger.error(err));
+  }, [fetchUserInfo]);
+
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
-      const { error } = await authClient.signOut();
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        console.log('SSE connection closed during sign out.');
+        eventSourceRef.current = null;
+      }
 
+      const { error } = await authClient.signOut();
       if (error) {
         logger.error('Sign out error', error);
         return;
       }
 
-      // Refresh the auth state
       await checkSession?.();
-
-      // UserProvider, for this case, will not refresh the router and we need to do it manually
       router.refresh();
-      // After refresh, AuthGuard will handle the redirect
     } catch (err) {
       logger.error('Sign out error', err);
     }
