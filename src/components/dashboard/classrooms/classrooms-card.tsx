@@ -8,7 +8,7 @@ import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import ClassRoomInformation from "./classroominfomation";
+import ClassRoomInformation from "./editclassroom/classroominfomation";
 
 import Chip from "@mui/material/Chip";
 import { Button, Box, IconButton, Menu, MenuItem } from "@mui/material";

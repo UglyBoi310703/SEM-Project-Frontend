@@ -260,6 +260,7 @@ export const APIAddNewEquipmentDetail = async (equipment: NewEquipmentRequest): 
       headers: {
         "Content-Type": "application/json",  
       },
+      withCredentials:true
     });
     console.log("Thiết bị đã được thêm thành công", response.data);
   } catch (error) {
@@ -278,7 +279,9 @@ export const APIUpdateEquipmentDetail = async (equipmentDetailId: number, newUpd
     const response = await axios.patch(`${BASE_URL}/api/v1/equipment-detail/${equipmentDetailId}`, newUpdateEquipmentDetail, {
       headers: {
         "Content-Type": "application/json",  
+
       },
+      withCredentials:true
     });
     console.log("Thiết bị đã được cập nhật thành công:", response.data);
   } catch (error) {

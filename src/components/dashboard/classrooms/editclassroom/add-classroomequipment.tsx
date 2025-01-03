@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react';
 import { APIgetAllEquipmentDetail, APIgetAllEquipmentDetailByRoomID } from '@/utils/api';
-import { Classroom } from './classrooms-card';
+import type { Classroom } from '../classrooms-card';
 
 export interface EquipmentDetail {
   id: number;
