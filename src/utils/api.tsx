@@ -98,7 +98,7 @@ export const APIUpdateEquipmentDetailLocation = async (classroom_id: number, Cla
       headers: {
         "Content-Type": "application/json",
       },
-      withCredentials: true, // Gửi thông tin xác thực
+      withCredentials: true, 
     });
     console.log("Thiết bị gắn với phòng học đã được cập nhật thành công:", response.data);
   } catch (error) {
@@ -272,6 +272,7 @@ export const APIUpdateEquipmentDetail = async (equipmentDetailId: number, newUpd
       headers: {
         "Content-Type": "application/json",  
       },
+      withCredentials: true
     });
     console.log("Thiết bị đã được cập nhật thành công:", response.data);
   } catch (error) {

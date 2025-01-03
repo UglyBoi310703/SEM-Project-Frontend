@@ -192,37 +192,37 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
 
   
   };
-  // const handleRemoveDevice = async (seri: string) => {
-  //   try {
+  const handleChangeDeviceLocation = async (seri: string) => {
+    try {
      
-  //     const deviceDetailResponse =  await APIgetAllEquipmentDetail(seri) 
-  //     const deviceDetail = deviceDetailResponse.content[0] 
-  //     const roomsResponse = await APIGetRoom('WAREHOUSE');
-  //     const room =roomsResponse.content[0];
-  //       const updatePayload = {
-  //       description: deviceDetail.description,
-  //       purchaseDate: deviceDetail.purchaseDate,
-  //       equipmentId: deviceDetail.id,  
-  //       roomId: room.id, // `id` của phòng "Nhà kho"
-  //     };  
-  //     const result = await Swal.fire({
-  //       title: "Xác nhận thêm thiết bị",
-  //       text: `Bạn có muốn xóa thiết bị khỏi phòng ?`,
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#3085d6",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "Xác nhận",
-  //       cancelButtonText: "Hủy",
-  //     });
-  //     if(result.isConfirmed){
-  //       await APIUpdateEquipmentDetail(deviceDetail.id, updatePayload)
-  //       toast.info("Thiết bị đã được xóa khỏi phòng học");
-  //         return
-  //     }}catch {
+      const deviceDetailResponse =  await APIgetAllEquipmentDetail(seri) 
+      const deviceDetail = deviceDetailResponse.content[0] 
+      const roomsResponse = await APIGetRoom('');
+      const room =roomsResponse.content[0];
+        const updatePayload = {
+        description: deviceDetail.description,
+        purchaseDate: deviceDetail.purchaseDate,
+        equipmentId: deviceDetail.id,  
+        roomId: room.id,  
+      };  
+      const result = await Swal.fire({
+        title: "Xác nhận thêm thiết bị",
+        text: `Bạn có muốn xóa thiết bị khỏi phòng ?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Xác nhận",
+        cancelButtonText: "Hủy",
+      });
+      if(result.isConfirmed){
+        await APIUpdateEquipmentDetail(deviceDetail.id, updatePayload)
+        toast.info("Thiết bị đã được chuyển sang phòng");
+          return
+      }}catch {
 
-  //   }
-  // };
+    }
+  };
   
 
   const onSubmit = async (data) => {
