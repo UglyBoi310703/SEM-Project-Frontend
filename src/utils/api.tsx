@@ -325,6 +325,23 @@ export async function APIgetEquipmentDetail(
   return response.data;
 }
 
+///Delete Equipment Detail
+export async function APIDeleteEquipmentDetail(
+  equipmentID: number
+): Promise<EquipmentDetailResponse> {
+  console.log(`${BASE_URL}/api/v1/equipment-detail/${equipmentID}`);
+  const response = await axios.delete<EquipmentDetailResponse>(
+    `${BASE_URL}/api/v1/equipment-detail/${equipmentID}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true, // Gửi thông tin xác thực
+  }
+  );
+  return response.data;
+}
+
+
 
 
 

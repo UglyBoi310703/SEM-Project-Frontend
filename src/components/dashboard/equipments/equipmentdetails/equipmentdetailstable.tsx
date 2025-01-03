@@ -20,8 +20,9 @@ import {
 } from '@mui/material';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import EditEquipmentModal from '../editequipment/editequipment';
-import { APIgetAllEquipmentDetailByEquipmentID, APIgetEquipmentDetail } from '@/utils/api';
+import { APIDeleteEquipmentDetail, APIgetAllEquipmentDetailByEquipmentID, APIgetEquipmentDetail } from '@/utils/api';
 import { EquipmentDetail } from '../../classrooms/add-classroomequipment';
+import Swal from 'sweetalert2';
 
 
 
@@ -69,8 +70,8 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
 
     const response = await APIgetEquipmentDetail(equipmentCategory.id, '', CategoryFilter);
     setEquipmentDetail(response.content);
-    setTotalElements(response.page.totalElements);  
-    setTotalPage(response.page.totalPages); 
+    setTotalElements(response.page.totalElements);
+    setTotalPage(response.page.totalPages);
   };
 
 
@@ -78,14 +79,14 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
     try {
       const response = await APIgetEquipmentDetail(equipmentCategory.id, searchKeyword, deviceStatus, newPage, rowsPerPage);
       setEquipmentDetail(response.content);
-      setPage(newPage); 
-      setTotalElements(response.page.totalElements); 
+      setPage(newPage);
+      setTotalElements(response.page.totalElements);
       setTotalPage(response.page.totalPages);
     } catch (error) {
       console.error("Lỗi khi chuyển trang:", error);
     }
   };
-  
+
 
 
 
@@ -103,7 +104,33 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
     }
   };
 
-
+  const handleDeleteEquipmentDetail = async (id: number) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Bạn có chắc chắn muốn xóa?',
+        text: 'Hành động này không thể hoàn tác!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy',
+      });
+  
+      if (result.isConfirmed) {
+        // Gọi API xóa thiết bị
+        await APIDeleteEquipmentDetail(id);
+        Swal.fire('Đã xóa!', 'Thiết bị đã được xóa thành công.', 'success');
+        const data = await APIgetAllEquipmentDetailByEquipmentID(equipmentCategory.id);
+        setEquipmentDetail(data.content);
+        setTotalElements(data.page.totalElements);
+        setTotalPage(data.page.totalPages);
+      }
+    } catch (error) {
+      console.error('Lỗi khi xóa thiết bị:', error);
+      Swal.fire('Lỗi!', 'Không thể xóa thiết bị. Vui lòng thử lại.', 'error');
+    }
+  };
   const handleRowsPerPageChange = async (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -113,9 +140,9 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
     setEquipmentDetail(response.content);
     setPage(0);
     console.log(response);
-    
-    setTotalElements(response.page.totalElements);  
-    setTotalPage(response.page.totalPages);  
+
+    setTotalElements(response.page.totalElements);
+    setTotalPage(response.page.totalPages);
   };
 
 
@@ -131,17 +158,17 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
   //   page * rowsPerPage,
   //   page * rowsPerPage + rowsPerPage
   // );
-  React.useEffect(()=> {
+  React.useEffect(() => {
     // console.log(equipmentdetails);
-    
+
     // console.log(page);
     // console.log(rowsPerPage);
-    
-    
+
+
     // console.log(filteredRows);
     console.log(totalElements);
-    
-    
+
+
   }, [filteredRows, page, rowsPerPage, equipmentdetails])
 
   React.useEffect(() => {
@@ -149,7 +176,7 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
     console.log('Device Status:', deviceStatus);
     console.log('Equipment Details:', equipmentdetails);
   }, [filteredRows, deviceStatus, equipmentdetails]);
-  
+
 
   return (
     <Box>
@@ -235,7 +262,11 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
                       }}
                     >
                       <EditEquipmentModal equipmentCategory={equipmentCategory} equipmentDetail={row} setUpdated={setUpdated} />
-                      <Button variant="outlined" color="error" >
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleDeleteEquipmentDetail(row.id)}
+                      >
                         Xoá
                       </Button>
                     </Box>
