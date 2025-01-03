@@ -9,29 +9,29 @@ const BASE_URL = 'http://localhost:8080';
 
 // //APIGetRoomsByKeyword, type, status
 export type RoomApiResponse = {
-  content: Classroom[];  
-  page:  {
+  content: Classroom[];
+  page: {
     size: number,
     number: number,
     totalElements: number,
     totalPages: number
-  };  
+  };
 };
 
 
-export async function APIGetRoom(  type: string = '', 
-  status: string = '', 
-  keyword: string = '', 
-  page: number = 0, 
+export async function APIGetRoom(type: string = '',
+  status: string = '',
+  keyword: string = '',
+  page: number = 0,
   size: number = 4): Promise<RoomApiResponse> {
   console.log(`${BASE_URL}/api/v1/room/search?type=${type}&status=${status}&keyword=${keyword}&page=${page}&size=${size}`);
   const response = await axios.get<RoomApiResponse>(`${BASE_URL}/api/v1/room/search?type=${type}&status=${status}&keyword=${keyword}&page=${page}&size=${size}`,
-   {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    withCredentials: true, // Gửi thông tin xác thực
-   }
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true, // Gửi thông tin xác thực
+    }
   );
   return response.data;
 }
@@ -93,22 +93,32 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
 export interface ClassRoomEquipmentId {
   equipmentDetailIds: number[]
 }
-export const APIUpdateEquipmentDetailLocation = async (classroom_id: number, ClassRoomEquipmentId: ClassRoomEquipmentId): Promise<void> => {
+export const APIUpdateEquipmentDetailLocation = async (
+  classroom_id: number,
+  ClassRoomEquipmentId: ClassRoomEquipmentId
+): Promise<boolean> => {
   try {
-    const response = await axios.put(`${BASE_URL}/api/v1/equipment-detail/location/room/${classroom_id}`, ClassRoomEquipmentId, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true, 
-    });
+    const response = await axios.put(
+      `${BASE_URL}/api/v1/equipment-detail/location/room/${classroom_id}`,
+      ClassRoomEquipmentId,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
     console.log("Thiết bị gắn với phòng học đã được cập nhật thành công:", response.data);
+    return true; // Trả về true khi thành công
   } catch (error) {
     console.error("Lỗi khi cập nhật thiết bị gắn với phòng học:", error);
     if (axios.isAxiosError(error)) {
       console.error("Chi tiết lỗi từ API:", error.response?.data);
     }
+    return false; // Trả về false khi gặp lỗi
   }
 };
+
 
 
 //APIGetAllEquipmentCategories
@@ -186,20 +196,20 @@ export const APIUpdateEquipmentCategory = async (equipmentCategoryId: number, ne
     }
   }
 };
-export interface EquipmentDetailResponse  {
-  content: EquipmentDetail[];  
-  page:  {
+export interface EquipmentDetailResponse {
+  content: EquipmentDetail[];
+  page: {
     size: number,
     number: number,
     totalElements: number,
     totalPages: number
-  };  
+  };
 };
 
 //APIgetAllEquipmentDetail
 export async function APIgetAllEquipmentDetail(
-  keyword: string = '', 
-  page: number = 0, 
+  keyword: string = '',
+  page: number = 0,
   size: number = 10
 ): Promise<EquipmentResponse> {
   const response = await axios.get<EquipmentDetailResponse>(
@@ -218,14 +228,14 @@ export async function APIgetAllEquipmentDetail(
 export async function APIgetAllEquipmentDetailByRoomID(
   roomID: number
 ): Promise<EquipmentResponse> {
-  console.log( `${BASE_URL}/api/v1/equipment-detail/room/${roomID}`);
+  console.log(`${BASE_URL}/api/v1/equipment-detail/room/${roomID}`);
   const response = await axios.get<EquipmentDetailResponse>(
-    `${BASE_URL}/api/v1/equipment-detail/room/${roomID}`,{
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true, // Gửi thông tin xác thực
-    }
+    `${BASE_URL}/api/v1/equipment-detail/room/${roomID}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true, // Gửi thông tin xác thực
+  }
   );
   return response.data;
 }
@@ -234,14 +244,14 @@ export async function APIgetAllEquipmentDetailByRoomID(
 export async function APIgetAllEquipmentDetailByEquipmentID(
   equipmentID: number
 ): Promise<EquipmentDetailResponse> {
-  console.log( `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentID}/search`);
+  console.log(`${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentID}/search`);
   const response = await axios.get<EquipmentDetailResponse>(
-    `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentID}/search`,{
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true, // Gửi thông tin xác thực
-    }
+    `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentID}/search`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    withCredentials: true, // Gửi thông tin xác thực
+  }
   );
   return response.data;
 }
@@ -255,12 +265,12 @@ export interface NewEquipmentRequest {
 }
 export const APIAddNewEquipmentDetail = async (equipment: NewEquipmentRequest): Promise<void> => {
   try {
-     
+
     const response = await axios.post(`${BASE_URL}/api/v1/equipment-detail`, equipment, {
       headers: {
-        "Content-Type": "application/json",  
+        "Content-Type": "application/json",
       },
-      withCredentials:true
+      withCredentials: true
     });
     console.log("Thiết bị đã được thêm thành công", response.data);
   } catch (error) {
@@ -275,13 +285,13 @@ export const APIAddNewEquipmentDetail = async (equipment: NewEquipmentRequest): 
 export const APIUpdateEquipmentDetail = async (equipmentDetailId: number, newUpdateEquipmentDetail: NewEquipmentRequest): Promise<void> => {
   try {
     console.log(`${BASE_URL}/api/v1/equipment-detail/${equipmentDetailId}`);
-    
+
     const response = await axios.patch(`${BASE_URL}/api/v1/equipment-detail/${equipmentDetailId}`, newUpdateEquipmentDetail, {
       headers: {
-        "Content-Type": "application/json",  
+        "Content-Type": "application/json",
 
       },
-      withCredentials:true
+      withCredentials: true
     });
     console.log("Thiết bị đã được cập nhật thành công:", response.data);
   } catch (error) {
@@ -294,13 +304,13 @@ export const APIUpdateEquipmentDetail = async (equipmentDetailId: number, newUpd
 
 export async function APIgetEquipmentDetail(
   equipmentId: number,
-  keyword: string = '', 
+  keyword: string = '',
   status: string = '',
-  page: number = 0, 
+  page: number = 0,
   size: number = 5
 ): Promise<EquipmentDetailResponse> {
-  console.log( `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentId}/search?keyword=${keyword}&status=${status}&page=${page}&size=${size}`);
-  
+  console.log(`${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentId}/search?keyword=${keyword}&status=${status}&page=${page}&size=${size}`);
+
   const response = await axios.get<EquipmentDetailResponse>(
     `${BASE_URL}/api/v1/equipment-detail/equipment/${equipmentId}/search?keyword=${keyword}&status=${status}&page=${page}&size=${size}`,
     {
@@ -310,8 +320,8 @@ export async function APIgetEquipmentDetail(
       withCredentials: true, // Gửi thông tin xác thực
     }
   );
-  
-  
+
+
   return response.data;
 }
 
@@ -366,9 +376,9 @@ export interface BorrowEquipmentRequest {
   createdAt: string;
 }
 export interface BorrowRoomRequestParam {
-  filter:string;
-  page:number;
-  size:number;
+  filter: string;
+  page: number;
+  size: number;
   sort: string[];
 }
 export interface BorrowEquipmentRequestsResponse {
@@ -588,7 +598,7 @@ interface ApiResponse {
   details: BorrowedEquipmentDetail[];
 }
 // Hàm gọi API lấy thông tin đơn mượn
-interface FetchBorrowDetailsParams  {
+interface FetchBorrowDetailsParams {
   id: string | number;
 };
 
@@ -652,7 +662,7 @@ export interface BorrowRoomResponse {
     startTime: string;
     endTime: string;
     comment: string;
-    cancelable:boolean;
+    cancelable: boolean;
     status: string;
   }[];
   page: {
@@ -699,19 +709,19 @@ export interface BorrowRoomBodyRequest {
 
 export interface BorrowRoomListResponse {
   content: {
-    uniqueId:number;
+    uniqueId: number;
     roomname: string;
     username: string;
-    email:string;
+    email: string;
     startTime: string;
     endTime: string;
     comment: string;
-    cancelable:boolean;
+    cancelable: boolean;
   }[];
   page: {
     page: number;
     size: number;
-    sort:string[];
+    sort: string[];
   };
 }
 
@@ -812,17 +822,17 @@ export const APISendAlertNotify = async (message: string): Promise<void> => {
 //APIGetRoomBorrowRequest-Admin
 export async function APIGetRoomBorrowRequestAdmin(
   email: string,
-  startDate: string = '', 
+  startDate: string = '',
   endDate: string = '',
-  page: number = 0, 
+  page: number = 0,
   size: number = 5,
   sort: string = ''
 ): Promise<EquipmentDetailResponse> {
-  console.log( `${BASE_URL}/api/v1/borrow/room/admin-request?email=${email}&page=${page}&size=${size}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`);
+  console.log(`${BASE_URL}/api/v1/borrow/room/admin-request?email=${email}&page=${page}&size=${size}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`);
   const response = await axios.get<EquipmentDetailResponse>(
     `${BASE_URL}/api/v1/borrow/room/admin-request?email=${email}&page=${page}&size=${size}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`
   );
-  
+
   return response.data;
 }
 
@@ -830,24 +840,24 @@ export async function APIGetRoomBorrowRequestAdmin(
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
 
-      // Gửi một sự kiện ngay khi kết nối được mở
-      res.write(`data: Subscribed to SSE\n\n`);
+    // Gửi một sự kiện ngay khi kết nối được mở
+    res.write(`data: Subscribed to SSE\n\n`);
 
-      // Ví dụ: Thực hiện công việc khác
-      const interval = setInterval(() => {
-          res.write(`data: Server is alive at ${new Date().toISOString()}\n\n`);
-      }, 1000);
+    // Ví dụ: Thực hiện công việc khác
+    const interval = setInterval(() => {
+      res.write(`data: Server is alive at ${new Date().toISOString()}\n\n`);
+    }, 1000);
 
-      // Dọn dẹp khi kết nối đóng
-      req.on('close', () => {
-          clearInterval(interval);
-          res.end();
-      });
+    // Dọn dẹp khi kết nối đóng
+    req.on('close', () => {
+      clearInterval(interval);
+      res.end();
+    });
   } else {
-      res.status(405).json({ message: 'Method not allowed' });
+    res.status(405).json({ message: 'Method not allowed' });
   }
 }

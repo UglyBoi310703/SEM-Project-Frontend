@@ -89,7 +89,15 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
     "phòng kho thiết bị": "WAREHOUSE",
     "phòng hội thảo": "MEETING_ROOM",
   };
-
+  const EquipmentCategoryMapping: Record<
+  "TEACHING_EQUIPMEN" | "ELECTRIC_EQUIPMENT" | "SPORTS_EQUIPMENT" | "LABORATORY_EQUIPMENT" ,
+  string
+> = {
+  "TEACHING_EQUIPMEN": "Thiết bị giảng dạy",
+  "ELECTRIC_EQUIPMENT": "Thiết bị giảng dạy",
+  "SPORTS_EQUIPMENT": "Thiết bị thể thao",
+  "LABORATORY_EQUIPMENT": "Thiết bị phòng thí nghiệm"
+};
   const {
     register,
     handleSubmit,
@@ -117,7 +125,6 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = React.useState(false);
   const [selectedDevices, setSelectedDevices] = React.useState<EquipmentDetail[]>([]);
   const [roomList, setRoomList] = React.useState<Classroom[]>([]);
-  const [roomData, setRoomD] = React.useState<Classroom>()
   const [roomNameError, setRoomNameError] = React.useState("");
   const [selectedType, setSelectedType] = React.useState(
     ClassMapping[room.type as keyof typeof ClassMapping]
@@ -126,12 +133,12 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
   const handleTypeChange = (event: SelectChangeEvent) => {
     setSelectedType(event.target.value);  
   };
+  const fetchEquipments = async () => {
+    const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
+    setSelectedDevices(equipmentsInRoom.content)
+  }
 
   React.useEffect(()=> {
-    const fetchEquipments = async () => {
-      const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
-      setSelectedDevices(equipmentsInRoom.content)
-    }
     fetchEquipments()
   }, [room])
   
@@ -413,10 +420,10 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
                                   <TableRow key={device.serialNumber}>
                                     <TableCell>{device.serialNumber}</TableCell>
                                     <TableCell>{device.equipmentName}</TableCell>
-                                    <TableCell>{device.category}</TableCell>
+                                    <TableCell>{EquipmentCategoryMapping[device.category]}</TableCell>
                                     <TableCell><Chip color={color} label={label} size="small" /></TableCell>
                                     <TableCell>
-                                     <ChangeDeviceLocationDialog/>
+                                    <ChangeDeviceLocationDialog device={device} room={room} fetchEquipments={fetchEquipments} />
                                     </TableCell>
                                   </TableRow>
                                 )

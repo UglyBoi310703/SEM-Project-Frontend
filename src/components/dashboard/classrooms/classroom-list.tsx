@@ -23,6 +23,7 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
   const [RoomType, setRoomType] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(0);  
   const [searchKeyword, setSearchKeyword] = React.useState("");
+  
   React.useEffect(()=> {
     setFilteredRooms(rooms)
   }, [rooms])
@@ -54,14 +55,9 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
 
   const handleApplyFilter = async () => {
     try {
-      
       const roomTypeFilter = RoomType === "All" ? "" : RoomType;
-      const roomStatusFilter = RoomStatus === "All" ? "" : RoomStatus;
-  
-   
+      const roomStatusFilter = RoomStatus === "All" ? "" : RoomStatus;    
       const response = await APIGetRoom(roomTypeFilter, roomStatusFilter);
-      
-   
       setFilteredRooms(response.content || []);
     } catch (error) {
       console.error("Lỗi khi áp dụng bộ lọc:", error);

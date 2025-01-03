@@ -235,7 +235,7 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
                       }}
                     >
                       <EditEquipmentModal equipmentCategory={equipmentCategory} equipmentDetail={row} setUpdated={setUpdated} />
-                      <Button variant="outlined" color="error">
+                      <Button variant="outlined" color="error" >
                         Xoá
                       </Button>
                     </Box>
