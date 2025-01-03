@@ -45,30 +45,30 @@ function AddRoomEquipments({ room, onAdd, selectedDeviceIds }: AddEquipmentsProp
   const [selectedCategory, setSelectedCategory] = useState('');
   const [equipments, setEquipments] = React.useState<EquipmentDetail[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
-
+  const fetchEquipments = async () => {
+    try {
+      // Gọi API để lấy tất cả thiết bị
+      const allEquipments = await APIgetAllEquipmentDetail('', 0, 10);
+      console.log(allEquipments);
+      // // Gọi API để lấy thiết bị thuộc phòng cụ thể
+      const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
+      console.log(equipmentsInRoom);
+      // // Lọc ra các thiết bị chưa thuộc phòng
+      const equipmentsNotInRoom = allEquipments.content.filter(
+        (equipment) =>
+          !equipmentsInRoom.content.some(
+            (roomEquipment) => roomEquipment.id === equipment.id
+          )
+      );
+      setEquipments(equipmentsNotInRoom);
+    } catch (err) {
+      console.error('Error fetching equipments', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   React.useEffect(() => {
-    const fetchEquipments = async () => {
-      try {
-        // Gọi API để lấy tất cả thiết bị
-        const allEquipments = await APIgetAllEquipmentDetail('', 0, 10);
-        console.log(allEquipments);
-        // // Gọi API để lấy thiết bị thuộc phòng cụ thể
-        const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
-        console.log(equipmentsInRoom);
-        // // Lọc ra các thiết bị chưa thuộc phòng
-        const equipmentsNotInRoom = allEquipments.content.filter(
-          (equipment) =>
-            !equipmentsInRoom.content.some(
-              (roomEquipment) => roomEquipment.id === equipment.id
-            )
-        );
-        setEquipments(equipmentsNotInRoom);
-      } catch (err) {
-        console.error('Error fetching equipments', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  
   
     fetchEquipments();
   }, []);
