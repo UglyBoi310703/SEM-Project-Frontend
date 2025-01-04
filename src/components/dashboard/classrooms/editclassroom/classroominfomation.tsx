@@ -89,7 +89,15 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
     "phòng kho thiết bị": "WAREHOUSE",
     "phòng hội thảo": "MEETING_ROOM",
   };
-
+  const EquipmentCategoryMapping: Record<
+  "TEACHING_EQUIPMEN" | "ELECTRIC_EQUIPMENT" | "SPORTS_EQUIPMENT" | "LABORATORY_EQUIPMENT" ,
+  string
+> = {
+  "TEACHING_EQUIPMEN": "Thiết bị giảng dạy",
+  "ELECTRIC_EQUIPMENT": "Thiết bị giảng dạy",
+  "SPORTS_EQUIPMENT": "Thiết bị thể thao",
+  "LABORATORY_EQUIPMENT": "Thiết bị phòng thí nghiệm"
+};
   const {
     register,
     handleSubmit,
@@ -117,7 +125,6 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
   const [addDeviceDialogOpen, setAddDeviceDialogOpen] = React.useState(false);
   const [selectedDevices, setSelectedDevices] = React.useState<EquipmentDetail[]>([]);
   const [roomList, setRoomList] = React.useState<Classroom[]>([]);
-  const [roomData, setRoomD] = React.useState<Classroom>()
   const [roomNameError, setRoomNameError] = React.useState("");
   const [selectedType, setSelectedType] = React.useState(
     ClassMapping[room.type as keyof typeof ClassMapping]
@@ -126,12 +133,12 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
   const handleTypeChange = (event: SelectChangeEvent) => {
     setSelectedType(event.target.value);  
   };
+  const fetchEquipments = async () => {
+    const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
+    setSelectedDevices(equipmentsInRoom.content)
+  }
 
   React.useEffect(()=> {
-    const fetchEquipments = async () => {
-      const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
-      setSelectedDevices(equipmentsInRoom.content)
-    }
     fetchEquipments()
   }, [room])
   
@@ -185,6 +192,12 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
         }else{
           if (!selectedDevices.find((d) => d.serialNumber === device.serialNumber)) {
             setSelectedDevices([...selectedDevices, device]);
+            if(device){
+              const ClassRoomEquipmentId = {
+                equipmentDetailIds: [device.id]
+              }
+              await APIUpdateEquipmentDetailLocation(room.id, ClassRoomEquipmentId)
+            }
           }
         }
       }
@@ -193,37 +206,7 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
 
   
   };
-  // const handleRemoveDevice = async (seri: string) => {
-  //   try {
-     
-  //     const deviceDetailResponse =  await APIgetAllEquipmentDetail(seri) 
-  //     const deviceDetail = deviceDetailResponse.content[0] 
-  //     const roomsResponse = await APIGetRoom('WAREHOUSE');
-  //     const room =roomsResponse.content[0];
-  //       const updatePayload = {
-  //       description: deviceDetail.description,
-  //       purchaseDate: deviceDetail.purchaseDate,
-  //       equipmentId: deviceDetail.id,  
-  //       roomId: room.id, // `id` của phòng "Nhà kho"
-  //     };  
-  //     const result = await Swal.fire({
-  //       title: "Xác nhận thêm thiết bị",
-  //       text: `Bạn có muốn xóa thiết bị khỏi phòng ?`,
-  //       icon: "warning",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#3085d6",
-  //       cancelButtonColor: "#d33",
-  //       confirmButtonText: "Xác nhận",
-  //       cancelButtonText: "Hủy",
-  //     });
-  //     if(result.isConfirmed){
-  //       await APIUpdateEquipmentDetail(deviceDetail.id, updatePayload)
-  //       toast.info("Thiết bị đã được xóa khỏi phòng học");
-  //         return
-  //     }}catch {
-
-  //   }
-  // };
+   
   
 
   const onSubmit = async (data) => {
@@ -262,12 +245,7 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
         type: data.type,
         capacity: parseInt(data.capacity, 10),
       };
-      if(equipmentDetailIds.length > 0){
-        const ClassRoomEquipmentId = {
-          equipmentDetailIds: equipmentDetailIds
-        }
-        await APIUpdateEquipmentDetailLocation(room.id, ClassRoomEquipmentId)
-      }
+    
       
       await APIModifyClassRoom(room.id, newClassroom);
 
@@ -413,10 +391,10 @@ function ClassRoomInformation({ room, onUpdateRoom }: ClassroomProps): React.JSX
                                   <TableRow key={device.serialNumber}>
                                     <TableCell>{device.serialNumber}</TableCell>
                                     <TableCell>{device.equipmentName}</TableCell>
-                                    <TableCell>{device.category}</TableCell>
+                                    <TableCell>{EquipmentCategoryMapping[device.category]}</TableCell>
                                     <TableCell><Chip color={color} label={label} size="small" /></TableCell>
                                     <TableCell>
-                                     <ChangeDeviceLocationDialog/>
+                                    <ChangeDeviceLocationDialog device={device} room={room} fetchEquipments={fetchEquipments} />
                                     </TableCell>
                                   </TableRow>
                                 )

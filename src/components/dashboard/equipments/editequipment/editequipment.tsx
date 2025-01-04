@@ -42,7 +42,15 @@ const validationSchema = yup.object().shape({
 function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: { equipmentDetail: EquipmentDetail, equipmentCategory:Equipment }): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [roomCategories, setRoomCategories] = useState<Classroom[]>([])
-
+  
+  const StatusMapping: Record<
+  "Có thể sử dụng" | "Đang sử dụng" | "Hỏng" ,
+  string
+> = {
+  "Có thể sử dụng": "USABLE",
+  "Đang sử dụng": "OCCUPIED",
+  "Hỏng": "BROKEN"
+};
   const {
     getValues,
     register,
@@ -56,7 +64,7 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
         ? dayjs(equipmentDetail.purchaseDate, 'DD-MM-YYYY')
         :  '',
       roomName: equipmentDetail.roomName,
-      status: equipmentDetail.status,
+      status: StatusMapping[equipmentDetail.status as keyof typeof StatusMapping],
       notes: equipmentDetail.description,
     },
     resolver: yupResolver(validationSchema),
@@ -69,7 +77,7 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
           ? dayjs(equipmentDetail.purchaseDate, 'DD-MM-YYYY')
           : '',
         roomName: equipmentDetail.roomName,
-        status: equipmentDetail.status,
+        status: StatusMapping[equipmentDetail.status as keyof typeof StatusMapping],
         notes: equipmentDetail.description,
       });
     }
@@ -140,10 +148,13 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
         const EditedData = {
           "description": data.notes, 
           "purchaseDate": purchaseDate,
+          "status":data.status,
           "equipmentId": equipmentCategory.id,
           "roomId": roomId  
         }  ;
-   
+        
+        console.log(data);
+        
         
         await APIUpdateEquipmentDetail(equipmentDetail.id, EditedData)
         // Gửi dữ liệu đến API hoặc thực hiện xử lý tiếp theo
@@ -170,7 +181,7 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
         ? dayjs(equipmentDetail.purchaseDate, 'DD-MM-YYYY')
         : null,
       roomName: equipmentDetail.roomName,
-      status: equipmentDetail.status,
+      status: StatusMapping[equipmentDetail.status as keyof typeof StatusMapping],
       notes: equipmentDetail.description,
     });
   };
@@ -235,13 +246,13 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
             <FormControl fullWidth margin="normal">
               <InputLabel>Trạng thái</InputLabel>
               <Select
-                defaultValue={equipmentDetail.status || 'Có thể sử dụng'}
+                defaultValue={StatusMapping[equipmentDetail.status as keyof typeof StatusMapping] || 'Có thể sử dụng'}
                 {...register('status')}
                 error={!!errors.status}
               >
-                <MenuItem value="Có thể sử dụng">Có thể sử dụng</MenuItem>
-                <MenuItem value="Hỏng">Hỏng</MenuItem>
-                <MenuItem value="Đang sử dụng">Đang sử dụng</MenuItem>
+                <MenuItem value="USABLE">Có thể sử dụng</MenuItem>
+                <MenuItem value="BROKEN">Hỏng</MenuItem>
+                <MenuItem value="OCCUPIED">Đang sử dụng</MenuItem>
               </Select>
               <Typography variant="caption" color="error">
                 {errors.status?.message}
