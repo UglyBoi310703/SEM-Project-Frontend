@@ -24,6 +24,7 @@ export interface UserPopoverProps {
 }
 
 export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
+  
   const { checkSession } = useUser();
   const router = useRouter();
   const [user, setUser] = React.useState<{ username: string; email: string } | null>(null);

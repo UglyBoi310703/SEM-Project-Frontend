@@ -11,10 +11,13 @@ import {
   TablePagination,
   Box,
   Typography,
+  OutlinedInput,
+  InputAdornment,
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { APIGetAdminBorrowRoomRequests } from "@/utils/api"; // Import hàm API
+import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
 
 interface RoomBorrowRecord {
   uniqueId: number;
@@ -33,6 +36,7 @@ function RoomBorrowTable(): React.JSX.Element {
   const [roomBorrowData, setRoomBorrowData] = useState<RoomBorrowRecord[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [borrowDate, setBorrowDate] = useState<Date | null>(null);
+  const [emailSearch,setemailSearch] = useState("");
 
   const fetchBorrowRequests = async () => {
 
@@ -46,7 +50,7 @@ function RoomBorrowTable(): React.JSX.Element {
         page,
         size: rowsPerPage,
         sort: [],
-        email: "", // Nếu cần lọc thêm
+        email: emailSearch, // Nếu cần lọc thêm
         startDate: localISODate,
         endDate: "", // Có thể thêm logic lấy endDate
       };
@@ -61,7 +65,7 @@ function RoomBorrowTable(): React.JSX.Element {
 
   useEffect(() => {
     fetchBorrowRequests();
-  }, [page, rowsPerPage, borrowDate]);
+  }, [page, rowsPerPage, borrowDate,emailSearch]);
 
   const handleDateChange = (date: Date | null) => {
     setBorrowDate(date);
@@ -83,23 +87,34 @@ function RoomBorrowTable(): React.JSX.Element {
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
           bgcolor: "background.paper",
           boxShadow: 1,
           mb: 2,
           p: 2,
         }}
       >
+          <OutlinedInput value={emailSearch}
+          onChange={(e) => setemailSearch(e.target.value)}
+          placeholder="Nhập email"
+          startAdornment={
+            <InputAdornment position="start">
+              <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
+            </InputAdornment>
+          }
+          sx={{ maxWidth: "220px" }}
+        />
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 2,
+            ml:5
           }}
         >
-          <Typography variant="h6">Bộ lọc:</Typography>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <Typography width={70} variant="h6">Bộ lọc:</Typography>
+          <LocalizationProvider  dateAdapter={AdapterDateFns}>
             <DatePicker
+              sx={{maxWidth:"220px"}}
               label="Ngày mượn từ:"
               value={borrowDate}
               onChange={handleDateChange}
@@ -107,7 +122,6 @@ function RoomBorrowTable(): React.JSX.Element {
           </LocalizationProvider>
         </Box>
       </Box>
-
       <TableContainer component={Paper}>
         <Table>
           <TableHead>

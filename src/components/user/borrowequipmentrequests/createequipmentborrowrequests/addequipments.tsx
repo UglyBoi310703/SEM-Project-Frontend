@@ -1,4 +1,4 @@
-"use client";
+// Đoạn mã sửa đổi
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -22,7 +22,6 @@ import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/di
 import { APIGetAllEquipment } from "@/utils/api";
 import type { Equipment } from "@/components/dashboard/equipments/equipment-categories-table";
 
-
 interface AddEquipmentsProps {
   onAdd: (device: Equipment, maxQuantity: number) => void;
   selectedDeviceNames: string[];
@@ -33,7 +32,7 @@ function AddEquipments({ onAdd, selectedDeviceNames }: AddEquipmentsProps): Reac
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  
+
   // Fetch dữ liệu từ API
   useEffect(() => {
     const fetchEquipment = async () => {
@@ -158,9 +157,14 @@ function AddEquipments({ onAdd, selectedDeviceNames }: AddEquipmentsProps): Reac
                     <Button
                       variant="contained"
                       onClick={() => onAdd(row, row.usableQuantity)}
-                      disabled={selectedDeviceNames.includes(row.equipmentName)}
+                      disabled={
+                        row.usableQuantity === 0 ||
+                        selectedDeviceNames.includes(row.equipmentName)
+                      }
                     >
-                      {selectedDeviceNames.includes(row.equipmentName) ? "Đã chọn" : "Thêm"}
+                      {selectedDeviceNames.includes(row.equipmentName)
+                        ? "Đã chọn"
+                        : "Thêm"}
                     </Button>
                   </TableCell>
                 </TableRow>

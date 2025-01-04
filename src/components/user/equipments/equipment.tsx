@@ -12,25 +12,58 @@ import Divider from '@mui/material/Divider';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import { FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, TablePagination } from '@mui/material';
 import { APIGetAllEquipment } from '@/utils/api';
 import type { Equipment } from '@/components/dashboard/equipments/equipment-categories-table';
 
 export function EquipmentsTable(): React.JSX.Element {
   const [equipmentCategories, setEquipmentCategories] = useState<Equipment[]>([]);
+  const [totalElements, setTotalElements] = useState(0);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(5); // Kích thước mỗi trang
+  const [keyword, setKeyword] = useState('');
+  const [category, setCategory] = useState("ALL");
 
-  // Fetch dữ liệu từ API
-  useEffect(() => {
-    const fetchEquipment = async () => {
-      try {
-        const data = await APIGetAllEquipment();
-        setEquipmentCategories(data.content);
-      } catch (err) {
-        console.error("Error fetching equipment data", err);
+  const fetchEquipment = async () => {
+    
+    try {
+      
+      const data = await APIGetAllEquipment({
+        category: category === "ALL" ? "" : category,
+        keyword: keyword,
+        page,
+        size: size,
       }
-    };
+      );
+      setEquipmentCategories(data.content);
+      setTotalElements(data.page.totalElements);
+    } catch (err) {
+      console.error('Error fetching equipment data', err);
+    }
+  };
+
+  useEffect(() => {
     fetchEquipment();
-  }, []);
+  }, [page, size, keyword, category]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setKeyword(e.target.value);
+    setPage(0); // Reset về trang đầu
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setCategory(e.target.value as string);
+    setPage(0); // Reset về trang đầu
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSize(parseInt(event.target.value, 10));
+    setPage(0); // Reset về trang đầu
+  };
 
   return (
     <Box>
@@ -47,25 +80,25 @@ export function EquipmentsTable(): React.JSX.Element {
         }}
       >
         <OutlinedInput
-          placeholder="Tìm kiếm"
+          placeholder="Nhập tên thiết bị"
+          value={keyword}
+          onChange={handleSearch}
           startAdornment={
             <InputAdornment position="start">
               <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
             </InputAdornment>
           }
-          sx={{ maxWidth: '500px' }}
+          sx={{ maxWidth: '250px' }}
         />
 
-        <FormControl sx={{ minWidth: 200 }} size="small">
+        <FormControl sx={{ minWidth: 150 }} size="small">
           <InputLabel>Loại thiết bị</InputLabel>
-          <Select
-            value="Tất cả"
-            name="deviceType"
-            label="Loại thiết bị"
-          >
-            <MenuItem value="Tất cả">Tất cả</MenuItem>
-            <MenuItem value="Phòng học">Phòng học</MenuItem>
-            <MenuItem value="Hỗ trợ">Hỗ trợ</MenuItem>
+          <Select value={category} onChange={handleCategoryChange} label="Loại thiết bị">
+            <MenuItem value="ALL">Tất cả</MenuItem>
+            <MenuItem value="TEACHING_EQUIPMENT">Thiết bị giảng dạy</MenuItem>
+            <MenuItem value="ELECTRIC_EQUIPMENT">Thiết bị điện</MenuItem>
+            <MenuItem value="SPORTS_EQUIPMENT">Thiết bị thể thao</MenuItem>
+            <MenuItem value="LABORATORY_EQUIPMENT">Thiết bị phòng thí nghiệm</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -99,7 +132,18 @@ export function EquipmentsTable(): React.JSX.Element {
         </Table>
       </Box>
 
-      <Divider />
+      <Divider sx={{ my: 2 }} />
+
+      <TablePagination
+        component="div"
+        count={totalElements}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={size}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        labelRowsPerPage="Số dòng mỗi trang"
+      />
     </Box>
   );
 }

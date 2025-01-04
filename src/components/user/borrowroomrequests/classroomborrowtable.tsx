@@ -138,28 +138,25 @@ function RoomBorrowTable(): React.JSX.Element {
           mb: 2,
         }}
       >
-         <Box  sx={{
-          width:"300px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent:"space-between",
-          bgcolor: "background.paper",
-          boxShadow: 1,
-          mb: 2,
-        }}>
-         <Typography variant="h6" sx={{ flexGrow: 2 }}>
-            Bộ lọc:
-          </Typography>
+         <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}>
+          <Typography variant="h6" sx={{ flexGrow: 2 }}>
+              Chọn ngày mượn
+            </Typography>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DatePicker
+          <DatePicker
              sx={{ maxWidth: 200 }}
-              label="Ngày mượn từ:"
+              label="Từ:"
               value={BorrowDate}
               onChange={(date) => handleDateChange(date)}
               renderInput={(params) => <FormControl {...params} size="small" />}
             />
+        
           </LocalizationProvider>
-         </Box>
+          </Box>
         <CreateBorrowRoomRequest onBorrowRequestCreated={fetchBorrowRequests} />
       </Box>
 

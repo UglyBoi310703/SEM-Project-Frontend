@@ -2,35 +2,24 @@
 
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Badge from '@mui/material/Badge';
+
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
-import { Bell as BellIcon } from '@phosphor-icons/react/dist/ssr/Bell';
 import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
-import { NotificationsPopover } from '../popover/notifications/notifications-popover';
 import { usePopover } from '@/hooks/use-popover';
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from '../popover/user-popover';
-import { Typography } from '@mui/material';
+import { Alert, Typography } from '@mui/material';
+import { NotificationsPopover } from '../popover/notifications/notifications-popover';
+
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
   const userPopover = usePopover<HTMLDivElement>();
 
   // State for Notifications Popover
-  const [notificationsAnchorEl, setNotificationsAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const handleNotificationsOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setNotificationsAnchorEl(event.currentTarget);
-  };
-
-  const handleNotificationsClose = () => {
-    setNotificationsAnchorEl(null);
-  };
-
-  const notificationsOpen = Boolean(notificationsAnchorEl);
   const contents = [
     "SEM APP Chúc bạn có một ngày làm việc hiệu quả.",
     "WELCOME TO SEM APP! (School Equipment Management App).",
@@ -38,6 +27,7 @@ export function MainNav(): React.JSX.Element {
     "Cảm ơn bạn đã sử dụng SEM APP, chúc bạn một ngày tốt lành.",
     
   ];
+  
   const [currentContent, setCurrentContent] = React.useState(contents[0]);
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -47,6 +37,27 @@ export function MainNav(): React.JSX.Element {
 
     return () => clearInterval(interval); // Dọn dẹp interval khi component bị hủy
   }, [contents]);
+//  React.useEffect(() => {
+//     const eventSource = new EventSource('http://localhost:8080/api/v1/notifications/subscribe',
+//       {
+//         withCredentials:true
+//       }
+//     );
+  
+//     eventSource.addEventListener('notification', (event) => {
+//       console.log('Received notification:', event.data);
+//       // Thực hiện xử lý khác, ví dụ: hiển thị thông báo
+//       alert(`Thông báo nhận được: ${event.data}`);
+//     });
+//     eventSource.onerror = () => {
+//       console.error('SSE connection error');
+//       eventSource.close();
+//     };
+  
+//     return () => {
+//       eventSource.close();
+//     };
+//   }, []);
 
   return (
     <React.Fragment>
@@ -115,13 +126,7 @@ export function MainNav(): React.JSX.Element {
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             {/* Notifications */}
-            <Tooltip title="Thông báo">
-              <Badge badgeContent={4} color="success" variant="dot">
-                <IconButton onClick={handleNotificationsOpen}>
-                  <BellIcon />
-                </IconButton>
-              </Badge>
-            </Tooltip>
+              <NotificationsPopover/>
 
             {/* Avatar */}
             <Avatar
@@ -133,13 +138,6 @@ export function MainNav(): React.JSX.Element {
           </Stack>
         </Stack>
       </Box>
-
-      {/* Notifications Popover */}
-      <NotificationsPopover
-        anchorEl={notificationsAnchorEl}
-        onClose={handleNotificationsClose}
-        open={notificationsOpen}
-      />
 
       {/* User Popover */}
       <UserPopover anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />

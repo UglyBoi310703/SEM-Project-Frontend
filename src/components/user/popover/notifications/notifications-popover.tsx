@@ -1,60 +1,144 @@
-"use client"
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import List from '@mui/material/List';
-import Popover from '@mui/material/Popover';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
-import { NotificationListItem } from './notification-list-item';
-import { NotificationsDialog } from './notifications-dialog';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Badge from "@mui/material/Badge";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Popover from "@mui/material/Popover";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import List from "@mui/material/List";
+import Button from "@mui/material/Button";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { Bell as BellIcon } from "@phosphor-icons/react/dist/ssr/Bell";
+import { APIGetAllMessages, APIMarkAsRead } from "@/utils/api";
+import { NotificationListItem } from "./notification-list-item";
+import { NotificationsDialog } from "./notifications-dialog";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export interface NotificationsPopoverProps {
-  anchorEl: Element | null;
-  onClose: () => void;
-  open: boolean;
+export interface Notifications {
+  id: number;
+  message: string;
+  read: boolean;
+  time: string;
 }
 
-export function NotificationsPopover({ anchorEl, onClose, open }: NotificationsPopoverProps): React.JSX.Element {
-  const [tabValue, setTabValue] = React.useState('all');
+export function NotificationsPopover(): React.JSX.Element {
+  const [notificationsAnchorEl, setNotificationsAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [tabValue, setTabValue] = React.useState("all");
+  const [notifications, setNotifications] = React.useState<Notifications[]>([]);
+  const [loading, setLoading] = React.useState(false);
   const [showAllDialog, setShowAllDialog] = React.useState(false);
+
+  const open = Boolean(notificationsAnchorEl);
+
+  // Fetch notifications on mount
+    const fetchNotifications = React.useCallback(async () => {
+      setLoading(true);
+      try {
+        const response = await APIGetAllMessages(); // Gọi API lấy thông báo
+        setNotifications(response);
+      } catch (error) {
+        console.error("Không thể tải thông báo:", error);
+      } finally {
+        setLoading(false);
+      }
+    }, []);
+  
+    // Fetch notifications khi component mount
+    React.useEffect(() => {
+      fetchNotifications();
+    }, [fetchNotifications]);
+  
+    
+   React.useEffect(() => {
+      const eventSource = new EventSource('http://localhost:8080/api/v1/notifications/subscribe',
+        {
+          withCredentials:true
+        }
+      );
+    
+      eventSource.addEventListener('notification', (event) => {
+        console.log('Received notification:', event.data);
+        // Thực hiện xử lý khác, ví dụ: hiển thị thông báo
+        toast.info(`Thông báo mới: ${event.data}`, { position: "top-center" });
+        fetchNotifications();
+       
+      });
+      eventSource.onerror = () => {
+        console.error('SSE connection error');
+        eventSource.close();
+      };
+    
+      return () => {
+        eventSource.close();
+      };
+    }, []);
+
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationsAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setNotificationsAnchorEl(null);
+  };
+
+  const handleOpenDialog = () => {
+    handleClose();
+    setShowAllDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setShowAllDialog(false);
+  };
 
   const handleChangeTab = (event: React.SyntheticEvent, newValue: string) => {
     setTabValue(newValue);
   };
 
-  // Hàm mở Dialog và đóng Popover
-  const handleOpenDialog = () => {
-    onClose(); // Đóng Popover
-    setShowAllDialog(true); // Mở Dialog
-  };
+  // Số lượng thông báo chưa đọc
+  const unreadCount = notifications.filter((notification) => !notification.read).length;
 
-  const handleCloseDialog = () => {
-    setShowAllDialog(false); // Đóng Dialog
-  };
-
-  const notifications = [
-    { id: 1, type: 'BorrowEquipmentRequest', message: 'Đươn mượn thiết bị mã ORD đã được phê duyệt', isRead: false, time: '2 giờ trước' },
-    { id: 2, type: 'BorrowRoomRequest', message: 'Đơn mượn phòng BRR-09 đã được phê duyệt', isRead: true, time: '1 ngày trước' },
-    { id: 3, type: 'CrashReports', message: 'Báo cáo sự cố mã CR-010', isRead: false, time: '3 giờ trước' },
-    { id: 4, type: 'BorrowEquipmentRequest', message: 'Đơn mượn thiết bị mã BER-10 đã bị từ chối', isRead: true, time: '2 ngày trước' },
-  ];
-
-  const filteredNotifications = notifications.filter((n) => {
-    if (tabValue === 'unread') return !n.isRead;
-    return true;
-  });
+  const filteredNotifications =
+    tabValue === "all"
+      ? notifications
+      : notifications.filter((notification) => !notification.read);
 
   return (
-    <>
+    <Box sx={{
+      backgroundColor:"#EEEEEE",
+      borderRadius:"20px"
+    }}>
+      {/* Bell Icon with Badge */}
+      <Tooltip title="Thông báo">
+        <Badge
+          badgeContent={unreadCount}
+          color="error"
+          max={99}
+          sx={{
+            "& .MuiBadge-badge": {
+              right: 10,
+              top: 5,
+              fontSize: "0.75rem",
+              height: "16px",
+              minWidth: "15px",
+            },
+          }}
+        >
+          <IconButton onClick={handleOpen}>
+            <BellIcon />
+          </IconButton>
+        </Badge>
+      </Tooltip>
+
+      {/* Notifications Popover */}
       <Popover
-        anchorEl={anchorEl}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        onClose={onClose}
+        anchorEl={notificationsAnchorEl}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        onClose={handleClose}
         open={open}
-        slotProps={{ paper: { sx: { width: '360px' } } }}
+        slotProps={{ paper: { sx: { width: "360px" } } }}
       >
         {/* Header */}
         <Box sx={{ px: 2, py: 1 }}>
@@ -71,22 +155,40 @@ export function NotificationsPopover({ anchorEl, onClose, open }: NotificationsP
         </Tabs>
         <Divider />
 
-        {/* Danh sách thông báo */}
+        {/* Notifications List */}
         <Box>
-          <List sx={{ maxHeight: '300px', overflow: 'auto' }}>
-            {filteredNotifications.slice(0, 3).map((item) => (
-              <NotificationListItem
-                key={item.id}
-                type={item.type}
-                message={item.message}
-                isRead={item.isRead}
-                time={item.time}
-                onClick={onClose} // Đóng Popover khi nhấn vào thông báo
-              />
-            ))}
+          <List sx={{ maxHeight: "300px", overflow: "auto" }}>
+            {loading ? (
+              <Typography sx={{ textAlign: "center", mt: 2 }}>Đang tải...</Typography>
+            ) : filteredNotifications.length === 0 ? (
+              <Typography sx={{ textAlign: "center", mt: 2 }}>
+                Không có thông báo nào.
+              </Typography>
+            ) : (
+              filteredNotifications.map((item) => (
+                <NotificationListItem
+                  key={item.id}
+                  message={item.message}
+                  isRead={item.read}
+                  time={item.time}
+                  onClick={async () => {
+                    try {
+                      await APIMarkAsRead(item.id); // Gọi API đánh dấu đã đọc
+                      setNotifications((prevNotifications) =>
+                        prevNotifications.map((notification) =>
+                          notification.id === item.id ? { ...notification, read: true } : notification
+                        )
+                      ); // Cập nhật trạng thái cục bộ
+                    } catch (error) {
+                      console.error("Không thể đánh dấu thông báo đã đọc:", error);
+                    }
+                  }}
+                />
+              ))
+            )}
           </List>
-          <Box sx={{ textAlign: 'center', p: 1 }}>
-            {/* Nút Xem tất cả */}
+          <Box sx={{ textAlign: "center", p: 1 }}>
+            {/* Button to view all */}
             <Button onClick={handleOpenDialog} size="small">
               Xem tất cả
             </Button>
@@ -94,12 +196,12 @@ export function NotificationsPopover({ anchorEl, onClose, open }: NotificationsP
         </Box>
       </Popover>
 
-      {/* Dialog hiển thị danh sách đầy đủ */}
+      {/* Notifications Dialog */}
       <NotificationsDialog
         open={showAllDialog}
         onClose={handleCloseDialog}
-        tabValue={tabValue}
+        notifications={notifications}
       />
-    </>
+    </Box>
   );
 }

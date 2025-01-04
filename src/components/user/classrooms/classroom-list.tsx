@@ -97,7 +97,7 @@ export default function ClassroomList(): React.JSX.Element {
             Bộ lọc:
           </Typography>
 
-          <FormControl sx={{ minWidth: 200 }} size="small">
+          <FormControl sx={{ minWidth: 150 }} size="small">
             <InputLabel>Trạng thái</InputLabel>
             <Select
               value={roomStatus}
@@ -112,7 +112,7 @@ export default function ClassroomList(): React.JSX.Element {
             </Select>
           </FormControl>
 
-          <FormControl sx={{ minWidth: 200 }} size="small">
+          <FormControl sx={{ minWidth: 150 }} size="small">
             <InputLabel>Loại phòng</InputLabel>
             <Select
               value={roomType}
@@ -128,15 +128,6 @@ export default function ClassroomList(): React.JSX.Element {
               <MenuItem value="OFFICE">Văn phòng</MenuItem>
             </Select>
           </FormControl>
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={fetchRooms}
-            sx={{ whiteSpace: "nowrap" }}
-          >
-            Áp dụng
-          </Button>
         </Box>
       </Box>
 

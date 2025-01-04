@@ -1,3 +1,4 @@
+"use client"
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -16,6 +17,7 @@ import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 import { useUser } from '@/hooks/use-user';
 
+
 export interface UserPopoverProps {
   anchorEl: Element | null;
   onClose: () => void;
@@ -23,25 +25,45 @@ export interface UserPopoverProps {
 }
 
 export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
+  
   const { checkSession } = useUser();
-
   const router = useRouter();
+  const [user, setUser] = React.useState<{ username: string; email: string } | null>(null);
+  const eventSourceRef = React.useRef<EventSource | null>(null); // Quản lý SSE
+
+  const fetchUserInfo = React.useCallback(async (): Promise<void> => {
+    try {
+      const { data, error } = await authClient.getMyInfo();
+      if (error) {
+        logger.error('Failed to fetch user info', error);
+        return;
+      }
+      setUser(data || null);
+    } catch (err) {
+      logger.error('An error occurred while fetching user info', err);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchUserInfo().catch((err: unknown) => logger.error(err));
+  }, [fetchUserInfo]);
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
-      const { error } = await authClient.signOut();
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        console.log('SSE connection closed during sign out.');
+        eventSourceRef.current = null;
+      }
 
+      const { error } = await authClient.signOut();
       if (error) {
         logger.error('Sign out error', error);
         return;
       }
 
-      // Refresh the auth state
       await checkSession?.();
-
-      // UserProvider, for this case, will not refresh the router and we need to do it manually
       router.refresh();
-      // After refresh, AuthGuard will handle the redirect
     } catch (err) {
       logger.error('Sign out error', err);
     }
@@ -56,10 +78,18 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
       slotProps={{ paper: { sx: { width: '240px' } } }}
     >
       <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">Ugly Boi</Typography>
-        <Typography color="text.secondary" variant="body2">
-          uglyboi3107@gmail.com
-        </Typography>
+        {user ? (
+          <>
+            <Typography variant="subtitle1">{user.username}</Typography>
+            <Typography color="text.secondary" variant="body2">
+              {user.email}
+            </Typography>
+          </>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            Đang tải thông tin người dùng...
+          </Typography>
+        )}
       </Box>
       <Divider />
       <MenuList disablePadding sx={{ p: '8px', '& .MuiMenuItem-root': { borderRadius: 1 } }}>

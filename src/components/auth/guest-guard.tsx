@@ -3,11 +3,11 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '@mui/material/Alert';
+import { useSnackbar } from 'notistack';
 
 import { paths } from '@/paths';
 import { logger } from '@/lib/default-logger';
 import { useUser } from '@/hooks/use-user';
-
 
 export interface GuestGuardProps {
   children: React.ReactNode;
@@ -15,9 +15,10 @@ export interface GuestGuardProps {
 
 export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | null {
   const router = useRouter();
-  
+  const eventSourceRef = React.useRef<EventSource | null>(null);
   const { user, error, isLoading } = useUser();
   const [isChecking, setIsChecking] = React.useState<boolean>(true);
+
 
   const checkPermissions = async (): Promise<void> => {
     if (isLoading) {
@@ -31,14 +32,13 @@ export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | n
 
     if (user) {
       logger.debug('[GuestGuard]: User is logged in, redirecting to dashboard');
-      if(user.role ==="ROLE_ADMIN"){
+
+      if (user.role === 'ROLE_ADMIN') {
         router.replace(paths.dashboard.equipments);
-        
-      }else{
+      } else {
         router.replace(paths.user.equipments);
-          
       }
-    
+
       return;
     }
 
@@ -46,9 +46,14 @@ export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | n
   };
 
   React.useEffect(() => {
-    checkPermissions().catch(() => {
-      // noop
-    });
+    checkPermissions().catch((err) => console.error('Error checking permissions:', err));
+
+    return () => {
+      // Cleanup khi component bị unmount
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Expected
   }, [user, error, isLoading]);
 

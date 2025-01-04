@@ -23,8 +23,9 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import BorrowEquipmentDetail from './equipmentborrowdetail';
 import UpdateBorrowEquipmentRequest from './edit-borrowequipment-request';
+
 import CreateBorrowEquipmentRequest from './createequipmentborrowrequests/create-equipmentborrow';
-import { APIGetFilteredBorrowEquipmentRequests, APIGetBorrowEquipmentDetails,APIBatchDeleteBorrowEquipments  } from '@/utils/api';
+import { APIGetFilteredBorrowEquipmentRequests,APIBatchDeleteBorrowEquipments  } from '@/utils/api';
 
 interface BorrowRecord {
   borrowId: number;
@@ -33,13 +34,15 @@ interface BorrowRecord {
   comment:string;
   expectedReturnDate: string;
   conditionbeforeborrow:string;
-  status: 'BORROWED'|'NOT_BORROWED'| 'RETURNED';
+  status: 'BORROWED'|'NOT_BORROWED'| 'RETURNED' | 'REJECTED'|'OVERDUE';
 }
 
 const statusMap = {
   BORROWED: { label: 'Đã duyệt', color: 'success' },
   NOT_BORROWED: { label: 'Chờ duyệt', color: 'warning' },
-  RETURNED: { label: 'Đã trả', color: 'info' },
+  OVERDUE: { label: "Quá hạn", color: "error" },
+  RETURNED: { label: "Đã trả", color: "info" },
+  REJECTED: { label: "Bị từ chối", color: "secondary" },
 } as const;
 
 function EquipmentBorrowTable() {
@@ -48,8 +51,6 @@ function EquipmentBorrowTable() {
   const [equipmentBorrowRequestStatus, setEquipmentBorrowRequestStatus] = useState<string[]>([]);
   const [borrowData, setBorrowData] = useState<BorrowRecord[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [selectedBorrowDetail, setSelectedBorrowDetail] = useState<any | null>(null);
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const status = equipmentBorrowRequestStatus === "Tất cả" ? [] : equipmentBorrowRequestStatus;
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -122,26 +123,8 @@ function EquipmentBorrowTable() {
     setPage(0);
   };
 
-  const handleOpenDetailDialog = async (borrowId: string) => {
-    try {
-      const detailResponse = await APIGetBorrowEquipmentDetails(Number(borrowId));
-      const teacherName = borrowData.find((record) => record.borrowId === borrowId)?.teacherName || 'Unknown';
-      const status = borrowData.find((record) => record.borrowId === borrowId)?.status || 'Unknown';
-      setSelectedBorrowDetail({
-        ...detailResponse,
-        teacherName,
-        status,
-      });
-      setDetailDialogOpen(true);
-    } catch (error) {
-      console.error('Error fetching borrow detail:', error);
-    }
-  };
 
-  const handleCloseDetailDialog = () => {
-    setDetailDialogOpen(false);
-    setSelectedBorrowDetail(null);
-  };
+
 const handleCancelBorrowRequest = async (id: number) => {
     Swal.fire({
       title: `Bạn có chắc chắn muốn hủy đơn mượn thiết bị mã ${id} ?`,
@@ -249,6 +232,7 @@ const handleCancelBorrowRequest = async (id: number) => {
               <TableCell>Tên giáo viên</TableCell>
               <TableCell>Ngày mượn</TableCell>
               <TableCell>Ngày trả dự kiến</TableCell>
+              <TableCell>Ghi chú</TableCell>
               <TableCell>Trạng thái</TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -263,22 +247,22 @@ const handleCancelBorrowRequest = async (id: number) => {
         <TableCell>{row.teacherName}</TableCell>
         <TableCell>{row.borrowDate}</TableCell>
         <TableCell>{row.expectedReturnDate}</TableCell>
+        <TableCell>{row.comment}</TableCell>
         <TableCell>
           <Chip color={color} label={label} size="small" />
         </TableCell>
         <TableCell>
           {isNotBorrow ? (
-            <>
-              <Button size="small" variant="contained"  style={{ marginRight: 8 }} onClick={() => handleOpenDetailDialog(row.borrowId)}>
-                Chi tiết
-              </Button>
+            <Box sx={{
+              display:"flex"
+            }}>
+              <BorrowEquipmentDetail borrowinfo={row} requestId={row.borrowId} />
               <UpdateBorrowEquipmentRequest
                 borrowRequestId={row.borrowId}
                 message={row.comment}
-                conditionbeforborrow={row.conditionBeforeBorrow}
+                conditionbeforborrow={row.conditionbeforeborrow}
                 returnDate={row.expectedReturnDate}
               />
-              
               <Button
                 variant="outlined"
                 color="error"
@@ -288,11 +272,9 @@ const handleCancelBorrowRequest = async (id: number) => {
               >
                 Huỷ
               </Button>
-            </>
+            </Box>
           ) : (
-            <Button size="small" variant="contained" onClick={() => handleOpenDetailDialog(row.borrowId)}>
-              Chi tiết
-            </Button>
+            <BorrowEquipmentDetail borrowinfo={row} requestId={row.borrowId} />
           )}
         </TableCell>
       </TableRow>
@@ -310,22 +292,6 @@ const handleCancelBorrowRequest = async (id: number) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
-
-      {selectedBorrowDetail && (
-        <BorrowEquipmentDetail
-          open={detailDialogOpen}
-          onClose={handleCloseDetailDialog}
-          borrower={{
-            teacherName: selectedBorrowDetail.teacherName,
-            status: selectedBorrowDetail.status,
-          }}
-          devices={selectedBorrowDetail.details.map((detail) => ({
-            name: detail.equipmentName,
-            quantity: detail.quantityBorrowed,
-            serialNumbers: detail.borrowedEquipmentDetailCodes,
-          }))}
-        />
-      )}
     </Box>
   );
 }

@@ -18,7 +18,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   Chip,
-  TextField,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -30,7 +29,7 @@ interface BorrowerInfo {
   borrowDate: string;
   expectedReturnDate: string;
   comment: string;
-  status: "NOT_BORROWED" | "BORROWED" | "OVERDUE" | "PAID" |"REJECTED";
+  status: "NOT_BORROWED" | "BORROWED" | "OVERDUE" | "RETURNED" |"REJECTED";
 }
 
 interface Device {
@@ -52,7 +51,7 @@ const statusMap = {
   NOT_BORROWED: { label: "Chưa mượn", color: "warning" },
   BORROWED: { label: "Đã mượn", color: "success" },
   OVERDUE: { label: "Quá hạn", color: "error" },
-  PAID: { label: "Đã trả", color: "info" },
+  RETURNED: { label: "Đã trả", color: "info" },
   REJECTED: { label: "Bị từ chối", color: "secondary" },
 } as const;
 
@@ -218,7 +217,7 @@ function BorrowEquipmentDetail({ borrowinfo, requestId, onPageChanged }: DetailP
                   <Accordion key={device.id}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <ListItemText
-                        primary={`${device.name}`}
+                        primary={device.name}
                         secondary={`Số lượng mượn: ${device.quantity}`}
                       />
                     </AccordionSummary>
@@ -227,8 +226,8 @@ function BorrowEquipmentDetail({ borrowinfo, requestId, onPageChanged }: DetailP
                         Tình trạng trước khi mượn: {device.conditionBeforeBorrow}
                       </Typography>
                       <List disablePadding>
-                        {(device.serialNumbers || []).map((serial, idx) => (
-                          <ListItem key={idx}>
+                        {(device.serialNumbers || []).map((serial) => (
+                          <ListItem key={serial}>
                             <ListItemText primary={`Serial: ${serial}`} />
                           </ListItem>
                         ))}

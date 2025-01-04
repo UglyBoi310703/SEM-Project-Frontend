@@ -14,7 +14,7 @@ export interface Classroom {
   roomName: string;
   type: string;
   capacity:number;
-  status:'OCCUPIED' | 'AVAILABLE' | 'BROKEN';
+  status:'IN_USE' | 'AVAILABLE' | 'BROKEN';
 }
 
 export interface ClassroomCardProps {
@@ -23,7 +23,7 @@ export interface ClassroomCardProps {
 const statusMap = {
   BROKEN: { label: 'Đang bảo trì', color: 'secondary' },
   AVAILABLE: { label: 'Sẵn sàng', color: 'success' },
-  OCCUPIED: { label: 'Đang được sử dụng', color: 'warning' },
+  IN_USE: { label: 'Đang được sử dụng', color: 'warning' },
 } as const;
 
 export function ClassroomCard({ classroom }: ClassroomCardProps): React.JSX.Element {

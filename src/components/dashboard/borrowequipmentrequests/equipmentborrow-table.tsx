@@ -24,10 +24,11 @@ import {
 } from "@mui/material";
 import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { APIGetFilteredBorrowEquipmentRequests } from "@/utils/api";
+import { APIGetFilteredBorrowEquipmentRequests,APISetReturnBorrowEquipmentRequest } from "@/utils/api";
 import BorrowEquipmentDetail from "./equipmentborrow-detail";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import Swal from "sweetalert2"; 
 
 interface BorrowRecord {
   requestId: number;
@@ -35,19 +36,17 @@ interface BorrowRecord {
   borrowDate: string;
   expectedReturnDate: string;
   comment: string;
-  status: "NOT_BORROWED" | "BORROWED" | "OVERDUE" | "PAID" |"REJECTED";
+  status: "NOT_BORROWED" | "BORROWED" | "OVERDUE"|"REJECTED"|"RETURNED";
 }
 
 const statusMap = {
   NOT_BORROWED: { label: "Chưa mượn", color: "warning" },
   BORROWED: { label: "Đã mượn", color: "success" },
   OVERDUE: { label: "Quá hạn", color: "error" },
-  PAID: { label: "Đã trả", color: "info" },
+  RETURNED: { label: "Đã trả", color: "info" },
   REJECTED: { label: "Bị từ chối", color: "secondary" },
   
 } as const;
-
-
 
 function EquipmentBorrowTable(): React.JSX.Element {
   const [borrowRecords, setBorrowRecords] = useState<BorrowRecord[]>([]);
@@ -73,11 +72,16 @@ function EquipmentBorrowTable(): React.JSX.Element {
 
   const handleChangeStatus = (status: BorrowRecord["status"]) => {
     if (menuAnchor.recordId !== null) {
-      setBorrowRecords((prevRecords) =>
-        prevRecords.map((record) =>
-          record.requestId === menuAnchor.recordId ? { ...record, status } : record
-        )
-      );
+      if (status === "RETURNED") {
+        handleConfirmReturn(menuAnchor.recordId); // Gọi hàm xác nhận trả thiết bị
+      } else {
+        // Các trạng thái khác không cần xác nhận
+        setBorrowRecords((prevRecords) =>
+          prevRecords.map((record) =>
+            record.requestId === menuAnchor.recordId ? { ...record, status } : record
+          )
+        );
+      }
     }
     handleCloseMenu();
   };
@@ -127,9 +131,40 @@ function EquipmentBorrowTable(): React.JSX.Element {
     }
   };
 
+  const handleConfirmReturn = async (requestId: number) => {
+    // Hiển thị hộp thoại xác nhận
+    const result = await Swal.fire({
+      title: "Xác nhận trả thiết bị",
+      text: `Xác nhận đơn mượn thiết bị mã ${requestId}: giáo viên đã trả thiết bị?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Xác nhận",
+      cancelButtonText: "Hủy",
+    });
+  
+    // Nếu người dùng xác nhận
+    if (result.isConfirmed) {
+      try {
+        // Gọi API
+        const message = await APISetReturnBorrowEquipmentRequest(requestId);
+        Swal.fire("Thành công", message, "success");
+  
+        // Cập nhật trạng thái cục bộ
+        setBorrowRecords((prevRecords) =>
+          prevRecords.map((record) =>
+            record.requestId === requestId ? { ...record, status: "RETURNED" } : record
+          )
+        );
+      } catch (error) {
+        Swal.fire("Lỗi", "Không thể cập nhật trạng thái. Vui lòng thử lại.", "error");
+        console.error(error);
+      }
+    }
+  };
   useEffect(() => {
     fetchBorrowRecords();
   }, [page, rowsPerPage,keySearch,BorowEquipmentStatus,endDate,startDate]); // Gọi lại API khi thay đổi trang hoặc số lượng bản ghi
+
 
   return (
     <Box>
@@ -225,34 +260,32 @@ function EquipmentBorrowTable(): React.JSX.Element {
                   <TableCell>{row.comment}</TableCell>
                   <TableCell>
                   <Box>
-                        <Chip color={color} label={label} size="small" />
+                    <Chip color={color} label={label} size="small" />
+                    {(row.status === "BORROWED" || row.status === "OVERDUE") && (
+                      <>
+                        <IconButton onClick={(event) => handleOpenMenu(event, row.requestId)}>
+                          <ArrowDropDownIcon />
+                        </IconButton>
+                        <Menu
+                        anchorEl={menuAnchor.anchorEl}
+                        open={menuAnchor.recordId === row.requestId}
+                        onClose={handleCloseMenu}
+                      >
                         {(row.status === "BORROWED" || row.status === "OVERDUE") && (
-                          <>
-                            <IconButton onClick={(event) => handleOpenMenu(event, row.requestId)}>
-                              <ArrowDropDownIcon />
-                            </IconButton>
-                            <Menu
-                              anchorEl={menuAnchor.anchorEl}
-                              open={menuAnchor.recordId === row.requestId}
-                              onClose={handleCloseMenu}
-                            >
-                              {(row.status === "BORROWED" ? ["BORROWED", "PAID"] : ["OVERDUE", "PAID"]).map(
-                                (statusKey) => (
-                                  <MenuItem
-                                    key={statusKey}
-                                    onClick={() => handleChangeStatus(statusKey as BorrowRecord["status"])}
-                                  >
-                                    <Chip
-                                      color={statusMap[statusKey].color}
-                                      label={statusMap[statusKey].label}
-                                      size="small"
-                                    />
-                                  </MenuItem>
-                                )
-                              )}
-                            </Menu>
-                          </>
+                         <>
+                          <MenuItem  onClick={() => handleCloseMenu()} >
+                          <Chip color={statusMap["BORROWED"].color} label={statusMap["BORROWED"].label} size="small" />
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => handleChangeStatus("RETURNED")} // Xử lý trạng thái "Đã trả"
+                          >
+                            
+                            <Chip color={statusMap["RETURNED"].color} label={statusMap["RETURNED"].label} size="small" />
+                          </MenuItem></>
                         )}
+                      </Menu>
+                      </>
+                    )}
                       </Box>
                   </TableCell>
                   <TableCell>

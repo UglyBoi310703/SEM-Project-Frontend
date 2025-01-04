@@ -357,5 +357,4 @@ function UpdateBorrowEquipmentRequest({
     </LocalizationProvider>
   );
 }
-
 export default UpdateBorrowEquipmentRequest;

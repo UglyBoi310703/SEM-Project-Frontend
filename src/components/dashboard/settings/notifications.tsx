@@ -8,6 +8,7 @@ import Card from '@mui/material/Card';
 import { Divider } from '@mui/material';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import NotificationComponent from '@/components/notificationsse/notification-sse';
 
 function NotificationOptions() {
   const [email, setEmail] = React.useState(true);

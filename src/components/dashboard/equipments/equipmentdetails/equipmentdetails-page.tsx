@@ -13,9 +13,6 @@ import AddEquipmentModal from '../addequipment/add-equipment';
 
 
 export default function EquipmentDetails({ equipmentCategory }): React.JSX.Element {
-  React.useEffect(() => {
-    console.log(equipmentCategory);
-  }, [])
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
     setOpen(true);

@@ -86,7 +86,10 @@ function CreateCrashReport(): React.JSX.Element {
   };
 
   return (
-    <Box>
+    <Box sx={{
+      backgroundColor:"#EEEEEE",
+      borderRadius:"20px"
+    }}>
       <Tooltip title="Báo cáo sự cố">
         <IconButton onClick={handleOpen}>
           <Warning />
@@ -109,7 +112,7 @@ function CreateCrashReport(): React.JSX.Element {
           }}
         >
           <DialogContent>
-            <Box component="form" mt={2}>
+            <Box mt={2}>
               <TextField
                 fullWidth
                 multiline

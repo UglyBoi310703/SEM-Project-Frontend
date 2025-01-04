@@ -534,6 +534,35 @@ export async function APIDenyBorrowEquipmentRequest(
     throw error;
   }
 }
+//3. Update satus BorrowRequest -> Returned
+export async function APISetReturnBorrowEquipmentRequest(
+  requestId: number,
+): Promise<string> {
+  try {
+    const response = await axios.patch<{ message: string }>(
+      `${BASE_URL}/api/v1/borrow/equipment/return`,
+        [requestId]
+      ,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Gửi thông tin xác thực nếu cần
+      }
+    );
+
+    console.log("Đổi trạng thái sang đã trả thành công:", response.data.message);
+    return response.data.message;
+  } catch (error) {
+    console.error("Lỗi khi đổi trạng thái:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+    throw error;
+  }
+}
+
+
 // APIUpdateBorrowEquipmentRequest
 export interface UpdateBorrowEquipmentRequest {
   uniqueID: number;
@@ -689,7 +718,7 @@ export async function APIGetBorrowRoomRequests(
 }
 //API GetBorrowRoomRequest-ADMIN
 export interface BorrowRoomBodyRequest {
-  email: number;
+  email: string;
   startDate: string;
   endDate: string;
   page: number;
@@ -739,6 +768,7 @@ export async function APIGetAdminBorrowRoomRequests(
     throw error;
   }
 }
+
 // APIBatchDeleteBorrowEquipments
 export const APIBatchDeleteBorrowEquipments = async (ids: number[]): Promise<void> => {
   try {
@@ -758,6 +788,7 @@ export const APIBatchDeleteBorrowEquipments = async (ids: number[]): Promise<voi
     throw error;
   }
 };
+
 
 // APIBatchDeleteBorrowRoom
 export const APIBatchDeleteBorrowRoom = async (ids: number[]): Promise<void> => {
@@ -809,45 +840,74 @@ export const APISendAlertNotify = async (message: string): Promise<void> => {
   }
 };
 
-//APIGetRoomBorrowRequest-Admin
-export async function APIGetRoomBorrowRequestAdmin(
-  email: string,
-  startDate: string = '', 
-  endDate: string = '',
-  page: number = 0, 
-  size: number = 5,
-  sort: string = ''
-): Promise<EquipmentDetailResponse> {
-  console.log( `${BASE_URL}/api/v1/borrow/room/admin-request?email=${email}&page=${page}&size=${size}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`);
-  const response = await axios.get<EquipmentDetailResponse>(
-    `${BASE_URL}/api/v1/borrow/room/admin-request?email=${email}&page=${page}&size=${size}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`
-  );
-  
-  return response.data;
-}
+
 
 //API Subcribe to Server-Send Events
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-
-      // Gửi một sự kiện ngay khi kết nối được mở
-      res.write(`data: Subscribed to SSE\n\n`);
-
-      // Ví dụ: Thực hiện công việc khác
-      const interval = setInterval(() => {
-          res.write(`data: Server is alive at ${new Date().toISOString()}\n\n`);
-      }, 1000);
-
-      // Dọn dẹp khi kết nối đóng
-      req.on('close', () => {
-          clearInterval(interval);
-          res.end();
-      });
-  } else {
-      res.status(405).json({ message: 'Method not allowed' });
-  }
+//API GET ALL Message
+interface Notification {
+  id:number;
+  message: string;
+  read: boolean;
+  time: string;
 }
+
+
+
+export const APIGetAllMessages = async (): Promise<Notification[]> => {
+  try {
+    const response = await axios.get<ApiResponse>(
+      `${BASE_URL}/api/v1/notifications/allMessage`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      }
+    );
+    console.log("Lấy thông báo thành công:", response.data);
+    return response.data; // Trả về dữ liệu thành công
+    
+  } catch (error) {
+    console.error("Lấy thông báo thất bại.");
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", {
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    } else {
+      console.error("Lỗi không xác định:", error);
+    }
+    throw error; // Vẫn throw lỗi để caller xử lý
+  }
+};
+
+//API Read Notification
+export const APIMarkAsRead = async (notificationId: number): Promise<string> => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/notifications/${notificationId}/read`,
+      {}, // Không cần truyền body trong trường hợp này
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Gửi thông tin xác thực
+      }
+    );
+
+    console.log("Đánh dấu thông báo là đã đọc thành công:", response.data);
+    return response.data.message; // Trả về message từ API
+  } catch (error) {
+    console.error("Đánh dấu thông báo là đã đọc thất bại.");
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", {
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    } else {
+      console.error("Lỗi không xác định:", error);
+    }
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+  }
+};

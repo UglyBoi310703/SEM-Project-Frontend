@@ -23,6 +23,7 @@ import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
+
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
   password: zod.string().min(1, { message: 'Password is required' }),
@@ -37,9 +38,8 @@ export function SignInForm(): React.JSX.Element {
   const { checkSession } = useUser();
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [isPending, setIsPending] = React.useState<boolean>(false);
-  const [message,setmessage] = React.useState("")
+
   // Sử dụng useRef để giữ tham chiếu đến EventSource
-  const eventSourceRef = React.useRef<EventSource | null>(null);
 
   const {
     control,
@@ -59,29 +59,13 @@ export function SignInForm(): React.JSX.Element {
           toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại!', { position: 'top-center' });
           return;
         }
-
-      
         await checkSession?.();
-        toast.success('Xin chào!', { position: 'top-center' });
-        // Gọi SSE sau khi đăng nhập thành công
-        eventSourceRef.current = new EventSource('http://localhost:8080/api/v1/notifications/subscribe',{
-          withCredentials:true
-        });
-       console.log(eventSourceRef.current)
-        eventSourceRef.current.onmessage = (event) => {
-          setmessage(event.data)
-          console.log('SSE Message:', message);
-        };
-  
-        eventSourceRef.current.onerror = () => {
-          console.error('SSE encountered an error.');
-          eventSourceRef.current?.close();
-        };
+       
+    
         // Refresh the auth state
-     
-
         // Chuyển hướng hoặc refresh
         router.refresh();
+       
       } catch (err) {
         console.error('Unexpected error during login:', err);
         toast.error('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại!', { position: 'top-center' });
@@ -93,6 +77,7 @@ export function SignInForm(): React.JSX.Element {
   );
 
   // Dọn dẹp kết nối SSE khi component bị unmount
+  
 
   return (
     <>
