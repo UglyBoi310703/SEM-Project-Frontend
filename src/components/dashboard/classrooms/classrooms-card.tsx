@@ -14,6 +14,8 @@ import Chip from "@mui/material/Chip";
 import { Button, Box, IconButton, Menu, MenuItem } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { APIChangeRoomStatus } from "@/utils/api";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 export interface Classroom {
   id: number,
@@ -47,15 +49,57 @@ export function ClassroomCard({ classroom, onUpdateRoom }: ClassroomCardProps): 
     setAnchorEl(null);
   };
 
-  const handleChangeStatus = async (status: "IN_USE" | "AVAILABLE" | "BROKEN") => {
-    setRoomStatus(status);
-    
-    if(status){
-      await APIChangeRoomStatus(classroom.id, status)
-      onUpdateRoom(classroom)
+ 
+const handleChangeStatus = async (status: "IN_USE" | "AVAILABLE" | "BROKEN") => {
+  const result = await Swal.fire({
+    title: 'Xác nhận thay đổi trạng thái',
+    text: `Bạn có chắc chắn muốn đổi trạng thái phòng thành ${statusMap[status].label}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Xác nhận',
+    cancelButtonText: 'Hủy',
+  });
+
+  if (result.isConfirmed) {
+    try {
+  
+      setRoomStatus(status);
+
+      if (status) {
+        await APIChangeRoomStatus(classroom.id, status);
+        onUpdateRoom(classroom);
+
+  
+        toast.success(`Trạng thái phòng đã được đổi thành "${status}".`, {
+          position: 'top-right',
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+
+      handleCloseMenu();
+    } catch (error) {
+      // Hiển thị Toastify thông báo lỗi
+      toast.error('Đã xảy ra lỗi khi đổi trạng thái phòng. Vui lòng thử lại.', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
+  } else {
     handleCloseMenu();
-  };
+  }
+};
   return (
     <Card sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <CardContent sx={{ flex: "1 1 auto" }}>
@@ -67,9 +111,12 @@ export function ClassroomCard({ classroom, onUpdateRoom }: ClassroomCardProps): 
             <Typography align="center" variant="body1">
               {classroom.type}
             </Typography>
-            <Typography align="center" variant="body1">
+            {
+              classroom.capacity ? <Typography align="center" variant="body1">
               Số lượng chỗ ngồi: {classroom.capacity}
-            </Typography>
+            </Typography> : null
+            }
+            
           </Stack>
         </Stack>
       </CardContent>

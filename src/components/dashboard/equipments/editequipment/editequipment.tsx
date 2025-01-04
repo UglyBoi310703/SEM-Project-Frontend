@@ -165,7 +165,7 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
         toast.success('Lưu thông tin thành công!');
         setOpen(false);
       } else {
-        // Trường hợp không tìm thấy phòng
+       
         toast.error('Không tìm thấy phòng. Vui lòng kiểm tra lại tên phòng.');
       }
     } catch (error) {
