@@ -13,13 +13,14 @@ import ClassRoomInformation from "./editclassroom/classroominfomation";
 import Chip from "@mui/material/Chip";
 import { Button, Box, IconButton, Menu, MenuItem } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { APIChangeRoomStatus } from "@/utils/api";
 
 export interface Classroom {
   id: number,
   roomName: string;
   type: string;
   capacity: number;
-  status: "OCCUPIED" | "AVAILABLE" | "BROKEN";
+  status: "IN_USE" | "AVAILABLE" | "BROKEN";
 }
 
 export interface ClassroomCardProps {
@@ -30,7 +31,7 @@ export interface ClassroomCardProps {
 const statusMap = {
   BROKEN: { label: "Đang bảo trì", color: "secondary" },
   AVAILABLE: { label: "Sẵn sàng", color: "success" },
-  OCCUPIED: { label: "Đang sử dụng", color: "warning" },
+  IN_USE: { label: "Đang sử dụng", color: "warning" },
 } as const;
 
 export function ClassroomCard({ classroom, onUpdateRoom }: ClassroomCardProps): React.JSX.Element {
@@ -46,8 +47,13 @@ export function ClassroomCard({ classroom, onUpdateRoom }: ClassroomCardProps): 
     setAnchorEl(null);
   };
 
-  const handleChangeStatus = (status: "OCCUPIED" | "AVAILABLE" | "BROKEN") => {
+  const handleChangeStatus = async (status: "IN_USE" | "AVAILABLE" | "BROKEN") => {
     setRoomStatus(status);
+    
+    if(status){
+      await APIChangeRoomStatus(classroom.id, status)
+      onUpdateRoom(classroom)
+    }
     handleCloseMenu();
   };
   return (
@@ -82,7 +88,7 @@ export function ClassroomCard({ classroom, onUpdateRoom }: ClassroomCardProps): 
             {Object.entries(statusMap).map(([statusKey, { label, color }]) => (
               <MenuItem
                 key={statusKey}
-                onClick={() => {handleChangeStatus(statusKey as "OCCUPIED" | "AVAILABLE" | "BROKEN")}}
+                onClick={() => {handleChangeStatus(statusKey as "IN_USE" | "AVAILABLE" | "BROKEN")}}
               >
                 <Chip color={color} label={label} size="small" />
               </MenuItem>

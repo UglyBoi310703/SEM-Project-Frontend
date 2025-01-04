@@ -14,6 +14,7 @@ import { usePopover } from '@/hooks/use-popover';
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from '../popover/user-popover';
 import { Typography } from '@mui/material';
+import { toast } from 'react-toastify';
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);

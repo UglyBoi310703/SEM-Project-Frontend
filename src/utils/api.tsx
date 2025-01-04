@@ -89,6 +89,24 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
   }
 };
 
+//APIChangeRoomStatus
+export const APIChangeRoomStatus = async (classroom_id: number,newStatus: string): Promise<void> => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/api/v1/room/${classroom_id}/status`, newStatus, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true, 
+    });
+    console.log("Trạng thái phòng học đã được cập nhật thành công:", response.data);
+  } catch (error) {
+    console.error("Lỗi khi cập nhật phòng học:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
+
 //APIUpdateEquipmentDetailLocation
 export interface ClassRoomEquipmentId {
   equipmentDetailIds: number[]
