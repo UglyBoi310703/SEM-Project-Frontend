@@ -28,6 +28,7 @@ import { Classroom } from '../../classrooms/classrooms-card';
 import { APIGetRoom, APIUpdateEquipmentDetail, NewEquipmentCategoryRequest, NewEquipmentRequest } from '@/utils/api';
 import _ from 'lodash';
 import { Equipment } from '../equipment-categories-table';
+import Swal from 'sweetalert2';
 
 const validationSchema = yup.object().shape({
   purchaseDate: yup
@@ -39,18 +40,18 @@ const validationSchema = yup.object().shape({
   notes: yup.string().max(500, 'Ghi chú không được vượt quá 500 ký tự'),
 });
 
-function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: { equipmentDetail: EquipmentDetail, equipmentCategory:Equipment }): React.JSX.Element {
+function EditEquipmentDialog({ setUpdated, equipmentCategory, equipmentDetail }: { equipmentDetail: EquipmentDetail, equipmentCategory: Equipment }): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [roomCategories, setRoomCategories] = useState<Classroom[]>([])
-  
+
   const StatusMapping: Record<
-  "Có thể sử dụng" | "Đang sử dụng" | "Hỏng" ,
-  string
-> = {
-  "Có thể sử dụng": "USABLE",
-  "Đang sử dụng": "OCCUPIED",
-  "Hỏng": "BROKEN"
-};
+    "Có thể sử dụng" | "Đang sử dụng" | "Hỏng",
+    string
+  > = {
+    "Có thể sử dụng": "USABLE",
+    "Đang sử dụng": "OCCUPIED",
+    "Hỏng": "BROKEN"
+  };
   const {
     getValues,
     register,
@@ -62,7 +63,7 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
     defaultValues: {
       purchaseDate: equipmentDetail.purchaseDate
         ? dayjs(equipmentDetail.purchaseDate, 'DD-MM-YYYY')
-        :  '',
+        : '',
       roomName: equipmentDetail.roomName,
       status: StatusMapping[equipmentDetail.status as keyof typeof StatusMapping],
       notes: equipmentDetail.description,
@@ -123,57 +124,74 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
   const debounceFetchRooms = React.useCallback(_.debounce(fetchRoomOptions, 300), []);
   const groupedRoomOptions = roomCategories.flatMap((category) =>
     category.options.map((option) => ({
-      label: option.roomName,   
-      value: option.id,         
+      label: option.roomName,
+      value: option.id,
       category: category.category,
     }))
   );
+
   const onSubmit = async (data: any) => {
-    console.log(data);
-    
     try {
       // Gọi API để lấy danh sách phòng dựa trên roomName
-      const response = await APIGetRoom('', '', data.roomName);
-      
+      const response = await APIGetRoom("", "", data.roomName);
+
       // Kiểm tra nếu tìm thấy phòng
       if (response.content && response.content.length > 0) {
-        const roomId = response.content[0].id;  // Lấy id của phòng đầu tiên khớp với roomName
-        
-        // Định dạng lại ngày mua
+        const roomId = response.content[0].id;
+
         const purchaseDate = data.purchaseDate
           ? dayjs(data.purchaseDate.toDate()).format("DD-MM-YYYY")
-          :  '';
-  
-        // Tạo đối tượng dữ liệu chỉnh sửa
+          : "";
+
         const EditedData = {
-          "description": data.notes, 
-          "purchaseDate": purchaseDate,
-          "status":data.status,
-          "equipmentId": equipmentCategory.id,
-          "roomId": roomId  
-        }  ;
-        
-        console.log(data);
-        
-        
-        await APIUpdateEquipmentDetail(equipmentDetail.id, EditedData)
-        // Gửi dữ liệu đến API hoặc thực hiện xử lý tiếp theo
-        console.log("Dữ liệu chỉnh sửa:", EditedData);
-        if (setUpdated) {
-          setUpdated(true);
+          description: data.notes,
+          purchaseDate: purchaseDate,
+          status: data.status,
+          equipmentId: equipmentCategory.id,
+          roomId: roomId,
+        };
+
+        // Hiển thị hộp thoại xác nhận bằng SweetAlert2
+        const result = await Swal.fire({
+          title: "Xác nhận chỉnh sửa",
+          text: "Bạn có chắc chắn muốn lưu các thay đổi này không?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Đồng ý",
+          cancelButtonText: "Hủy",
+        });
+
+
+        if (result.isConfirmed) {
+          console.log(data);
+
+          await APIUpdateEquipmentDetail(equipmentDetail.id, EditedData);
+
+          // Gửi dữ liệu đến API hoặc thực hiện xử lý tiếp theo
+          console.log("Dữ liệu chỉnh sửa:", EditedData);
+          if (setUpdated) {
+            setUpdated(true);
+          }
+          toast.success("Lưu thông tin thành công!");
+          setOpen(false);
+        } else {
+
+          console.log("Người dùng đã hủy thao tác chỉnh sửa.");
         }
-        toast.success('Lưu thông tin thành công!');
-        setOpen(false);
       } else {
-       
-        toast.error('Không tìm thấy phòng. Vui lòng kiểm tra lại tên phòng.');
+        toast.error("Không tìm thấy phòng. Vui lòng kiểm tra lại tên phòng.");
+        setValue('roomName', equipmentDetail.roomName, { shouldValidate: true });
+        // Làm sạch giá trị trong `Autocomplete`
+        // setRoomCategories([]);
       }
     } catch (error) {
-      console.error('Lỗi khi gọi API:', error);
-      toast.error('Lỗi khi lấy thông tin phòng. Vui lòng thử lại.');
+      console.error("Lỗi khi gọi API:", error);
+      toast.error("Lỗi khi lấy thông tin phòng. Vui lòng thử lại.");
     }
   };
-  
+
 
   const handleReset = () => {
     reset({
@@ -228,7 +246,7 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
                   ? { label: equipmentDetail.roomName, category: 'Unknown' }
                   : null
               }
-              
+
               onInputChange={(event, value) => debounceFetchRooms(value)}
               onChange={(_, value) => setValue('roomName', value?.value || '', { shouldValidate: true })}
               renderInput={(params) => (
