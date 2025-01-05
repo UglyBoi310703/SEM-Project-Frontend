@@ -235,17 +235,20 @@ function EquipmentBorrowTable(): React.JSX.Element {
       </Box>
 
       {/* Bảng */}
-      <TableContainer component={Paper}>
+      <TableContainer sx={{ display:"flex",
+          flexDirection:"column",
+          alignItems:"center",
+          overflowX: 'auto' }} component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Mã đơn mượn</TableCell>
-              <TableCell>Tên giáo viên</TableCell>
-              <TableCell>Ngày mượn</TableCell>
-              <TableCell>Ngày trả dự kiến</TableCell>
-              <TableCell>Ghi chú</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Hành động</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Mã đơn mượn</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên giáo viên</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ngày mượn</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ngày trả dự kiến</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ghi chú</TableCell>
+              <TableCell  sx={{ fontWeight: "bold", pl:5}}>Trạng thái</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }} >Hành động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -253,16 +256,17 @@ function EquipmentBorrowTable(): React.JSX.Element {
               const { label, color } = statusMap[row.status] ?? { label: "Unknown", color: "default" };
               return (
                 <TableRow key={row.requestId}>
-                  <TableCell>{row.requestId}</TableCell>
-                  <TableCell>{row.teacherName}</TableCell>
-                  <TableCell>{row.borrowDate}</TableCell>
-                  <TableCell>{row.expectedReturnDate}</TableCell>
-                  <TableCell>{row.comment}</TableCell>
-                  <TableCell>
-                  <Box>
+                  <TableCell  align="center">{row.requestId}</TableCell>
+                  <TableCell  align="center">{row.teacherName}</TableCell>
+                  <TableCell  align="center">{row.borrowDate}</TableCell>
+                  <TableCell  align="center">{row.expectedReturnDate}</TableCell>
+                  <TableCell  align="center">{row.comment}</TableCell>
+                  <TableCell sx={{pl:5}} >
+                  <Box >
                     <Chip color={color} label={label} size="small" />
                     {(row.status === "BORROWED" || row.status === "OVERDUE") && (
-                      <>
+                      <
+                        >
                         <IconButton onClick={(event) => handleOpenMenu(event, row.requestId)}>
                           <ArrowDropDownIcon />
                         </IconButton>

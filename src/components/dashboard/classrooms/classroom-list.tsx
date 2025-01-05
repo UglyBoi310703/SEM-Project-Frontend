@@ -12,6 +12,7 @@ import {
   InputAdornment,
   Pagination,
   Grid,
+  Stack
 } from "@mui/material";
 import { MagnifyingGlass as MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
 import { ClassroomCard } from "@/components/dashboard/classrooms/classrooms-card";
@@ -79,7 +80,7 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
     return <Typography>Đang tải danh sách phòng học...</Typography>;
   }
   return (
-    <>
+    <Stack spacing={3}>
       {/* Search and Filter */}
       <Box
         sx={{
@@ -121,7 +122,7 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
           </FormControl>
           <FormControl sx={{ minWidth: 200 }} size="small">
             <InputLabel>Loại phòng</InputLabel>
-            <Select value={RoomType} onChange={handleRoomTypeFilterChange}>
+            <Select label="Loại phòng" value={RoomType} onChange={handleRoomTypeFilterChange}>
               <MenuItem value="All">Tất cả</MenuItem>
               <MenuItem value="CLASSROOM">Phòng học</MenuItem>
               <MenuItem value="EQUIPMENT_ROOM">Phòng thiết bị</MenuItem>
@@ -141,9 +142,10 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
           </Button>
         </Box>
       </Box>
-      <Grid container spacing={3}>
+      
+      <Grid  sx={{ padding: 1 }} container spacing={3}>
         {filterRooms.map((classroom) => (
-          <Grid key={classroom.roomName} lg={4} md={6} xs={12}>
+          <Grid  sx={{ padding: 2 }} key={classroom.roomName} lg={4} md={6} xs={12}>
             <ClassroomCard classroom={classroom} onUpdateRoom={onUpdateRoom} />
           </Grid>
         ))}
@@ -157,6 +159,6 @@ export default function ClassRoomList({data, rooms, isLoading, onUpdateRoom ,  o
           disabled={data?.page?.totalPages === 0}
         />
       </Box>
-    </>
+    </Stack>
   );
 }

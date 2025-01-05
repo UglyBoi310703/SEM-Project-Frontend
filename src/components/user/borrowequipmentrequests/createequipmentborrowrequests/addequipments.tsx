@@ -122,6 +122,7 @@ function AddEquipments({ onAdd, selectedDeviceNames }: AddEquipmentsProps): Reac
 
       <Box
         sx={{
+         
           overflowY: "auto",
           height: 400, // Thiết lập chiều cao cố định và cuộn
         }}
@@ -139,24 +140,25 @@ function AddEquipments({ onAdd, selectedDeviceNames }: AddEquipmentsProps): Reac
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell>Tên thiết bị</TableCell>
-                <TableCell>Loại thiết bị</TableCell>
-                <TableCell>Có thể sử dụng</TableCell>
-                <TableCell></TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên thiết bị</TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>Loại thiết bị</TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>Có thể mượn</TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredEquipments.map((row) => (
                 <TableRow hover key={row.id}>
-                  <TableCell>
+                  <TableCell align="center">
                     <Typography variant="subtitle2">{row.equipmentName}</Typography>
                   </TableCell>
-                  <TableCell>{row.category}</TableCell>
-                  <TableCell>{row.usableQuantity}</TableCell>
+                  <TableCell align="center">{row.category}</TableCell>
+                  <TableCell align="center">{row.totalQuantityHasUsableInWarehouse}</TableCell>
                   <TableCell>
                     <Button
+                      size="small"
                       variant="contained"
-                      onClick={() => onAdd(row, row.usableQuantity)}
+                      onClick={() => onAdd(row, row.totalQuantityHasUsableInWarehouse)}
                       disabled={
                         row.usableQuantity === 0 ||
                         selectedDeviceNames.includes(row.equipmentName)

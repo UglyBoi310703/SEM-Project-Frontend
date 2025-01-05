@@ -35,14 +35,29 @@ function RoomBorrowTable(): React.JSX.Element {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [roomBorrowData, setRoomBorrowData] = useState<RoomBorrowRecord[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [borrowDate, setBorrowDate] = useState<Date | null>(null);
   const [emailSearch,setemailSearch] = useState("");
+  const [StartDateFilter, setStartDateFilter] = useState<Date | null>(null);
+  const [EndDateFilter, setEndDateFilter] = useState<Date | null>(null);
+
+  const handleStartDateChange = ( date: Date | null) => {
+    setStartDateFilter(date);
+    setPage(0);
+  };
+  const handleEndDateChange = ( date: Date | null) => {
+    setEndDateFilter(date);
+    setPage(0);
+  };
 
   const fetchBorrowRequests = async () => {
 
     try {
-      const localISODate = borrowDate
-      ? new Date(borrowDate.getTime() - borrowDate.getTimezoneOffset() * 60000)
+      const localISOStartDate = StartDateFilter
+      ? new Date(StartDateFilter.getTime() - StartDateFilter.getTimezoneOffset() * 60000)
+          .toISOString()
+          .split("T")[0]
+      : "";
+      const localISOEndDate = EndDateFilter
+      ? new Date(EndDateFilter.getTime() - EndDateFilter.getTimezoneOffset() * 60000)
           .toISOString()
           .split("T")[0]
       : "";
@@ -51,8 +66,8 @@ function RoomBorrowTable(): React.JSX.Element {
         size: rowsPerPage,
         sort: [],
         email: emailSearch, // Nếu cần lọc thêm
-        startDate: localISODate,
-        endDate: "", // Có thể thêm logic lấy endDate
+        startDate: localISOStartDate,
+        endDate: localISOEndDate, // Có thể thêm logic lấy endDate
       };
 
       const response = await APIGetAdminBorrowRoomRequests(params);
@@ -65,12 +80,8 @@ function RoomBorrowTable(): React.JSX.Element {
 
   useEffect(() => {
     fetchBorrowRequests();
-  }, [page, rowsPerPage, borrowDate,emailSearch]);
+  }, [page, rowsPerPage, StartDateFilter,emailSearch,EndDateFilter]);
 
-  const handleDateChange = (date: Date | null) => {
-    setBorrowDate(date);
-    setPage(0);
-  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -112,39 +123,50 @@ function RoomBorrowTable(): React.JSX.Element {
           }}
         >
           <Typography width={70} variant="h6">Bộ lọc:</Typography>
-          <LocalizationProvider  dateAdapter={AdapterDateFns}>
-            <DatePicker
-              sx={{maxWidth:"220px"}}
-              label="Ngày mượn từ:"
-              value={borrowDate}
-              onChange={handleDateChange}
-            />
-          </LocalizationProvider>
+           <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DatePicker
+                       sx={{ maxWidth: 200 }}
+                        label="Từ:"
+                        value={StartDateFilter}
+                        onChange={(date) => handleStartDateChange(date)}
+                        renderInput={(params) => <FormControl {...params} size="small" />}
+                      />
+                      <DatePicker
+                       sx={{ maxWidth: 200 }}
+                        label="Đến:"
+                        value={EndDateFilter}
+                        onChange={(date) => handleEndDateChange(date)}
+                        renderInput={(params) => <FormControl {...params} size="small" />}
+                      />
+                    </LocalizationProvider>
         </Box>
       </Box>
-      <TableContainer component={Paper}>
+      <TableContainer sx={{ display:"flex",
+          flexDirection:"column",
+          alignItems:"center",
+          overflowX: 'auto' }} component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Mã đơn mượn</TableCell>
-              <TableCell>Tên phòng</TableCell>
-              <TableCell>Tên người mượn</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Thời gian mượn</TableCell>
-              <TableCell>Thời gian trả</TableCell>
-              <TableCell>Ghi chú</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Mã đơn mượn</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên phòng</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên người mượn</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Email</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Thời gian mượn</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Thời gian trả</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ghi chú</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {roomBorrowData.map((row) => (
               <TableRow key={row.uniqueId}>
-                <TableCell>{row.uniqueId}</TableCell>
-                <TableCell>{row.roomName}</TableCell>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{row.email}</TableCell>
-                <TableCell>{row.startTime}</TableCell>
-                <TableCell>{row.endTime}</TableCell>
-                <TableCell>{row.comment}</TableCell>
+                <TableCell align="center">{row.uniqueId}</TableCell>
+                <TableCell align="center">{row.roomName}</TableCell>
+                <TableCell align="center">{row.username}</TableCell>
+                <TableCell align="center">{row.email}</TableCell>
+                <TableCell align="center">{row.startTime}</TableCell>
+                <TableCell align="center">{row.endTime}</TableCell>
+                <TableCell align="center">{row.comment}</TableCell>
               </TableRow>
             ))}
           </TableBody>

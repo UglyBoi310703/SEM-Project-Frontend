@@ -23,6 +23,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { APIAddNewEquipmentCategory, APIGetAllEquipment } from "@/utils/api";
 import { Equipment } from "../equipment-categories-table";
 
+
+
 function AddCategoryEquipmentModal({ onUpdateEquipmentCategory }): JSX.Element {
   const [open, setOpen] = useState(false);
   const [existingCategories, setExistingCategories] = React.useState<Equipment[]>([]);
@@ -32,6 +34,9 @@ function AddCategoryEquipmentModal({ onUpdateEquipmentCategory }): JSX.Element {
       try {
         const response = await APIGetAllEquipment();
         setExistingCategories(response.content || []);
+        if(onUpdateEquipmentCategory){
+          onUpdateEquipmentCategory();
+        }
       } catch (error) {
         console.error("Lỗi khi tải danh sách loại thiết bị:", error);
         toast.error("Không thể tải danh sách loại thiết bị.");

@@ -84,7 +84,7 @@ function UpdateBorrowEquipmentRequest({
             equipmentName: detail.equipmentName,
             usableQuantity: detail.quantityBorrowed,
             maxQuantity: matchingEquipment
-              ? matchingEquipment.usableQuantity
+              ? matchingEquipment.totalQuantityHasUsableInWarehouse
               : detail.quantityBorrowed,
             currentQuantity: detail.quantityBorrowed,
           };
@@ -280,16 +280,16 @@ function UpdateBorrowEquipmentRequest({
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Tên thiết bị</TableCell>
-                      <TableCell>Số lượng</TableCell>
-                      <TableCell>Hành động</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên thiết bị</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>Số lượng</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>Hành động</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {selectedDevices.map((device) => (
                       <TableRow key={device.id}>
-                        <TableCell>{device.equipmentName}</TableCell>
-                        <TableCell>
+                        <TableCell align="center">{device.equipmentName}</TableCell>
+                        <TableCell sx={{display:"flex",alignItems:"center", justifyContent:"center"}}>
                           <Stack direction="row" spacing={1} alignItems="center">
                             <TextField
                               type="number"
@@ -301,13 +301,15 @@ function UpdateBorrowEquipmentRequest({
                               }
                               onBlur={() => handleBlur(device.id)}
                               inputProps={{ min: 1, max: device.maxQuantity }}
-                              sx={{ width: 80 }}
+                              sx={{ width: 70 }}
                             />
                             <Typography>/ {device.maxQuantity}</Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell>
+                        <TableCell align="center" >
                           <Button
+                            size="small"
+                            variant="outlined"
                             color="error"
                             onClick={() => handleRemoveDevice(device.id)}
                           >

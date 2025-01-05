@@ -34,6 +34,7 @@ export interface Equipment {
   usableQuantity: number;
   inUseQuantity: number;
   brokenQuantity: number;
+  totalQuantityHasUsableInWarehouse:number;
 }
 
 export function EquipmentsTable(): React.JSX.Element {
@@ -45,25 +46,28 @@ export function EquipmentsTable(): React.JSX.Element {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Fetch data
+
+    // Fetch data
+  const fetchEquipments = async () => {
+    setIsLoading(true);
+    try {
+      const response = await APIGetAllEquipment({
+        category: equipmentType === "All" ? "" : equipmentType,
+        keyword: searchKeyword,
+        page,
+        size: rowsPerPage,
+      });
+      setEquipmentCategories(response.content || []);
+      setTotalElements(response.page.totalElements || 0);
+    } catch (error) {
+      console.error("Error fetching equipment data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchEquipments = async () => {
-      setIsLoading(true);
-      try {
-        const response = await APIGetAllEquipment({
-          category: equipmentType === "All" ? "" : equipmentType,
-          keyword: searchKeyword,
-          page,
-          size: rowsPerPage,
-        });
-        setEquipmentCategories(response.content || []);
-        setTotalElements(response.page.totalElements || 0);
-      } catch (error) {
-        console.error("Error fetching equipment data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    
     fetchEquipments();
   }, [searchKeyword, equipmentType, page, rowsPerPage]);
 
@@ -115,52 +119,52 @@ export function EquipmentsTable(): React.JSX.Element {
             </Select>
           </FormControl>
         </Box>
-        <AddCategoryEquipmentModal />
+        <AddCategoryEquipmentModal onUpdateEquipmentCategory={fetchEquipments}  />
       </Box>
 
       {/* Equipment Table */}
-      <Box sx={{ overflowX: "auto" }}>
+      <Box sx={{ display:"flex",
+          flexDirection:"column",
+          alignItems:"center",
+          overflowX: 'auto' }}>
         <Table sx={{ minWidth: "900px" }}>
           <TableHead>
             <TableRow>
-              <TableCell>Mã thiết bị</TableCell>
-              <TableCell>Tên thiết bị</TableCell>
-              <TableCell>Loại thiết bị</TableCell>
-              <TableCell>Tổng số lượng</TableCell>
-              <TableCell>Có thể sử dụng</TableCell>
-              <TableCell>Đang được sử dụng</TableCell>
-              <TableCell>Bị hỏng</TableCell>
-              <TableCell>Hành động</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Mã thiết bị</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên thiết bị</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Loại thiết bị</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tổng số lượng</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Có thể sử dụng</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Đang được sử dụng</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Bị hỏng</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Hành động</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {equipmentCategories.map((row) => (
               <TableRow hover key={row.id}>
-                <TableCell>{row.id}</TableCell>
-                <TableCell>
+                <TableCell align="center">{row.id}</TableCell>
+                <TableCell align="center">
                   <Stack direction="row" spacing={2}>
                     <Typography variant="subtitle2">{row.equipmentName}</Typography>
                   </Stack>
                 </TableCell>
-                <TableCell>{row.category}</TableCell>
-                <TableCell>{row.totalQuantity}</TableCell>
-                <TableCell>{row.usableQuantity}</TableCell>
-                <TableCell>{row.inUseQuantity}</TableCell>
-                <TableCell>{row.brokenQuantity}</TableCell>
-                <TableCell>
+                <TableCell align="center">{row.category}</TableCell>
+                <TableCell align="center">{row.totalQuantity}</TableCell>
+                <TableCell align="center">{row.usableQuantity}</TableCell>
+                <TableCell align="center">{row.inUseQuantity}</TableCell>
+                <TableCell align="center">{row.brokenQuantity}</TableCell>
+                <TableCell align="center">
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <EquipmentDetails equipmentCategory={row} />
-                    <EditEquipmentCategoryModal equipmentCategory={row} />
+                    <EditEquipmentCategoryModal onUpdateEquipmentCategory={fetchEquipments} equipmentCategory={row} />
                   </Box>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </Box>
-
-      {/* Pagination */}
-      <Divider />
+        <Divider />
       <TablePagination
         component="div"
         count={totalElements}
@@ -170,6 +174,10 @@ export function EquipmentsTable(): React.JSX.Element {
         onRowsPerPageChange={handleChangeRowsPerPage}
         rowsPerPageOptions={[2, 5, 10]}
       />
+      </Box>
+
+      {/* Pagination */}
+    
     </Box>
   );
 }

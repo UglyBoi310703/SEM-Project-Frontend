@@ -32,9 +32,9 @@ class AuthClient {
         body: JSON.stringify(params),
       });
 
-      if (!response.ok) {
+      if (response.status!==200) {
         const errorData = await response.json();
-        return { error: errorData.detail };
+        return { error: errorData.title };
       }
 
       return {};
@@ -54,9 +54,9 @@ class AuthClient {
         credentials: 'include',
       });
 
-      if (!response.ok) {
+      if (response.status !== 200) {
         const errorData = await response.json();
-        return { error: errorData.message || 'Sign-in failed' };
+        return { error: errorData.detail };
       }
 
       const data = await response.json();

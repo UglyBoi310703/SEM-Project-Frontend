@@ -64,13 +64,15 @@ export default function Page(): React.JSX.Element {
           <AddClassroomModal onUpdateRoom={() => fetchRooms(page)} />
         </div>
       </Stack>
-      <ClassRoomList
+    <Stack spacing={1}>
+    <ClassRoomList
         rooms={rooms}
         data={data}
         isLoading={isLoading}
         onPageChange={handlePageChange}  
         onUpdateRoom={handleUpdateRoom} 
       />
+    </Stack>
     </Stack>
   );
 }

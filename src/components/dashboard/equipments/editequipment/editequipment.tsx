@@ -188,7 +188,7 @@ function EditEquipmentDialog({setUpdated, equipmentCategory, equipmentDetail }: 
 
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(true)}>
+      <Button size='small' variant="contained" onClick={() => setOpen(true)}>
         Sửa thông tin
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">

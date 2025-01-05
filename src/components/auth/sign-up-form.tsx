@@ -53,7 +53,6 @@ export function SignUpForm(): React.JSX.Element {
       const { error } = await authClient.signUp(values);
 
       if (error) {
-        toast.error('Đăng ký thất bại: ' + error);
         setError('root', { type: 'server', message: error });
         setIsPending(false);
         return;
@@ -137,6 +136,7 @@ export function SignUpForm(): React.JSX.Element {
               </FormControl>
             )}
           />
+            {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
           <Button disabled={isPending} type="submit" variant="contained">
             Đăng ký
           </Button>

@@ -48,7 +48,7 @@ function AddRoomEquipments({ room, onAdd, selectedDeviceIds }: AddEquipmentsProp
   const fetchEquipments = async () => {
     try {
       // Gọi API để lấy tất cả thiết bị
-      const allEquipments = await APIgetAllEquipmentDetail('', 0, 10);
+      const allEquipments = await APIgetAllEquipmentDetail(searchTerm, 0, 10);
       console.log(allEquipments);
       // // Gọi API để lấy thiết bị thuộc phòng cụ thể
       const equipmentsInRoom = await APIgetAllEquipmentDetailByRoomID(room.id);
@@ -71,7 +71,7 @@ function AddRoomEquipments({ room, onAdd, selectedDeviceIds }: AddEquipmentsProp
   
   
     fetchEquipments();
-  }, []);
+  }, [searchTerm]);
 
   React.useEffect(()=> {
     console.log(selectedDeviceIds);

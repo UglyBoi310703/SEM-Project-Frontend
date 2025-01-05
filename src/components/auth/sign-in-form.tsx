@@ -55,17 +55,16 @@ export function SignInForm(): React.JSX.Element {
       try {
         const { error } = await authClient.signInWithPassword(values);
         if (error) {
+          console.log(error)
           setError('root', { type: 'server', message: error });
           toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại!', { position: 'top-center' });
           return;
         }
         await checkSession?.();
        
-    
         // Refresh the auth state
         // Chuyển hướng hoặc refresh
         router.refresh();
-       
       } catch (err) {
         console.error('Unexpected error during login:', err);
         toast.error('Đã xảy ra lỗi không mong muốn. Vui lòng thử lại!', { position: 'top-center' });

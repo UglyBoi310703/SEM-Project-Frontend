@@ -10,7 +10,7 @@ import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 import { usePopover } from '@/hooks/use-popover';
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from '../popover/user-popover';
-import { Alert, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { NotificationsPopover } from '../popover/notifications/notifications-popover';
 
 
@@ -27,7 +27,7 @@ export function MainNav(): React.JSX.Element {
     "Cảm ơn bạn đã sử dụng SEM APP, chúc bạn một ngày tốt lành.",
     
   ];
-  
+
   const [currentContent, setCurrentContent] = React.useState(contents[0]);
   React.useEffect(() => {
     const interval = setInterval(() => {

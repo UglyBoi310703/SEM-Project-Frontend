@@ -37,26 +37,35 @@ function RoomBorrowTable(): React.JSX.Element {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [roomBorrowData, setRoomBorrowData] = useState<RoomBorrowRecord[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [BorrowDate, setBorrowDate] = useState<Date | null>(null);
+  const [StartDateFilter, setStartDateFilter] = useState<Date | null>(null);
+  const [EndDateFilter, setEndDateFilter] = useState<Date | null>(null);
 
-  const handleDateChange = ( date: Date | null) => {
-
-    setBorrowDate(date);
+  const handleStartDateChange = ( date: Date | null) => {
+    setStartDateFilter(date);
+    setPage(0);
+  };
+  const handleEndDateChange = ( date: Date | null) => {
+    setEndDateFilter(date);
     setPage(0);
   };
   const fetchBorrowRequests = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
       const userId = user.id;
-      const localISODate = BorrowDate
-      ? new Date(BorrowDate.getTime() - BorrowDate.getTimezoneOffset() * 60000)
+      const localISOStartDate = StartDateFilter
+      ? new Date(StartDateFilter.getTime() - StartDateFilter.getTimezoneOffset() * 60000)
+          .toISOString()
+          .split("T")[0]
+      : "";
+      const localISOEndDate = EndDateFilter
+      ? new Date(EndDateFilter.getTime() - EndDateFilter.getTimezoneOffset() * 60000)
           .toISOString()
           .split("T")[0]
       : "";
       const request: BorrowRoomRequest = {
         userId,
-        startDate: localISODate,
-        endDate: "",
+        startDate: localISOStartDate,
+        endDate: localISOEndDate,
         page, // Trang hiện tại
         size: rowsPerPage, // Số lượng bản ghi trên mỗi trang
         sort: [],
@@ -86,7 +95,7 @@ function RoomBorrowTable(): React.JSX.Element {
   useEffect(() => {
     setRoomBorrowData([]); // Xóa dữ liệu cũ
     fetchBorrowRequests();
-  }, [page, rowsPerPage,BorrowDate]);
+  }, [page, rowsPerPage,StartDateFilter,EndDateFilter]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -150,65 +159,91 @@ function RoomBorrowTable(): React.JSX.Element {
           <DatePicker
              sx={{ maxWidth: 200 }}
               label="Từ:"
-              value={BorrowDate}
-              onChange={(date) => handleDateChange(date)}
+              value={StartDateFilter}
+              onChange={(date) => handleStartDateChange(date)}
               renderInput={(params) => <FormControl {...params} size="small" />}
             />
-        
+            <DatePicker
+             sx={{ maxWidth: 200 }}
+              label="Đến:"
+              value={EndDateFilter}
+              onChange={(date) => handleEndDateChange(date)}
+              renderInput={(params) => <FormControl {...params} size="small" />}
+            />
           </LocalizationProvider>
           </Box>
         <CreateBorrowRoomRequest onBorrowRequestCreated={fetchBorrowRequests} />
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Mã đơn mượn</TableCell>
-              <TableCell>Tên phòng</TableCell>
-              <TableCell>Tên người mượn</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Thời gian mượn</TableCell>
-              <TableCell>Thời gian trả</TableCell>
-              <TableCell>Ghi chú</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {roomBorrowData.map((row) => (
-              <TableRow key={row.uniqueId}>
-                <TableCell>{row.uniqueId}</TableCell>
-                <TableCell>{row.roomName}</TableCell>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{row.email}</TableCell>
-                <TableCell>{row.startTime}</TableCell>
-                <TableCell>{row.endTime}</TableCell>
-                <TableCell>{row.comment}</TableCell>
-                <TableCell>
-                  {row.cancelable === true && (
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => handleCancelBorrowRequest(row.uniqueId)}
-                    >
-                      Hủy
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          component="div"
-          count={totalRecords}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+      <TableContainer
+  sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+  component={Paper}
+>
+  <Table>
+    <TableHead>
+      <TableRow>
+        {[
+          "Mã đơn mượn",
+          "Tên phòng",
+          "Tên người mượn",
+          "Email",
+          "Thời gian mượn",
+          "Thời gian trả",
+          "Ghi chú",
+          "",
+        ].map((header, index) => (
+          <TableCell
+            key={index}
+            align="center"
+            sx={{ fontWeight: "bold", textAlign: "center" }}
+          >
+            {header}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {roomBorrowData.map((row) => (
+        <TableRow key={row.uniqueId}>
+          {[
+            row.uniqueId,
+            row.roomName,
+            row.username,
+            row.email,
+            row.startTime,
+            row.endTime,
+            row.comment,
+          ].map((value, index) => (
+            <TableCell key={index} align="center" sx={{ textAlign: "center" }}>
+              {value}
+            </TableCell>
+          ))}
+          <TableCell align="center">
+            {row.cancelable && (
+              <Button
+                variant="outlined"
+                color="error"
+                size="small"
+                onClick={() => handleCancelBorrowRequest(row.uniqueId)}
+              >
+                Hủy
+              </Button>
+            )}
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+  <TablePagination
+    component="div"
+    count={totalRecords}
+    page={page}
+    onPageChange={handleChangePage}
+    rowsPerPage={rowsPerPage}
+    onRowsPerPageChange={handleChangeRowsPerPage}
+  />
+</TableContainer>
+
     </Box>
   );
 }

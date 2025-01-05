@@ -89,6 +89,24 @@ export const APIModifyClassRoom = async (classroom_id: number, newClassroom: New
   }
 };
 
+//APIChangeRoomStatus
+export const APIChangeRoomStatus = async (classroom_id: number,newStatus: string): Promise<void> => {
+  try {
+    const response = await axios.patch(`${BASE_URL}/api/v1/room/${classroom_id}/status`, newStatus, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true, 
+    });
+    console.log("Trạng thái phòng học đã được cập nhật thành công:", response.data);
+  } catch (error) {
+    console.error("Lỗi khi cập nhật phòng học:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", error.response?.data);
+    }
+  }
+};
+
 //APIUpdateEquipmentDetailLocation
 export interface ClassRoomEquipmentId {
   equipmentDetailIds: number[]
@@ -122,8 +140,20 @@ export const APIUpdateEquipmentDetailLocation = async (
 
 
 //APIGetAllEquipmentCategories
+interface EquipmentCategoris{
+  id: number;
+  equipmentName: string;
+  code: string;
+  category: string;
+  totalQuantity: number;
+  usableQuantity: number;
+  inUseQuantity: number;
+  brokenQuantity: number;
+  totalQuantityHasUsableInWarehouse:number;
+}
+
 export interface EquipmentResponse {
-  content: Equipment[];
+  content: EquipmentCategoris[];
   page: {
     size: number;
     number: number;
@@ -504,6 +534,7 @@ export async function APIGetBorrowEquipmentDetailsById(
     throw error;
   }
 }
+
 // API BorrowEquipmentActions
 //1.API ApproveBorrowEquipment
 export async function APIApproveBorrowEquipmentRequest(
@@ -520,6 +551,7 @@ export async function APIApproveBorrowEquipmentRequest(
         withCredentials: true, // Gửi cookie
       }
     );
+
     console.log("Phê duyệt đơn mượn thành công:", response.data.message);
     return response.data.message;
   } catch (error) {
@@ -561,6 +593,7 @@ export async function APIDenyBorrowEquipmentRequest(
     throw error;
   }
 }
+
 //3. Update satus BorrowRequest -> Returned
 export async function APISetReturnBorrowEquipmentRequest(
   requestId: number,
@@ -743,6 +776,7 @@ export async function APIGetBorrowRoomRequests(
     throw error;
   }
 }
+
 //API GetBorrowRoomRequest-ADMIN
 export interface BorrowRoomBodyRequest {
   email: string;
@@ -837,8 +871,44 @@ export const APIBatchDeleteBorrowRoom = async (ids: number[]): Promise<void> => 
   }
 };
 
-//API Message
 
+//API USER
+//API CHANGE PASSWORD
+
+export const APIChangePassword = async (
+  oldPassword: string,
+  newPassword: string
+): Promise<string> => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/user/change-password`,
+      { oldPassword, newPassword }, // Request body gửi dưới dạng đối tượng
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Gửi thông tin xác thực
+      }
+    );
+
+    console.log("Đổi mật khẩu thành công:", response.data);
+    return response.data.message; // Trả về thông báo từ API
+  } catch (error) {
+    console.error("Đổi mật khẩu thất bại.");
+    if (axios.isAxiosError(error)) {
+      console.error("Chi tiết lỗi từ API:", {
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+    } else {
+      console.error("Lỗi không xác định:", error);
+    }
+    throw error; // Ném lỗi để xử lý ở nơi gọi hàm
+  }
+};
+
+
+//API Message
 //SendAlertNotify
 export const APISendAlertNotify = async (message: string): Promise<void> => {
   try {

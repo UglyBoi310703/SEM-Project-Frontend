@@ -231,13 +231,13 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
         <Table sx={{ minWidth: '900px' }}>
           <TableHead>
             <TableRow>
-              <TableCell>Số seri</TableCell>
-              <TableCell>Tên thiết bị</TableCell>
-              <TableCell>Ngày mua</TableCell>
-              <TableCell>Phòng chứa</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Ghi chú</TableCell>
-              <TableCell></TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Số seri</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên thiết bị</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ngày mua</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Phòng chứa</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Trạng thái</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ghi chú</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -245,15 +245,15 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
               const { label, color } = statusMap[row.status];
               return (
                 <TableRow hover key={row.id}>
-                  <TableCell>{row.serialNumber}</TableCell>
-                  <TableCell>{row.equipmentName}</TableCell>
-                  <TableCell>{row.purchaseDate}</TableCell>
-                  <TableCell>{row.roomName}</TableCell>
-                  <TableCell>
+                  <TableCell  align="center">{row.serialNumber}</TableCell>
+                  <TableCell  align="center">{row.equipmentName}</TableCell>
+                  <TableCell  align="center">{row.purchaseDate}</TableCell>
+                  <TableCell  align="center">{row.roomName}</TableCell>
+                  <TableCell  align="center">
                     <Chip color={color} label={label} size="small" />
                   </TableCell>
-                  <TableCell>{row.description}</TableCell>
-                  <TableCell>
+                  <TableCell  align="center">{row.description}</TableCell>
+                  <TableCell  align="center">
                     <Box
                       sx={{
                         display: 'flex',
@@ -263,6 +263,7 @@ export function EquipmentsDetailsTable({ equipmentCategory, updated, setUpdated 
                     >
                       <EditEquipmentModal equipmentCategory={equipmentCategory} equipmentDetail={row} setUpdated={setUpdated} />
                       <Button
+                        size='small'
                         variant="outlined"
                         color="error"
                         onClick={() => handleDeleteEquipmentDetail(row.id)}

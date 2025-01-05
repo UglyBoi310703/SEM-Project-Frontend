@@ -25,6 +25,7 @@ export default function EquipmentDetails({ equipmentCategory }): React.JSX.Eleme
   return (
     <React.Fragment>
       <Button
+        size='small'
         variant="contained"
         onClick={handleClickOpen}
       >

@@ -155,7 +155,7 @@ function EditEquipmentCategoryModal({
 
   return (
     <>
-      <Button variant="outlined" onClick={() => setOpen(true)}>
+      <Button size='small' variant="outlined" onClick={() => setOpen(true)}>
         Sửa
       </Button>
       <Modal open={open} onClose={() => setOpen(false)}>

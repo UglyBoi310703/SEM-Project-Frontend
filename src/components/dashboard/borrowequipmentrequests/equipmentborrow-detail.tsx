@@ -103,7 +103,8 @@ function BorrowEquipmentDetail({ borrowinfo, requestId, onPageChanged }: DetailP
         }
       });
     } catch (error) {
-      Swal.fire("Lỗi!", "Không thể phê duyệt đơn mượn.", "error");
+      
+      Swal.fire("Lỗi, không thể duyệt đơn mượn!", error.response.data.detail, "error");
     }
   };
 
@@ -154,7 +155,7 @@ function BorrowEquipmentDetail({ borrowinfo, requestId, onPageChanged }: DetailP
 
   return (
     <Box>
-      <Button variant="contained" onClick={() => setOpen(true)}>
+      <Button size="small" variant="contained" onClick={() => setOpen(true)}>
         Chi tiết
       </Button>
       <Dialog disableEnforceFocus open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -241,6 +242,7 @@ function BorrowEquipmentDetail({ borrowinfo, requestId, onPageChanged }: DetailP
         </DialogContent>
         <DialogActions>
           <Button
+            size="small"
             variant="outlined"
             onClick={handleDeny}
             color="error"
@@ -249,6 +251,7 @@ function BorrowEquipmentDetail({ borrowinfo, requestId, onPageChanged }: DetailP
             Từ chối
           </Button>
           <Button
+            size="small"
             variant="outlined"
             onClick={handleApprove}
             color="primary"

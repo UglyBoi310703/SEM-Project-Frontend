@@ -102,48 +102,52 @@ export function EquipmentsTable(): React.JSX.Element {
           </Select>
         </FormControl>
       </Box>
-
-      <Box sx={{ overflowX: 'auto' }}>
+      <Box sx={{ display:"flex",
+          flexDirection:"column",
+          alignItems:"center",
+          overflowX: 'auto' }}>
+   
         <Table sx={{ minWidth: '900px' }}>
           <TableHead>
             <TableRow>
-              <TableCell>Mã thiết bị</TableCell>
-              <TableCell>Tên thiết bị</TableCell>
-              <TableCell>Loại thiết bị</TableCell>
-              <TableCell>Tổng số lượng</TableCell>
-              <TableCell>Có thể sử dụng</TableCell>
-              <TableCell>Đang được sử dụng</TableCell>
-              <TableCell>Bị hỏng</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Mã thiết bị</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên thiết bị</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Loại thiết bị</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tổng số lượng</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Có thể mượn</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Đang được sử dụng</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Bị hỏng</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {equipmentCategories.map((row) => (
               <TableRow hover key={row.id}>
-                <TableCell>{row.id}</TableCell>
-                <TableCell>{row.equipmentName}</TableCell>
-                <TableCell>{row.category}</TableCell>
-                <TableCell>{row.totalQuantity}</TableCell>
-                <TableCell>{row.usableQuantity}</TableCell>
-                <TableCell>{row.inUseQuantity}</TableCell>
-                <TableCell>{row.brokenQuantity}</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>{row.id}</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>{row.equipmentName}</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>{row.category}</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>{row.totalQuantity}</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>{row.totalQuantityHasUsableInWarehouse}</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>{row.inUseQuantity}</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>{row.brokenQuantity}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        <Divider sx={{ my: 2 }} />
+
+<TablePagination
+  component="div"
+  count={totalElements}
+  page={page}
+  onPageChange={handleChangePage}
+  rowsPerPage={size}
+  onRowsPerPageChange={handleChangeRowsPerPage}
+  rowsPerPageOptions={[5, 10, 25, 50]}
+  labelRowsPerPage="Số dòng mỗi trang"
+/>
       </Box>
 
-      <Divider sx={{ my: 2 }} />
-
-      <TablePagination
-        component="div"
-        count={totalElements}
-        page={page}
-        onPageChange={handleChangePage}
-        rowsPerPage={size}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        rowsPerPageOptions={[5, 10, 25, 50]}
-        labelRowsPerPage="Số dòng mỗi trang"
-      />
+    
     </Box>
   );
 }

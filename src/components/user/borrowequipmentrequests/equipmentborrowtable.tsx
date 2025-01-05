@@ -224,17 +224,19 @@ const handleCancelBorrowRequest = async (id: number) => {
         </Box>
         <CreateBorrowEquipmentRequest onBorrowRequestCreated={handleBorrowRequestCreated}/>
       </Box>
-      <TableContainer component={Paper}>
+      <TableContainer sx={{ display:"flex",
+          flexDirection:"column",
+          alignItems:"center",}} component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Mã đơn mượn</TableCell>
-              <TableCell>Tên giáo viên</TableCell>
-              <TableCell>Ngày mượn</TableCell>
-              <TableCell>Ngày trả dự kiến</TableCell>
-              <TableCell>Ghi chú</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell></TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }} >Mã đơn mượn</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Tên giáo viên</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ngày mượn</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ngày trả dự kiến</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ghi chú</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Trạng thái</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -243,15 +245,15 @@ const handleCancelBorrowRequest = async (id: number) => {
     const isNotBorrow = row.status === 'NOT_BORROWED';
     return (
       <TableRow key={row.borrowId}>
-        <TableCell>{row.borrowId}</TableCell>
-        <TableCell>{row.teacherName}</TableCell>
-        <TableCell>{row.borrowDate}</TableCell>
-        <TableCell>{row.expectedReturnDate}</TableCell>
-        <TableCell>{row.comment}</TableCell>
-        <TableCell>
+        <TableCell align="center">{row.borrowId}</TableCell>
+        <TableCell align="center">{row.teacherName}</TableCell>
+        <TableCell align="center">{row.borrowDate}</TableCell>
+        <TableCell align="center">{row.expectedReturnDate}</TableCell>
+        <TableCell align="center">{row.comment}</TableCell>
+        <TableCell align="center">
           <Chip color={color} label={label} size="small" />
         </TableCell>
-        <TableCell>
+        <TableCell >
           {isNotBorrow ? (
             <Box sx={{
               display:"flex"
@@ -281,7 +283,6 @@ const handleCancelBorrowRequest = async (id: number) => {
     );
   })}
 </TableBody>
-
         </Table>
         <TablePagination
           component="div"
