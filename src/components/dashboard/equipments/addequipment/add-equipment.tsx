@@ -144,7 +144,7 @@ function AddEquipmentDialog({ equipmentCategory , setUpdated}) {
       >
         Thêm thiết bị
       </Button>
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>
           <Box
             sx={{

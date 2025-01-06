@@ -41,7 +41,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
             <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">
               Chào mừng đến với SEM APP{' '}
               <Box component="span" sx={{ color: '#15b79e' }}>
-                <Typography>School Eqipment Management App - Ứng dụng quản lý thiết bị tại Trường THPT iGLOW</Typography>
+                <Typography>School Equipment Management App - Ứng dụng quản lý thiết bị tại Trường THPT iGLOW</Typography>
               </Box>
             </Typography>
             <Typography align="center" variant="subtitle1">

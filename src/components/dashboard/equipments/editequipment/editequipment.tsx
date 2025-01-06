@@ -261,9 +261,9 @@ function EditEquipmentDialog({ setUpdated, equipmentCategory, equipmentDetail }:
                 />
               )}
             />
-            <FormControl fullWidth margin="normal">
+            <FormControl  fullWidth margin="normal">
               <InputLabel>Trạng thái</InputLabel>
-              <Select
+              <Select label="Trạng thái"
                 defaultValue={StatusMapping[equipmentDetail.status as keyof typeof StatusMapping] || 'Có thể sử dụng'}
                 {...register('status')}
                 error={!!errors.status}
