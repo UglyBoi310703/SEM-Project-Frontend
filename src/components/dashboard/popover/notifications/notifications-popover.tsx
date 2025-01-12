@@ -62,7 +62,7 @@ export function NotificationsPopover(): React.JSX.Element {
     eventSource.addEventListener('notification', (event) => {
       console.log('Received notification:', event.data);
       // Thực hiện xử lý khác, ví dụ: hiển thị thông báo
-      toast.info(`Thông báo mới: ${event.data}`, { position: "top-center" });
+      toast.info(`Thông báo mới: ${event.data}`, { position: "top-center",autoClose:10000 });
       fetchNotifications();
      
     });

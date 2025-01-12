@@ -61,7 +61,6 @@ export function SignInForm(): React.JSX.Element {
           return;
         }
         await checkSession?.();
-       
         // Refresh the auth state
         // Chuyển hướng hoặc refresh
         router.refresh();
